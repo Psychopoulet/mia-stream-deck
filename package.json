@@ -18,6 +18,7 @@
   "files": [
     "/bin",
     "/lib/cjs",
+    "/lib/data",
     "/public"
   ],
   "engines": {
