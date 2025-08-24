@@ -1,0 +1,66 @@
+{
+	"openapi": "3.0.2",
+	"info": {
+		"title": "mia-stream-deck",
+		"version": "1.0.0"
+	},
+	"paths": {
+		"/mia-stream-deck/api/swipe-{direction}": {
+			"put": {
+				"description": "",
+				"summary": "Swipe in a specific direction",
+				"operationId": "swipe",
+				"parameters": [
+					{
+						"name": "direction",
+						"in": "path",
+						"required": true,
+						"schema": {
+							"type": "string",
+							"enum": [
+								"top", "right", "down", "left"
+							]
+						}
+					}
+				],
+				"responses": {
+					"201": {
+						"description": "Everything is fine"
+					},
+					"default": {
+						"description": "An error occured",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Error"
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+	},
+	"components": {
+		"schemas": {
+			"Error": {
+				"type": "object",
+				"properties": {
+					"code": {
+						"type": "string"
+					},
+					"message": {
+						"type": "string"
+					}
+				},
+				"required": [ "code", "message" ]
+			}
+		}
+	},
+	"servers": [
+		{
+			"url": "http://localhost:8000/",
+			"description": "test server"
+		}
+	]
+}

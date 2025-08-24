@@ -20,7 +20,7 @@ export default class OrchestratorStreamDeck extends Orchestrator {
         super({
             ...data,
             "packageFile": join(__dirname, "..", "..", "package.json"),
-            "descriptorFile": join(__dirname, "Descriptor.json"),
+            "descriptorFile": join(__dirname, "..", "data", "Descriptor.json"),
             "mediatorFile": join(__dirname, "Mediator.js"),
             "serverFile": join(__dirname, "Server.js")
         });
