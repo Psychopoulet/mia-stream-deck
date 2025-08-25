@@ -8,6 +8,9 @@
     // externals
     import type ContainerPattern from "node-containerpattern";
 
+    // locals
+    import type { operations } from "./Descriptor";
+
 // module
 
 export default class MediatorStreamDeck extends Mediator {
@@ -28,11 +31,11 @@ export default class MediatorStreamDeck extends Mediator {
 
     }
 
-    public swipe (urlParameters: object): Promise<void> {
+    public swipe (urlParameters: operations["swipe"]["parameters"]): Promise<operations["swipe"]["responses"]["201"]["content"]> {
 
         console.log("swipe", urlParameters);
 
-        return Promise.resolve();
+        return Promise.resolve(undefined);
 
     }
 

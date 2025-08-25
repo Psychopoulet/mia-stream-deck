@@ -12,7 +12,7 @@
     "unit-tests": "npm run-script build && npx nyc --reporter=html --reporter=text mocha",
     "tests": "npm run-script lint && npm run-script check-requires && npm run-script check-updates && npm run-script unit-tests",
     "clean": "npx rimraf \"./lib/cjs\"",
-    "build": "npm run-script clean && npx tsc --project \"./tsconfig.json\"",
+    "build": "npm run-script clean && npx openapi-typescript ./lib/data/Descriptor.json -o ./lib/src/Descriptor.ts && npx tsc --project \"./tsconfig.json\"",
     "ci": "npm run-script tests && npx nyc report --reporter=text-lcov | coveralls"
   },
   "files": [
@@ -39,6 +39,7 @@
     "mocha": "11.7.1",
     "node-containerpattern": "1.8.0",
     "nyc": "17.1.0",
+    "openapi-typescript": "7.9.1",
     "rimraf": "6.0.1",
     "typescript": "5.8.3",
     "used-deps-analyzer": "0.1.8",
