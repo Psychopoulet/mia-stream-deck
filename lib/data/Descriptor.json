@@ -5,7 +5,7 @@
 		"version": "1.0.0"
 	},
 	"paths": {
-		"/mia-stream-deck/api/swipe-{direction}": {
+		"/mia-stream-deck/api/swipe/{direction}": {
 			"put": {
 				"description": "",
 				"summary": "Swipe in a specific direction",

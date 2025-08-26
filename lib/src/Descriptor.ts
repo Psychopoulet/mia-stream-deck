@@ -4,7 +4,7 @@
  */
 
 export interface paths {
-    "/mia-stream-deck/api/swipe-{direction}": {
+    "/mia-stream-deck/api/swipe/{direction}": {
         parameters: {
             query?: never;
             header?: never;
