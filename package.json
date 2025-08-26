@@ -5,7 +5,7 @@
   "typings": "./lib/cjs/main.d.cts",
   "main": "./lib/cjs/main.cjs",
   "scripts": {
-    "prepare": "husky",
+    "prepare": "npx husky",
     "lint": "npx eslint --config \".eslintrc-src.js\" --ext .cts,.ts \"./lib/src/**/*\" && npx eslint --config \".eslintrc-tests.js\" \"./bin/*.js\" \"./test/**/*.js\"",
     "check-requires": "npx used-deps-analyzer \"./package.json\" \"./lib/src\" --no-dev --overkill \"fs-extra\" \"node-promfs\"",
     "check-updates": "npx check-version-modules",
@@ -25,7 +25,7 @@
     "node": ">=16.0.0"
   },
   "dependencies": {
-    "node-pluginsmanager-plugin": "6.4.3"
+    "node-pluginsmanager-plugin": "6.4.5"
   },
   "devDependencies": {
     "@types/express": "5.0.3",
