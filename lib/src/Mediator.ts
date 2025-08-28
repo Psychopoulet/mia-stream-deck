@@ -53,9 +53,7 @@ export default class MediatorStreamDeck extends Mediator {
 
     public getFrontApp (): Promise<operations["getFrontApp"]["responses"]["200"]["content"]["application/javascript"]> {
 
-        console.log("getFrontApp");
-
-        return Promise.resolve("");
+        return readFile(join(__dirname, "..", "..", "public", "app.js"), "utf-8");
 
     }
 
