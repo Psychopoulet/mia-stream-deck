@@ -53,7 +53,15 @@ export default class MediatorStreamDeck extends Mediator {
 
     public getFrontApp (): Promise<operations["getFrontApp"]["responses"]["200"]["content"]["application/javascript"]> {
 
-        return readFile(join(__dirname, "..", "..", "public", "app.js"), "utf-8");
+        return readFile(join(__dirname, "..", "..", "public", "app.js"), "utf-8").then((content: string): string => {
+
+            return content
+
+                .replace("{{plugin.name}}", this.getPluginName())
+                .replace("{{plugin.version}}", this.getPluginVersion())
+                .replace("{{plugin.description}}", this.getPluginDescription());
+
+        });
 
     }
 
