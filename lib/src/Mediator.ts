@@ -1,5 +1,9 @@
 // deps
 
+    // natives
+    import { readFile } from "node:fs/promises";
+    import { join } from "node:path";
+
     // externals
     import { Mediator } from "node-pluginsmanager-plugin";
 
@@ -31,9 +35,33 @@ export default class MediatorStreamDeck extends Mediator {
 
     }
 
+    public getFrontIndex (): Promise<operations["getFrontIndex"]["responses"]["200"]["content"]["text/html"]> {
+
+        return readFile(join(__dirname, "..", "..", "public", "index.html"), "utf-8").then((content: string): string => {
+
+            return content
+
+                .replace("{{plugin.name}}", this.getPluginName())
+                .replace("{{plugin.version}}", this.getPluginVersion())
+                .replace("{{plugin.description}}", this.getPluginDescription())
+
+                .replace("{{plugin.appFront}}", "/" + this.getPluginName() + "/public/app.js");
+
+        });
+
+    }
+
+    public getFrontApp (): Promise<operations["getFrontApp"]["responses"]["200"]["content"]["application/javascript"]> {
+
+        console.log("getFrontApp");
+
+        return Promise.resolve("");
+
+    }
+
     public swipe (urlParameters: operations["swipe"]["parameters"]): Promise<operations["swipe"]["responses"]["201"]["content"]> {
 
-        console.log("swipe", urlParameters);
+        console.log("direction", urlParameters.path.direction);
 
         return Promise.resolve(undefined);
 

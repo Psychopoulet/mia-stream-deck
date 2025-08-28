@@ -5,6 +5,126 @@
 		"version": "1.0.0"
 	},
 	"paths": {
+
+		"/mia-stream-deck/descriptor": {
+			"get": {
+				"description": "",
+				"summary": "Plugin's descriptor",
+				"operationId": "getDescriptor",
+				"responses": {
+					"200": {
+						"description": "Plugin's descriptor",
+						"content": {
+							"application/json": {
+								"schema": {
+									"type": "object"
+								}
+							}
+						}
+					},
+					"default": {
+						"description": "An error occured",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Error"
+								}
+							}
+						}
+					}
+				}
+			}
+		},
+		"/mia-stream-deck/status": {
+			"get": {
+				"description": "",
+				"summary": "Plugin's status",
+				"operationId": "getStatus",
+				"responses": {
+					"200": {
+						"description": "Plugin's status",
+						"content": {
+							"application/json": {
+								"schema": {
+									"type": "string",
+									"enum": [ "ENABLED", "INITIALIZED" ]
+								}
+							}
+						}
+					},
+					"default": {
+						"description": "An error occured",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Error"
+								}
+							}
+						}
+					}
+				}
+			}
+		},
+
+		"/mia-stream-deck/public/index.html": {
+			"get": {
+				"description": "",
+				"summary": "Plugin's front",
+				"operationId": "getFrontIndex",
+				"responses": {
+					"200": {
+						"description": "Plugin's front",
+						"content": {
+							"text/html": {
+								"schema": {
+									"type": "string"
+								}
+							}
+						}
+					},
+					"default": {
+						"description": "An error occured",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Error"
+								}
+							}
+						}
+					}
+				}
+			}
+		},
+		"/mia-stream-deck/public/app.js": {
+			"get": {
+				"description": "",
+				"summary": "Plugin's front",
+				"operationId": "getFrontApp",
+				"responses": {
+					"200": {
+						"description": "Plugin's front app",
+						"content": {
+							"application/javascript": {
+								"schema": {
+									"type": "string"
+								}
+							}
+						}
+					},
+					"default": {
+						"description": "An error occured",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Error"
+								}
+							}
+						}
+					}
+				}
+			}
+		},
+
 		"/mia-stream-deck/api/swipe/{direction}": {
 			"put": {
 				"description": "",
@@ -40,6 +160,7 @@
 				}
 			}
 		}
+
 	},
 	"components": {
 		"schemas": {
