@@ -9,7 +9,7 @@
 // types & interfaces
 
     // externals
-    import { iOrchestratorOptions } from "node-pluginsmanager-plugin";
+    import type { iOrchestratorOptions } from "node-pluginsmanager-plugin";
 
 // module
 

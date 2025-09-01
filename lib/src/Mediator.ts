@@ -65,7 +65,7 @@ export default class MediatorStreamDeck extends Mediator {
 
     }
 
-    public swipe (urlParameters: operations["swipe"]["parameters"]): Promise<operations["swipe"]["responses"]["201"]["content"]> {
+    public swipe (urlParameters: operations["swipe"]["parameters"]): Promise<operations["swipe"]["responses"]["201"]["content"]["application/json"]> {
 
         console.log("direction", urlParameters.path.direction);
 

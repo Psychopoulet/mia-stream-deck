@@ -145,7 +145,10 @@
 				],
 				"responses": {
 					"201": {
-						"description": "Everything is fine"
+						"description": "Everything is fine",
+						"content": {
+							"application/json": {}
+						}
 					},
 					"default": {
 						"description": "An error occured",
