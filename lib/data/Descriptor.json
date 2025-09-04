@@ -95,7 +95,7 @@
 				}
 			}
 		},
-		"/mia-stream-deck/public/app.js": {
+		"/mia-stream-deck/public/bundle.js": {
 			"get": {
 				"description": "",
 				"summary": "Plugin's front",

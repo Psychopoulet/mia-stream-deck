@@ -43,9 +43,7 @@ export default class MediatorStreamDeck extends Mediator {
 
                 .replace(/{{plugin.name}}/g, this.getPluginName())
                 .replace(/{{plugin.version}}/g, this.getPluginVersion())
-                .replace(/{{plugin.description}}/g, this.getPluginDescription())
-
-                .replace(/{{plugin.appFront}}/g, "/" + this.getPluginName() + "/public/app.js");
+                .replace(/{{plugin.description}}/g, this.getPluginDescription());
 
         });
 
@@ -53,7 +51,7 @@ export default class MediatorStreamDeck extends Mediator {
 
     public getFrontApp (): Promise<operations["getFrontApp"]["responses"]["200"]["content"]["application/javascript"]> {
 
-        return readFile(join(__dirname, "..", "..", "public", "app.js"), "utf-8").then((content: string): string => {
+        return readFile(join(__dirname, "..", "..", "public", "bundle.js"), "utf-8").then((content: string): string => {
 
             return content
 
@@ -78,27 +76,27 @@ export default class MediatorStreamDeck extends Mediator {
         return Promise.resolve([
             [
                 {
+                    "picture": "http://localhost:3000/public/pictures/warcraft3.png",
                     "action": {
-                        "type": "empty"
+                        "type": "command",
+                        "command": "vlc --intf dummy http://localhost:3000/public/sounds/PeonReady1.wav vlc://quit"
                     }
                 },
                 {
-                    "icon": "fa-solid fa-arrow-up",
+                    "icon": "up",
                     "action": {
                         "type": "input-key",
                         "key": "up"
                     }
                 },
                 {
-                    "icon": "",
-                    "picture": "",
                     "action": {
                         "type": "empty"
                     }
                 }
             ], [
                 {
-                    "icon": "fa-solid fa-arrow-left",
+                    "icon": "left",
                     "action": {
                         "type": "input-key",
                         "key": "left"
@@ -110,7 +108,7 @@ export default class MediatorStreamDeck extends Mediator {
                     }
                 },
                 {
-                    "icon": "fa-solid fa-arrow-right",
+                    "icon": "right",
                     "action": {
                         "type": "input-key",
                         "command": "right"
@@ -123,7 +121,7 @@ export default class MediatorStreamDeck extends Mediator {
                     }
                 },
                 {
-                    "icon": "fa-solid fa-arrow-down",
+                    "icon": "down",
                     "action": {
                         "type": "input-key",
                         "command": "down"

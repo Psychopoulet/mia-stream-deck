@@ -55,7 +55,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/mia-stream-deck/public/app.js": {
+    "/mia-stream-deck/public/bundle.js": {
         parameters: {
             query?: never;
             header?: never;
