@@ -162,6 +162,38 @@
 					}
 				}
 			}
+		},
+		"/mia-stream-deck/api/table": {
+			"get": {
+				"description": "",
+				"summary": "Get the command table",
+				"operationId": "getTable",
+				"responses": {
+					"200": {
+						"description": "Table registered",
+						"content": {
+							"application/json": {
+								"schema": {
+									"type": "array",
+									"items": {
+										"$ref": "#/components/schemas/Line"
+									}
+								}
+							}
+						}
+					},
+					"default": {
+						"description": "An error occured",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Error"
+								}
+							}
+						}
+					}
+				}
+			}
 		}
 
 	},
@@ -178,6 +210,34 @@
 					}
 				},
 				"required": [ "code", "message" ]
+			},
+			"Line": {
+				"type": "array",
+				"items": {
+					"$ref": "#/components/schemas/Row"
+				}
+			},
+			"Row": {
+				"type": "object",
+				"properties": {
+					"icon": {
+						"type": "string"
+					},
+					"picture": {
+						"type": "string"
+					},
+					"action": {
+						"type": "object",
+						"properties": {
+							"type": {
+								"type": "string",
+								"enum": [ "empty", "command", "input-string", "input-key" ]
+							}
+						},
+						"required": [ "type" ]
+					}
+				},
+				"required": [ "action" ]
 			}
 		}
 	},

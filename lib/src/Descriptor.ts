@@ -89,6 +89,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/mia-stream-deck/api/table": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get the command table */
+        get: operations["getTable"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -96,6 +113,15 @@ export interface components {
         Error: {
             code: string;
             message: string;
+        };
+        Line: components["schemas"]["Row"][];
+        Row: {
+            icon?: string;
+            picture?: string;
+            action: {
+                /** @enum {string} */
+                type: "empty" | "command" | "input-string" | "input-key";
+            };
         };
     };
     responses: never;
@@ -240,6 +266,35 @@ export interface operations {
                 };
                 content: {
                     "application/json": unknown;
+                };
+            };
+            /** @description An error occured */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+        };
+    };
+    getTable: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Table registered */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Line"][];
                 };
             };
             /** @description An error occured */

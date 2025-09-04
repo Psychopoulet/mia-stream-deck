@@ -41,11 +41,11 @@ export default class MediatorStreamDeck extends Mediator {
 
             return content
 
-                .replace("{{plugin.name}}", this.getPluginName())
-                .replace("{{plugin.version}}", this.getPluginVersion())
-                .replace("{{plugin.description}}", this.getPluginDescription())
+                .replace(/{{plugin.name}}/g, this.getPluginName())
+                .replace(/{{plugin.version}}/g, this.getPluginVersion())
+                .replace(/{{plugin.description}}/g, this.getPluginDescription())
 
-                .replace("{{plugin.appFront}}", "/" + this.getPluginName() + "/public/app.js");
+                .replace(/{{plugin.appFront}}/g, "/" + this.getPluginName() + "/public/app.js");
 
         });
 
@@ -57,9 +57,9 @@ export default class MediatorStreamDeck extends Mediator {
 
             return content
 
-                .replace("{{plugin.name}}", this.getPluginName())
-                .replace("{{plugin.version}}", this.getPluginVersion())
-                .replace("{{plugin.description}}", this.getPluginDescription());
+                .replace(/{{plugin.name}}/g, this.getPluginName())
+                .replace(/{{plugin.version}}/g, this.getPluginVersion())
+                .replace(/{{plugin.description}}/g, this.getPluginDescription());
 
         });
 
@@ -69,7 +69,73 @@ export default class MediatorStreamDeck extends Mediator {
 
         console.log("direction", urlParameters.path.direction);
 
-        return Promise.resolve(undefined);
+        return Promise.resolve();
+
+    }
+
+    public getTable (): Promise<operations["getTable"]["responses"]["200"]["content"]["application/json"]> {
+
+        return Promise.resolve([
+            [
+                {
+                    "action": {
+                        "type": "empty"
+                    }
+                },
+                {
+                    "icon": "fa-solid fa-arrow-up",
+                    "action": {
+                        "type": "input-key",
+                        "key": "up"
+                    }
+                },
+                {
+                    "icon": "",
+                    "picture": "",
+                    "action": {
+                        "type": "empty"
+                    }
+                }
+            ], [
+                {
+                    "icon": "fa-solid fa-arrow-left",
+                    "action": {
+                        "type": "input-key",
+                        "key": "left"
+                    }
+                },
+                {
+                    "action": {
+                        "type": "empty"
+                    }
+                },
+                {
+                    "icon": "fa-solid fa-arrow-right",
+                    "action": {
+                        "type": "input-key",
+                        "command": "right"
+                    }
+                }
+            ], [
+                {
+                    "action": {
+                        "type": "empty"
+                    }
+                },
+                {
+                    "icon": "fa-solid fa-arrow-down",
+                    "action": {
+                        "type": "input-key",
+                        "command": "down"
+                    }
+                },
+                {
+                    "action": {
+                        "type": "empty"
+                    }
+                }
+            ]
+        ]);
 
     }
 

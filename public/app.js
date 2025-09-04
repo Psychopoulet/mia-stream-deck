@@ -35,20 +35,20 @@ class Swipper {
         if (Math.abs(xDiff) > Math.abs(yDiff)) { /*most significant*/
 
             if (0 < xDiff) {
-                this._api("left");
+                this._swipe("left");
             }
             else {
-                this._api("right");
+                this._swipe("right");
             }
 
         }
         else {
 
             if (0 < yDiff) {
-                this._api("top");
+                this._swipe("top");
             }
             else {
-                this._api("down");
+                this._swipe("down");
             }
 
         }
@@ -59,7 +59,7 @@ class Swipper {
 
     }
 
-    _api (direction) {
+    _swipe (direction) {
 
         fetch("/{{plugin.name}}/api/swipe/" + direction, {
             "method": "put"
@@ -77,6 +77,57 @@ class Swipper {
 
         document.addEventListener("touchstart", this._handleTouchStart.bind(this), false);
         document.addEventListener("touchmove", this._handleTouchMove.bind(this), false);
+
+        fetch("/{{plugin.name}}/api/table", {
+            "method": "get"
+        }).then((res) => {
+
+            if (res.ok) {
+                return res.json();
+            }
+            else {
+                return Promise.reject(new Error("Problem with request getTable has status '" + res.status + "' (" + res.statusText + ")"));
+            }
+
+        }).then((lines) => {
+
+            console.log(lines);
+
+            const elementTable = document.getElementById("table");
+
+            lines.forEach((line) => {
+
+                const elementLine = document.createElement("tr");
+
+                    line.forEach((row) => {
+
+                        const elementRow = document.createElement("td");
+
+                            if ("empty" !== row.action.type) {
+
+                                if (row.icon) {
+                                    elementRow.classList = row.icon;
+                                }
+
+                                elementRow.innerText = JSON.stringify(row);
+
+                            }
+
+                        elementLine.appendChild(elementRow);
+
+                    });
+
+                elementTable.appendChild(elementLine);
+
+            });
+
+        }).catch((err) => {
+
+            console.error(err);
+
+            alert(err.message);
+
+        });
 
         return this;
 
