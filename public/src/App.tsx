@@ -15,7 +15,7 @@
     import type { components } from "../../lib/src/Descriptor";
 
 	interface iState {
-		"table": components["schemas"]["Line"][];
+		"table": components["schemas"]["Table"];
 		"loading": boolean;
 	}
 
@@ -49,7 +49,7 @@ export default class App extends React.Component<iPropsNode, iState> {
 
         fetch("/{{plugin.name}}/api/table", {
             "method": "get"
-        }).then((res: Response): Promise<components["schemas"]["Line"][]> => {
+        }).then((res: Response): Promise<components["schemas"]["Table"]> => {
 
             if (res.ok) {
                 return res.json();
@@ -58,7 +58,7 @@ export default class App extends React.Component<iPropsNode, iState> {
                 return Promise.reject(new Error("Problem with request getTable has status '" + res.status + "' (" + res.statusText + ")"));
             }
 
-        }).then((table: components["schemas"]["Line"][]): void => {
+        }).then((table: components["schemas"]["Table"]): void => {
 
 			this.setState({
 				"table": table,
@@ -81,7 +81,7 @@ export default class App extends React.Component<iPropsNode, iState> {
 
 	// render
 
-	private _renderRow (row: components["schemas"]["Row"]): React.JSX.Element {
+	private _renderCommand (row: components["schemas"]["Command"]): React.JSX.Element {
 
 		if ("empty" === row.action.type) {
 			return <></>;
@@ -115,7 +115,7 @@ export default class App extends React.Component<iPropsNode, iState> {
 
 		let countMaxRows: number = 0;
 
-		this.state.table.forEach((line: components["schemas"]["Line"]): void => {
+		this.state.table.forEach((line: components["schemas"]["Command"][]): void => {
 
 			if (countMaxRows < line.length) {
 				countMaxRows = line.length;
@@ -130,18 +130,18 @@ export default class App extends React.Component<iPropsNode, iState> {
 
 			<TableBody>
 
-				{ this.state.table.map((line: components["schemas"]["Line"], indexLine: number): React.JSX.Element => {
+				{ this.state.table.map((line: components["schemas"]["Command"][], indexLine: number): React.JSX.Element => {
 
 					return <tr key={ indexLine }>
 
-						{ line.map((row: components["schemas"]["Row"], indexRow: number): React.JSX.Element => {
+						{ line.map((row: components["schemas"]["Command"], indexRow: number): React.JSX.Element => {
 
 							return <td key={ indexLine + "-" + indexRow } className="text-center" style={{
 								"height": maxPercentLineSize + "%",
 								"width": maxPercentRowSize + "%"
 							}}>
 
-								{ this._renderRow(row) }
+								{ this._renderCommand(row) }
 
 							</td>;
 

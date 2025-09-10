@@ -30450,7 +30450,7 @@ var App = /** @class */ (function (_super) {
         });
     };
     // render
-    App.prototype._renderRow = function (row) {
+    App.prototype._renderCommand = function (row) {
         if ("empty" === row.action.type) {
             return react__WEBPACK_IMPORTED_MODULE_0___default().createElement((react__WEBPACK_IMPORTED_MODULE_0___default().Fragment), null);
         }
@@ -30487,7 +30487,7 @@ var App = /** @class */ (function (_super) {
                     return react__WEBPACK_IMPORTED_MODULE_0___default().createElement("td", { key: indexLine + "-" + indexRow, className: "text-center", style: {
                             "height": maxPercentLineSize + "%",
                             "width": maxPercentRowSize + "%"
-                        } }, _this._renderRow(row));
+                        } }, _this._renderCommand(row));
                 }));
             })));
     };

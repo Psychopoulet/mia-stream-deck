@@ -111,7 +111,7 @@ export default class MediatorStreamDeck extends Mediator {
                     "icon": "right",
                     "action": {
                         "type": "input-key",
-                        "command": "right"
+                        "key": "right"
                     }
                 }
             ], [
@@ -124,7 +124,7 @@ export default class MediatorStreamDeck extends Mediator {
                     "icon": "down",
                     "action": {
                         "type": "input-key",
-                        "command": "down"
+                        "key": "down"
                     }
                 },
                 {

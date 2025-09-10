@@ -174,10 +174,7 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"type": "array",
-									"items": {
-										"$ref": "#/components/schemas/Line"
-									}
+									"$ref": "#/components/schemas/Table"
 								}
 							}
 						}
@@ -201,6 +198,7 @@
 		"schemas": {
 			"Error": {
 				"type": "object",
+				"description": "JSON Error description",
 				"properties": {
 					"code": {
 						"type": "string"
@@ -211,33 +209,129 @@
 				},
 				"required": [ "code", "message" ]
 			},
-			"Line": {
+			"Table": {
 				"type": "array",
+				"description": "Commands table description, contains an array for the lines which contains an array for the rows. Each row is a command.",
 				"items": {
-					"$ref": "#/components/schemas/Row"
+					"type": "array",
+					"items": {
+						"$ref": "#/components/schemas/Command"
+					}
 				}
 			},
-			"Row": {
+			"Command": {
 				"type": "object",
+				"description": "Differents command types descriptions",
 				"properties": {
 					"icon": {
 						"type": "string"
 					},
 					"picture": {
-						"type": "string"
+						"type": "string",
+						"format": "uri"
 					},
 					"action": {
-						"type": "object",
-						"properties": {
-							"type": {
-								"type": "string",
-								"enum": [ "empty", "command", "input-string", "input-key" ]
-							}
-						},
-						"required": [ "type" ]
+						"oneOf": [
+							{ "$ref": "#/components/schemas/ActionEmpty" },
+							{ "$ref": "#/components/schemas/ActionInputString" },
+							{ "$ref": "#/components/schemas/ActionInputKey" },
+							{ "$ref": "#/components/schemas/ActionCommand" },
+							{ "$ref": "#/components/schemas/ActionPlugin" }
+						]
 					}
 				},
 				"required": [ "action" ]
+			},
+			"ActionEmpty": {
+				"type": "object",
+				"description": "Empty command (an empty row in the table)",
+				"properties": {
+					"type": {
+						"type": "string",
+						"enum": [ "empty" ]
+					}
+				},
+				"required": [ "type" ]
+			},
+			"ActionInputString": {
+				"type": "object",
+				"description": "Input string (keyboard simulator)",
+				"properties": {
+					"type": {
+						"type": "string",
+						"enum": [ "input-string" ]
+					},
+					"string": {
+						"type": "string",
+						"minLength": 1
+					},
+					"enter": {
+						"description": "Add a 'enter' input at the end of the string (default : false)",
+						"type": "boolean"
+					}
+				},
+				"required": [ "type", "string" ]
+			},
+			"ActionInputKey": {
+				"type": "object",
+				"description": "Input specific key (keyboard simulator)",
+				"properties": {
+					"type": {
+						"type": "string",
+						"enum": [ "input-key" ]
+					},
+					"key": {
+						"type": "string",
+						"minLength": 1
+					},
+					"alt": {
+						"description": "Key + alt (default : false)",
+						"type": "boolean"
+					},
+					"ctrl": {
+						"description": "Key + ctrl (default : false)",
+						"type": "boolean"
+					},
+					"shift": {
+						"description": "Key + shift (default : false)",
+						"type": "boolean"
+					}
+				},
+				"required": [ "type", "key" ]
+			},
+			"ActionCommand": {
+				"type": "object",
+				"description": "Execute a command line (like in a terminal)",
+				"properties": {
+					"type": {
+						"type": "string",
+						"enum": [ "command" ]
+					},
+					"command": {
+						"type": "string",
+						"minLength": 1
+					}
+				},
+				"required": [ "type", "command" ]
+			},
+			"ActionPlugin": {
+				"type": "object",
+				"description": "Execute a plugin method",
+				"properties": {
+					"type": {
+						"type": "string",
+						"enum": [ "plugin" ]
+					},
+					"plugin": {
+						"type": "string",
+						"minLength": 1
+					},
+					"operationId": {
+						"type": "string",
+						"minLength": 1
+					}
+				},
+				"required": [ "type", "plugin", "operationId" ]
 			}
 		}
 	},

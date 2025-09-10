@@ -110,18 +110,57 @@ export interface paths {
 export type webhooks = Record<string, never>;
 export interface components {
     schemas: {
+        /** @description JSON Error description */
         Error: {
             code: string;
             message: string;
         };
-        Line: components["schemas"]["Row"][];
-        Row: {
+        /** @description Commands table description, contains an array for the lines which contains an array for the rows. Each row is a command. */
+        Table: components["schemas"]["Command"][][];
+        /** @description Differents command types descriptions */
+        Command: {
             icon?: string;
+            /** Format: uri */
             picture?: string;
-            action: {
-                /** @enum {string} */
-                type: "empty" | "command" | "input-string" | "input-key";
-            };
+            action: components["schemas"]["ActionEmpty"] | components["schemas"]["ActionInputString"] | components["schemas"]["ActionInputKey"] | components["schemas"]["ActionCommand"] | components["schemas"]["ActionPlugin"];
+        };
+        /** @description Empty command (an empty row in the table) */
+        ActionEmpty: {
+            /** @enum {string} */
+            type: "empty";
+        };
+        /** @description Input string (keyboard simulator) */
+        ActionInputString: {
+            /** @enum {string} */
+            type: "input-string";
+            string: string;
+            /** @description Add a 'enter' input at the end of the string (default : false) */
+            enter?: boolean;
+        };
+        /** @description Input specific key (keyboard simulator) */
+        ActionInputKey: {
+            /** @enum {string} */
+            type: "input-key";
+            key: string;
+            /** @description Key + alt (default : false) */
+            alt?: boolean;
+            /** @description Key + ctrl (default : false) */
+            ctrl?: boolean;
+            /** @description Key + shift (default : false) */
+            shift?: boolean;
+        };
+        /** @description Execute a command line (like in a terminal) */
+        ActionCommand: {
+            /** @enum {string} */
+            type: "command";
+            command: string;
+        };
+        /** @description Execute a plugin method */
+        ActionPlugin: {
+            /** @enum {string} */
+            type: "plugin";
+            plugin: string;
+            operationId: string;
         };
     };
     responses: never;
@@ -294,7 +333,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["Line"][];
+                    "application/json": components["schemas"]["Table"];
                 };
             };
             /** @description An error occured */
