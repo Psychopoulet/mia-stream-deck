@@ -1,6 +1,7 @@
 // deps
 
     // natives
+    import { exec } from "node:child_process";
     import { readFile } from "node:fs/promises";
     import { join } from "node:path";
 
@@ -13,7 +14,7 @@
     import type ContainerPattern from "node-containerpattern";
 
     // locals
-    import type { operations } from "./Descriptor";
+    import type { operations, components } from "./Descriptor";
 
 // module
 
@@ -82,21 +83,21 @@ export default class MediatorStreamDeck extends Mediator {
                 {
                     "picture": "http://localhost:3000/public/pictures/warcraft3.png",
                     "action": {
-                        "type": "command",
-                        "command": "cd \"" + join(__dirname, "..", "..", "..", "warcraft3sounds") + "\" && npm run start"
+                        "type": "COMMAND",
+                        "command": "cd \"C:\\Users\\FlowUP\\Documents\\projects\\warcraft3sounds\" && npm run start"
                     }
                 },
                 {
                     "icon": "up",
                     "action": {
-                        "type": "input-key",
+                        "type": "INPUT-KEY",
                         "key": "up"
                     }
                 },
                 {
                     "picture": "http://localhost:3000/public/pictures/warcraft3.png",
                     "action": {
-                        "type": "command",
+                        "type": "COMMAND",
                         "command": "vlc --intf dummy http://localhost:3000/public/sounds/PeonReady1.wav vlc://quit"
                     }
                 }
@@ -104,38 +105,38 @@ export default class MediatorStreamDeck extends Mediator {
                 {
                     "icon": "left",
                     "action": {
-                        "type": "input-key",
+                        "type": "INPUT-KEY",
                         "key": "left"
                     }
                 },
                 {
                     "action": {
-                        "type": "empty"
+                        "type": "EMPTY"
                     }
                 },
                 {
                     "icon": "right",
                     "action": {
-                        "type": "input-key",
+                        "type": "INPUT-KEY",
                         "key": "right"
                     }
                 }
             ], [
                 {
                     "action": {
-                        "type": "empty"
+                        "type": "EMPTY"
                     }
                 },
                 {
                     "icon": "down",
                     "action": {
-                        "type": "input-key",
+                        "type": "INPUT-KEY",
                         "key": "down"
                     }
                 },
                 {
                     "action": {
-                        "type": "empty"
+                        "type": "EMPTY"
                     }
                 }
             ]
@@ -143,9 +144,45 @@ export default class MediatorStreamDeck extends Mediator {
 
     }
 
-    public executeCommand (urlParameters: operations["executeCommand"]["parameters"], bodyParameters: operations["executeCommand"]["requestBody"]): Promise<operations["executeCommand"]["responses"]["204"]["content"]["application/json"]> {
+    public executeCommand (urlParameters: operations["executeCommand"]["parameters"], bodyParameters: operations["executeCommand"]["requestBody"]["content"]["application/json"]): Promise<operations["executeCommand"]["responses"]["204"]["content"]["application/json"]> {
 
         console.log("executeCommand", bodyParameters);
+
+        if ("COMMAND" === bodyParameters.action.type) {
+
+            return new Promise((resolve: (value: unknown) => void, reject: (value: Error) => void): void => {
+
+                const command: components["schemas"]["ActionCommand"] = bodyParameters.action as components["schemas"]["ActionCommand"];
+
+                exec(command.command, (err: Error | null, stdout: string, stderr: string): void => {
+
+                    if (err) {
+
+                        console.log("err", err);
+
+                        return reject(err);
+
+                    }
+                    else if (0 < stderr.length) {
+
+                        console.log("stderr", stderr);
+
+                        return reject(new Error(stderr));
+
+                    }
+                    else {
+
+                        console.log("stdout", stdout);
+
+                        return resolve(undefined);
+
+                    }
+
+                });
+
+            });
+
+        }
 
         return Promise.resolve();
 

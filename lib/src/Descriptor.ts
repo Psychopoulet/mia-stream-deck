@@ -144,12 +144,12 @@ export interface components {
         /** @description Empty command (an empty row in the table) */
         ActionEmpty: {
             /** @enum {string} */
-            type: "empty";
+            type: "EMPTY";
         };
         /** @description Input string (keyboard simulator) */
         ActionInputString: {
             /** @enum {string} */
-            type: "input-string";
+            type: "INPUT-STRING";
             string: string;
             /** @description Add a 'enter' input at the end of the string (default : false) */
             enter?: boolean;
@@ -157,7 +157,7 @@ export interface components {
         /** @description Input specific key (keyboard simulator) */
         ActionInputKey: {
             /** @enum {string} */
-            type: "input-key";
+            type: "INPUT-KEY";
             key: string;
             /** @description Key + alt (default : false) */
             alt?: boolean;
@@ -169,13 +169,13 @@ export interface components {
         /** @description Execute a command line (like in a terminal) */
         ActionCommand: {
             /** @enum {string} */
-            type: "command";
+            type: "COMMAND";
             command: string;
         };
         /** @description Execute a plugin method */
         ActionPlugin: {
             /** @enum {string} */
-            type: "plugin";
+            type: "PLUGIN";
             plugin: string;
             operationId: string;
         };

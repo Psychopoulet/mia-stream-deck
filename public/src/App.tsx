@@ -126,7 +126,7 @@ export default class App extends React.Component<iPropsNode, iState> {
 
 	private _renderCommand (cmd: components["schemas"]["Command"]): React.JSX.Element {
 
-		if ("empty" === cmd.action.type) {
+		if ("EMPTY" === cmd.action.type) {
 			return <></>;
 		}
 

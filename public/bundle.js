@@ -30476,7 +30476,7 @@ var App = /** @class */ (function (_super) {
     // render
     App.prototype._renderCommand = function (cmd) {
         var _this = this;
-        if ("empty" === cmd.action.type) {
+        if ("EMPTY" === cmd.action.type) {
             return react__WEBPACK_IMPORTED_MODULE_0___default().createElement((react__WEBPACK_IMPORTED_MODULE_0___default().Fragment), null);
         }
         if (cmd.icon) {
@@ -30578,7 +30578,7 @@ var SDK = /** @class */ (function () {
                 return Promise.resolve();
             }
             else {
-                return Promise.reject(new Error("Problem with request getTableByName has status '" + res.status + "' (" + res.statusText + ")"));
+                return Promise.reject(new Error("Problem with request executeCommand has status '" + res.status + "' (" + res.statusText + ")"));
             }
         });
     };

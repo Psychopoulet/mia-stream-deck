@@ -50,7 +50,7 @@ export class SDK {
                 return Promise.resolve();
             }
             else {
-                return Promise.reject(new Error("Problem with request getTableByName has status '" + res.status + "' (" + res.statusText + ")"));
+                return Promise.reject(new Error("Problem with request executeCommand has status '" + res.status + "' (" + res.statusText + ")"));
             }
 
         });
