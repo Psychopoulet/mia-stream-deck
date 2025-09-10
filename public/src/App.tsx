@@ -96,7 +96,7 @@ export default class App extends React.Component<iPropsNode, iState> {
 		}
 		else if (row.picture) {
 
-			return <Image crossOrigin="anonymous" src={ row.picture } onClick={ () => {
+			return <Image crossOrigin="anonymous" src={ row.picture } className="rounded h-100" onClick={ () => {
 				alert("click Image : " + JSON.stringify(row));
 			} } />
 
@@ -136,7 +136,7 @@ export default class App extends React.Component<iPropsNode, iState> {
 
 						{ line.map((row: components["schemas"]["Row"], indexRow: number): React.JSX.Element => {
 
-							return <td key={ indexLine + "-" + indexRow } style={{
+							return <td key={ indexLine + "-" + indexRow } className="text-center" style={{
 								"height": maxPercentLineSize + "%",
 								"width": maxPercentRowSize + "%"
 							}}>
