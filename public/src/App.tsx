@@ -89,15 +89,15 @@ export default class App extends React.Component<iPropsNode, iState> {
 
 		if (row.icon) {
 
-			return <Button icon={ row.icon as tIcon } block onClick={ () => {
-				console.log("click Icon", row);
+			return <Button icon={ row.icon as tIcon } variant="secondary" outline className="w-100 h-100 d-block" onClick={ () => {
+				alert("click Icon : " + JSON.stringify(row));
 			} } />
 
 		}
 		else if (row.picture) {
 
 			return <Image crossOrigin="anonymous" src={ row.picture } onClick={ () => {
-				console.log("click Image", row);
+				alert("click Image : " + JSON.stringify(row));
 			} } />
 
 		}
@@ -113,23 +113,20 @@ export default class App extends React.Component<iPropsNode, iState> {
 			return <Alert variant="warning">Loading...</Alert>;
 		}
 
-		let countMaxRow: number = 0;
+		let countMaxRows: number = 0;
 
 		this.state.table.forEach((line: components["schemas"]["Line"]): void => {
 
-			if (countMaxRow < line.length) {
-				countMaxRow = line.length;
+			if (countMaxRows < line.length) {
+				countMaxRows = line.length;
 			}
 
 		});
 
-		console.log("countMaxRow", countMaxRow);
+		const maxPercentLineSize: number = 100 / this.state.table.length;
+		const maxPercentRowSize: number = 100 / countMaxRows;
 
-		const maxPercentRowSize: number = 100 / countMaxRow;
-
-		return <Table borderless className="m-0" style={{
-			"minHeight": "100vh"
-		}}>
+		return <Table borderless className="m-0 p-0 vh-100">
 
 			<TableBody>
 
@@ -139,7 +136,10 @@ export default class App extends React.Component<iPropsNode, iState> {
 
 						{ line.map((row: components["schemas"]["Row"], indexRow: number): React.JSX.Element => {
 
-							return <td key={ indexLine + "-" + indexRow } style={{ "width": maxPercentRowSize + "%" }}>
+							return <td key={ indexLine + "-" + indexRow } style={{
+								"height": maxPercentLineSize + "%",
+								"width": maxPercentRowSize + "%"
+							}}>
 
 								{ this._renderRow(row) }
 

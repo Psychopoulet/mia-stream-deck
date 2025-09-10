@@ -30455,13 +30455,13 @@ var App = /** @class */ (function (_super) {
             return react__WEBPACK_IMPORTED_MODULE_0___default().createElement((react__WEBPACK_IMPORTED_MODULE_0___default().Fragment), null);
         }
         if (row.icon) {
-            return react__WEBPACK_IMPORTED_MODULE_0___default().createElement(react_bootstrap_fontawesome__WEBPACK_IMPORTED_MODULE_1__.Button, { icon: row.icon, block: true, onClick: function () {
-                    console.log("click Icon", row);
+            return react__WEBPACK_IMPORTED_MODULE_0___default().createElement(react_bootstrap_fontawesome__WEBPACK_IMPORTED_MODULE_1__.Button, { icon: row.icon, variant: "secondary", outline: true, className: "w-100 h-100 d-block", onClick: function () {
+                    alert("click Icon : " + JSON.stringify(row));
                 } });
         }
         else if (row.picture) {
             return react__WEBPACK_IMPORTED_MODULE_0___default().createElement(react_bootstrap_fontawesome__WEBPACK_IMPORTED_MODULE_1__.Image, { crossOrigin: "anonymous", src: row.picture, onClick: function () {
-                    console.log("click Image", row);
+                    alert("click Image : " + JSON.stringify(row));
                 } });
         }
         else {
@@ -30473,20 +30473,21 @@ var App = /** @class */ (function (_super) {
         if (this.state.loading) {
             return react__WEBPACK_IMPORTED_MODULE_0___default().createElement(react_bootstrap_fontawesome__WEBPACK_IMPORTED_MODULE_1__.Alert, { variant: "warning" }, "Loading...");
         }
-        var countMaxRow = 0;
+        var countMaxRows = 0;
         this.state.table.forEach(function (line) {
-            if (countMaxRow < line.length) {
-                countMaxRow = line.length;
+            if (countMaxRows < line.length) {
+                countMaxRows = line.length;
             }
         });
-        console.log("countMaxRow", countMaxRow);
-        var maxPercentRowSize = 100 / countMaxRow;
-        return react__WEBPACK_IMPORTED_MODULE_0___default().createElement(react_bootstrap_fontawesome__WEBPACK_IMPORTED_MODULE_1__.Table, { borderless: true, className: "m-0", style: {
-                "minHeight": "100vh"
-            } },
+        var maxPercentLineSize = 100 / this.state.table.length;
+        var maxPercentRowSize = 100 / countMaxRows;
+        return react__WEBPACK_IMPORTED_MODULE_0___default().createElement(react_bootstrap_fontawesome__WEBPACK_IMPORTED_MODULE_1__.Table, { borderless: true, className: "m-0 p-0 vh-100" },
             react__WEBPACK_IMPORTED_MODULE_0___default().createElement(react_bootstrap_fontawesome__WEBPACK_IMPORTED_MODULE_1__.TableBody, null, this.state.table.map(function (line, indexLine) {
                 return react__WEBPACK_IMPORTED_MODULE_0___default().createElement("tr", { key: indexLine }, line.map(function (row, indexRow) {
-                    return react__WEBPACK_IMPORTED_MODULE_0___default().createElement("td", { key: indexLine + "-" + indexRow, style: { "width": maxPercentRowSize + "%" } }, _this._renderRow(row));
+                    return react__WEBPACK_IMPORTED_MODULE_0___default().createElement("td", { key: indexLine + "-" + indexRow, style: {
+                            "height": maxPercentLineSize + "%",
+                            "width": maxPercentRowSize + "%"
+                        } }, _this._renderRow(row));
                 }));
             })));
     };
