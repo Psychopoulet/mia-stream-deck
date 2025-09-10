@@ -30389,6 +30389,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react */ "./node_modules/react/index.js");
 /* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(react__WEBPACK_IMPORTED_MODULE_0__);
 /* harmony import */ var react_bootstrap_fontawesome__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! react-bootstrap-fontawesome */ "./node_modules/react-bootstrap-fontawesome/lib/dist/main.js");
+/* harmony import */ var _sdk__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./sdk */ "./public/src/sdk.ts");
 
 var __extends = (undefined && undefined.__extends) || (function () {
     var extendStatics = function (d, b) {
@@ -30409,15 +30410,20 @@ var __extends = (undefined && undefined.__extends) || (function () {
 // externals
 
 
+// locals
+
 // component
 var App = /** @class */ (function (_super) {
     __extends(App, _super);
     // constructor
     function App(props) {
         var _this = _super.call(this, props) || this;
+        // private
+        _this._sdk = (0,_sdk__WEBPACK_IMPORTED_MODULE_2__["default"])();
         _this.state = {
             "table": [],
-            "loading": true
+            "loading": true,
+            "running": false
         };
         return _this;
     }
@@ -30427,15 +30433,8 @@ var App = /** @class */ (function (_super) {
             "table": [],
             "loading": true
         });
-        fetch("/{{plugin.name}}/api/table", {
-            "method": "get"
-        }).then(function (res) {
-            if (res.ok) {
-                return res.json();
-            }
-            else {
-                return Promise.reject(new Error("Problem with request getTable has status '" + res.status + "' (" + res.statusText + ")"));
-            }
+        this._sdk.getTables().then(function (tablenames) {
+            return _this._sdk.getTableByName("presentation");
         }).then(function (table) {
             _this.setState({
                 "table": table,
@@ -30447,25 +30446,58 @@ var App = /** @class */ (function (_super) {
             _this.setState({
                 "loading": false
             });
+        }).catch(function (err) {
+            console.error(err);
+            alert(err.message);
+            _this.setState({
+                "loading": false
+            });
+        });
+    };
+    // events
+    App.prototype._executeCommand = function (cmd) {
+        var _this = this;
+        this.setState({
+            "running": true
+        });
+        this._sdk.executeCommand(cmd).then(function () {
+            alert("running");
+            _this.setState({
+                "running": false
+            });
+        }).catch(function (err) {
+            console.error(err);
+            alert(err.message);
+            _this.setState({
+                "running": false
+            });
         });
     };
     // render
-    App.prototype._renderCommand = function (row) {
-        if ("empty" === row.action.type) {
+    App.prototype._renderCommand = function (cmd) {
+        var _this = this;
+        if ("empty" === cmd.action.type) {
             return react__WEBPACK_IMPORTED_MODULE_0___default().createElement((react__WEBPACK_IMPORTED_MODULE_0___default().Fragment), null);
         }
-        if (row.icon) {
-            return react__WEBPACK_IMPORTED_MODULE_0___default().createElement(react_bootstrap_fontawesome__WEBPACK_IMPORTED_MODULE_1__.Button, { icon: row.icon, variant: "secondary", outline: true, className: "w-100 h-100 d-block", onClick: function () {
-                    alert("click Icon : " + JSON.stringify(row));
+        if (cmd.icon) {
+            return react__WEBPACK_IMPORTED_MODULE_0___default().createElement(react_bootstrap_fontawesome__WEBPACK_IMPORTED_MODULE_1__.Button, { icon: cmd.icon, variant: "secondary", className: "w-100 h-100 d-block", outline: true, disabled: this.state.running, onClick: function (e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    return _this._executeCommand(cmd);
                 } });
         }
-        else if (row.picture) {
-            return react__WEBPACK_IMPORTED_MODULE_0___default().createElement(react_bootstrap_fontawesome__WEBPACK_IMPORTED_MODULE_1__.Image, { crossOrigin: "anonymous", src: row.picture, className: "rounded h-100", onClick: function () {
-                    alert("click Image : " + JSON.stringify(row));
+        else if (cmd.picture) {
+            return react__WEBPACK_IMPORTED_MODULE_0___default().createElement(react_bootstrap_fontawesome__WEBPACK_IMPORTED_MODULE_1__.Image, { crossOrigin: "anonymous", src: cmd.picture, className: "rounded h-100", onClick: function (e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    if (_this.state.running) {
+                        return;
+                    }
+                    return _this._executeCommand(cmd);
                 } });
         }
         else {
-            return react__WEBPACK_IMPORTED_MODULE_0___default().createElement("span", null, JSON.stringify(row));
+            return react__WEBPACK_IMPORTED_MODULE_0___default().createElement("span", null, JSON.stringify(cmd));
         }
     };
     App.prototype.render = function () {
@@ -30497,6 +30529,69 @@ var App = /** @class */ (function (_super) {
 }((react__WEBPACK_IMPORTED_MODULE_0___default().Component)));
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (App);
 ;
+
+
+/***/ }),
+
+/***/ "./public/src/sdk.ts":
+/*!***************************!*\
+  !*** ./public/src/sdk.ts ***!
+  \***************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   SDK: () => (/* binding */ SDK),
+/* harmony export */   "default": () => (/* binding */ getSDK)
+/* harmony export */ });
+
+// component
+var SDK = /** @class */ (function () {
+    function SDK() {
+    }
+    SDK.prototype.getTables = function () {
+        return fetch("/{{plugin.name}}/api/tables").then(function (res) {
+            if (res.ok) {
+                return res.json();
+            }
+            else {
+                return Promise.reject(new Error("Problem with request getTables has status '" + res.status + "' (" + res.statusText + ")"));
+            }
+        });
+    };
+    SDK.prototype.getTableByName = function (tablename) {
+        return fetch("/{{plugin.name}}/api/tables/" + tablename).then(function (res) {
+            if (res.ok) {
+                return res.json();
+            }
+            else {
+                return Promise.reject(new Error("Problem with request getTableByName has status '" + res.status + "' (" + res.statusText + ")"));
+            }
+        });
+    };
+    SDK.prototype.executeCommand = function (cmd) {
+        return fetch("/{{plugin.name}}/api/execute-command", {
+            "method": "put",
+            "body": JSON.stringify(cmd)
+        }).then(function (res) {
+            if (res.ok) {
+                return Promise.resolve();
+            }
+            else {
+                return Promise.reject(new Error("Problem with request getTableByName has status '" + res.status + "' (" + res.statusText + ")"));
+            }
+        });
+    };
+    return SDK;
+}());
+
+var _sdk = null;
+function getSDK() {
+    if (null === _sdk) {
+        _sdk = new SDK();
+    }
+    return _sdk;
+}
 
 
 /***/ })

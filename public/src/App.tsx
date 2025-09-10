@@ -6,6 +6,9 @@
     import React from "react";
     import { Alert, Button, Image, Table, TableBody } from "react-bootstrap-fontawesome";
 
+	// locals
+    import getSDK from "./sdk";
+
 // types & interfaces
 
 	// externals
@@ -13,10 +16,12 @@
 
 	// locals
     import type { components } from "../../lib/src/Descriptor";
+    import type { SDK } from "./sdk";
 
 	interface iState {
 		"table": components["schemas"]["Table"];
 		"loading": boolean;
+		"running": boolean;
 	}
 
 // component
@@ -27,6 +32,10 @@ export default class App extends React.Component<iPropsNode, iState> {
 
 		public static displayName: string = "App";
 
+	// private
+
+		private _sdk: SDK = getSDK();
+
 	// constructor
 
 	public constructor (props: iPropsNode) {
@@ -35,7 +44,8 @@ export default class App extends React.Component<iPropsNode, iState> {
 
 		this.state = {
 			"table": [],
-			"loading": true
+			"loading": true,
+			"running": false
 		};
 
 	}
@@ -47,21 +57,24 @@ export default class App extends React.Component<iPropsNode, iState> {
 			"loading": true
 		});
 
-        fetch("/{{plugin.name}}/api/table", {
-            "method": "get"
-        }).then((res: Response): Promise<components["schemas"]["Table"]> => {
+		this._sdk.getTables().then((tablenames: components["schemas"]["TableName"][]): Promise<components["schemas"]["Table"]> => {
 
-            if (res.ok) {
-                return res.json();
-            }
-            else {
-                return Promise.reject(new Error("Problem with request getTable has status '" + res.status + "' (" + res.statusText + ")"));
-            }
+			return this._sdk.getTableByName("presentation");
 
-        }).then((table: components["schemas"]["Table"]): void => {
+		}).then((table: components["schemas"]["Table"]): void => {
 
 			this.setState({
 				"table": table,
+				"loading": false
+			});
+
+		}).catch((err: Error): void => {
+
+			console.error(err);
+
+			alert(err.message);
+
+			this.setState({
 				"loading": false
 			});
 
@@ -79,30 +92,80 @@ export default class App extends React.Component<iPropsNode, iState> {
 
 	}
 
+	// events
+
+	private _executeCommand (cmd: components["schemas"]["Command"]): void {
+
+		this.setState({
+			"running": true
+		});
+
+		this._sdk.executeCommand(cmd).then((): void => {
+
+			alert("running");
+
+			this.setState({
+				"running": false
+			});
+
+		}).catch((err: Error): void => {
+
+            console.error(err);
+
+            alert(err.message);
+
+			this.setState({
+				"running": false
+			});
+
+        });
+
+	}
+
 	// render
 
-	private _renderCommand (row: components["schemas"]["Command"]): React.JSX.Element {
+	private _renderCommand (cmd: components["schemas"]["Command"]): React.JSX.Element {
 
-		if ("empty" === row.action.type) {
+		if ("empty" === cmd.action.type) {
 			return <></>;
 		}
 
-		if (row.icon) {
+		if (cmd.icon) {
 
-			return <Button icon={ row.icon as tIcon } variant="secondary" outline className="w-100 h-100 d-block" onClick={ () => {
-				alert("click Icon : " + JSON.stringify(row));
+			return <Button
+				icon={ cmd.icon as tIcon } variant="secondary"
+				className="w-100 h-100 d-block" outline
+				disabled={ this.state.running }
+				onClick={ (e: React.MouseEvent<HTMLButtonElement>): void => {
+
+				e.preventDefault();
+				e.stopPropagation();
+
+				return this._executeCommand(cmd);
+
 			} } />
 
 		}
-		else if (row.picture) {
+		else if (cmd.picture) {
 
-			return <Image crossOrigin="anonymous" src={ row.picture } className="rounded h-100" onClick={ () => {
-				alert("click Image : " + JSON.stringify(row));
+			return <Image crossOrigin="anonymous" src={ cmd.picture }
+				className="rounded h-100"
+				onClick={ (e: React.MouseEvent<HTMLImageElement>): void => {
+
+				e.preventDefault();
+				e.stopPropagation();
+
+				if (this.state.running) {
+					return;
+				}
+
+				return this._executeCommand(cmd);
+
 			} } />
 
 		}
 		else {
-			return <span>{ JSON.stringify(row) }</span>;
+			return <span>{ JSON.stringify(cmd) }</span>;
 		}
 
 	}

@@ -63,15 +63,19 @@ export default class MediatorStreamDeck extends Mediator {
 
     }
 
-    public swipe (urlParameters: operations["swipe"]["parameters"]): Promise<operations["swipe"]["responses"]["201"]["content"]["application/json"]> {
+    public getTables (): Promise<operations["getTables"]["responses"]["200"]["content"]["application/json"]> {
 
-        console.log("direction", urlParameters.path.direction);
+        console.log("getTables");
 
-        return Promise.resolve();
+        return Promise.resolve([
+            "presentation"
+        ]);
 
     }
 
-    public getTable (): Promise<operations["getTable"]["responses"]["200"]["content"]["application/json"]> {
+    public getTableByName (urlParameters: operations["getTableByName"]["parameters"]): Promise<operations["getTableByName"]["responses"]["200"]["content"]["application/json"]> {
+
+        console.log("getTableByName", urlParameters.path.tablename);
 
         return Promise.resolve([
             [
@@ -79,7 +83,7 @@ export default class MediatorStreamDeck extends Mediator {
                     "picture": "http://localhost:3000/public/pictures/warcraft3.png",
                     "action": {
                         "type": "command",
-                        "command": "vlc --intf dummy http://localhost:3000/public/sounds/PeonReady1.wav vlc://quit"
+                        "command": "cd \"" + join(__dirname, "..", "..", "..", "warcraft3sounds") + "\" && npm run start"
                     }
                 },
                 {
@@ -90,8 +94,10 @@ export default class MediatorStreamDeck extends Mediator {
                     }
                 },
                 {
+                    "picture": "http://localhost:3000/public/pictures/warcraft3.png",
                     "action": {
-                        "type": "empty"
+                        "type": "command",
+                        "command": "vlc --intf dummy http://localhost:3000/public/sounds/PeonReady1.wav vlc://quit"
                     }
                 }
             ], [
@@ -134,6 +140,14 @@ export default class MediatorStreamDeck extends Mediator {
                 }
             ]
         ]);
+
+    }
+
+    public executeCommand (urlParameters: operations["executeCommand"]["parameters"], bodyParameters: operations["executeCommand"]["requestBody"]): Promise<operations["executeCommand"]["responses"]["204"]["content"]["application/json"]> {
+
+        console.log("executeCommand", bodyParameters);
+
+        return Promise.resolve();
 
     }
 

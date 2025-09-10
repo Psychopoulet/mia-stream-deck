@@ -72,16 +72,16 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/mia-stream-deck/api/swipe/{direction}": {
+    "/mia-stream-deck/api/tables": {
         parameters: {
             query?: never;
             header?: never;
             path?: never;
             cookie?: never;
         };
-        get?: never;
-        /** Swipe in a specific direction */
-        put: operations["swipe"];
+        /** Get the tables' names */
+        get: operations["getTables"];
+        put?: never;
         post?: never;
         delete?: never;
         options?: never;
@@ -89,7 +89,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/mia-stream-deck/api/table": {
+    "/mia-stream-deck/api/tables/{tablename}": {
         parameters: {
             query?: never;
             header?: never;
@@ -97,8 +97,25 @@ export interface paths {
             cookie?: never;
         };
         /** Get the command table */
-        get: operations["getTable"];
+        get: operations["getTableByName"];
         put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/mia-stream-deck/api/execute-command": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /** Execute the command */
+        put: operations["executeCommand"];
         post?: never;
         delete?: never;
         options?: never;
@@ -115,12 +132,12 @@ export interface components {
             code: string;
             message: string;
         };
+        TableName: string;
         /** @description Commands table description, contains an array for the lines which contains an array for the rows. Each row is a command. */
         Table: components["schemas"]["Command"][][];
         /** @description Differents command types descriptions */
         Command: {
             icon?: string;
-            /** Format: uri */
             picture?: string;
             action: components["schemas"]["ActionEmpty"] | components["schemas"]["ActionInputString"] | components["schemas"]["ActionInputKey"] | components["schemas"]["ActionCommand"] | components["schemas"]["ActionPlugin"];
         };
@@ -287,24 +304,22 @@ export interface operations {
             };
         };
     };
-    swipe: {
+    getTables: {
         parameters: {
             query?: never;
             header?: never;
-            path: {
-                direction: "top" | "right" | "down" | "left";
-            };
+            path?: never;
             cookie?: never;
         };
         requestBody?: never;
         responses: {
-            /** @description Everything is fine */
-            201: {
+            /** @description Tables registered */
+            200: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": unknown;
+                    "application/json": components["schemas"]["TableName"][];
                 };
             };
             /** @description An error occured */
@@ -318,11 +333,13 @@ export interface operations {
             };
         };
     };
-    getTable: {
+    getTableByName: {
         parameters: {
             query?: never;
             header?: never;
-            path?: never;
+            path: {
+                tablename: components["schemas"]["TableName"];
+            };
             cookie?: never;
         };
         requestBody?: never;
@@ -334,6 +351,39 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["Table"];
+                };
+            };
+            /** @description An error occured */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+        };
+    };
+    executeCommand: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["Command"];
+            };
+        };
+        responses: {
+            /** @description Command running */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": unknown;
                 };
             };
             /** @description An error occured */
