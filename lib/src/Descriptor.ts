@@ -62,8 +62,25 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** Plugin's front */
+        /** Plugin's front app */
         get: operations["getFrontApp"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/mia-stream-deck/public/bundle.js.map": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Plugin's front app map */
+        get: operations["getFrontAppMap"];
         put?: never;
         post?: never;
         delete?: never;
@@ -291,6 +308,35 @@ export interface operations {
                 };
                 content: {
                     "application/javascript": string;
+                };
+            };
+            /** @description An error occured */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+        };
+    };
+    getFrontAppMap: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Plugin's front app */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": Record<string, never>;
                 };
             };
             /** @description An error occured */

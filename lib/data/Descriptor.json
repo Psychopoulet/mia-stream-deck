@@ -98,7 +98,7 @@
 		"/mia-stream-deck/public/bundle.js": {
 			"get": {
 				"description": "",
-				"summary": "Plugin's front",
+				"summary": "Plugin's front app",
 				"operationId": "getFrontApp",
 				"responses": {
 					"200": {
@@ -107,6 +107,35 @@
 							"application/javascript": {
 								"schema": {
 									"type": "string"
+								}
+							}
+						}
+					},
+					"default": {
+						"description": "An error occured",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Error"
+								}
+							}
+						}
+					}
+				}
+			}
+		},
+		"/mia-stream-deck/public/bundle.js.map": {
+			"get": {
+				"description": "",
+				"summary": "Plugin's front app map",
+				"operationId": "getFrontAppMap",
+				"responses": {
+					"200": {
+						"description": "Plugin's front app",
+						"content": {
+							"application/json": {
+								"schema": {
+									"type": "object"
 								}
 							}
 						}

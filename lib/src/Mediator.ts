@@ -64,6 +64,10 @@ export default class MediatorStreamDeck extends Mediator {
 
     }
 
+    public getFrontAppMap (): Promise<operations["getFrontApp"]["responses"]["200"]["content"]["application/javascript"]> {
+        return readFile(join(__dirname, "..", "..", "public", "bundle.js.map"), "utf-8");
+    }
+
     public getTables (): Promise<operations["getTables"]["responses"]["200"]["content"]["application/json"]> {
 
         console.log("getTables");
