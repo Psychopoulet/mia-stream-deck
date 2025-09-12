@@ -30545,9 +30545,40 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   "default": () => (/* binding */ getSDK)
 /* harmony export */ });
 
+var __spreadArray = (undefined && undefined.__spreadArray) || function (to, from, pack) {
+    if (pack || arguments.length === 2) for (var i = 0, l = from.length, ar; i < l; i++) {
+        if (ar || !(i in from)) {
+            if (!ar) ar = Array.prototype.slice.call(from, 0, i);
+            ar[i] = from[i];
+        }
+    }
+    return to.concat(ar || Array.prototype.slice.call(from));
+};
 // component
 var SDK = /** @class */ (function () {
     function SDK() {
+        var socket = new WebSocket("ws://localhost:{{app.port}}");
+        socket.addEventListener("error", function () {
+            var data = [];
+            for (var _i = 0; _i < arguments.length; _i++) {
+                data[_i] = arguments[_i];
+            }
+            console.error.apply(console, __spreadArray(["socket error"], data, false));
+        });
+        socket.addEventListener("open", function () {
+            var data = [];
+            for (var _i = 0; _i < arguments.length; _i++) {
+                data[_i] = arguments[_i];
+            }
+            console.log.apply(console, __spreadArray(["socket opened"], data, false));
+        });
+        socket.addEventListener("close", function () {
+            var data = [];
+            for (var _i = 0; _i < arguments.length; _i++) {
+                data[_i] = arguments[_i];
+            }
+            console.log.apply(console, __spreadArray(["socket closed"], data, false));
+        });
     }
     SDK.prototype.getTables = function () {
         return fetch("/{{plugin.name}}/api/tables").then(function (res) {

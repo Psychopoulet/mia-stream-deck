@@ -9,6 +9,24 @@
 
 export class SDK {
 
+    public constructor () {
+
+        const socket = new WebSocket("ws://localhost:{{app.port}}");
+
+        socket.addEventListener("error", (...data): void => {
+            console.error("socket error", ...data);
+        });
+
+        socket.addEventListener("open", (...data): void => {
+            console.log("socket opened", ...data);
+        });
+
+        socket.addEventListener("close", (...data): void => {
+            console.log("socket closed", ...data);
+        });
+
+    }
+
     public getTables (): Promise<operations["getTables"]["responses"]["200"]["content"]["application/json"]> {
 
         return fetch("/{{plugin.name}}/api/tables").then((res: Response): Promise<components["schemas"]["TableName"][]> => {

@@ -12,6 +12,8 @@
 
     // externals
     import type ContainerPattern from "node-containerpattern";
+    import type ConfManager from "node-confmanager";
+    import type { iDescriptorUserOptions } from "node-pluginsmanager-plugin";
 
     // locals
     import type { operations, components } from "./Descriptor";
@@ -20,20 +22,26 @@
 
 export default class MediatorStreamDeck extends Mediator {
 
+    protected _port: number;
+
+    public constructor (data: iDescriptorUserOptions) {
+
+        super(data);
+
+        this._port = 0;
+
+    }
+
     protected _initWorkSpace (container: ContainerPattern): Promise<void> {
 
-        console.log("init for", container.get("app.name") as string, container.get("app.version") as string);
+        this._port = (container.get("conf") as ConfManager).get("port") as number;
 
         return Promise.resolve();
 
     }
 
     protected _releaseWorkSpace  (container: ContainerPattern): Promise<void> {
-
-        console.log("release for", container.get("app.name") as string, container.get("app.version") as string);
-
         return Promise.resolve();
-
     }
 
     public getFrontIndex (): Promise<operations["getFrontIndex"]["responses"]["200"]["content"]["text/html"]> {
@@ -56,6 +64,7 @@ export default class MediatorStreamDeck extends Mediator {
 
             return content
 
+                .replace(/{{app.port}}/g, String(this._port))
                 .replace(/{{plugin.name}}/g, this.getPluginName())
                 .replace(/{{plugin.version}}/g, this.getPluginVersion())
                 .replace(/{{plugin.description}}/g, this.getPluginDescription());
