@@ -1,5 +1,10 @@
 "use strict";
 
+// deps
+
+    // natives
+    import { EventEmitter } from "events";
+
 // types & interfaces
 
     // locals
@@ -7,22 +12,32 @@
 
 // component
 
-export class SDK {
+export class SDK extends EventEmitter<{
+    "connected": [];
+    "disconnected": [ number, string ];
+    "message": [ string ];
+}> {
 
     public constructor () {
 
+        super();
+
         const socket = new WebSocket("ws://localhost:{{app.port}}");
 
-        socket.addEventListener("error", (...data): void => {
-            console.error("socket error", ...data);
+        socket.addEventListener("error", (err: Event): void => {
+            console.error("socket error", err);
         });
 
-        socket.addEventListener("open", (...data): void => {
-            console.log("socket opened", ...data);
+        socket.addEventListener("open", (): void => {
+            this.emit("connected");
         });
 
-        socket.addEventListener("close", (...data): void => {
-            console.log("socket closed", ...data);
+        socket.addEventListener("close", (data: CloseEvent): void => {
+            this.emit("disconnected", data.code, data.reason);
+        });
+
+        socket.addEventListener("message", (data: MessageEvent): void => {
+            this.emit("message", data.data);
         });
 
     }
