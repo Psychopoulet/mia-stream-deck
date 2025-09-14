@@ -4,7 +4,7 @@
 
     // externals
     import React from "react";
-    import { Alert } from "react-bootstrap-fontawesome";
+    import { Alert, SelectLabel } from "react-bootstrap-fontawesome";
 
     // locals
     import getSDK from "./sdk";
@@ -22,6 +22,7 @@
     interface iState {
         "loading": boolean;
         "tables": components["schemas"]["TableName"][];
+        "tablename": string;
     }
 
 // component
@@ -44,7 +45,8 @@ export default class TableCommandsChoice extends React.Component<iPropsNode, iSt
 
         this.state = {
             "loading": true,
-            "tables": []
+            "tables": [],
+            "tablename": ""
         };
 
     }
@@ -72,6 +74,19 @@ export default class TableCommandsChoice extends React.Component<iPropsNode, iSt
 
     }
 
+    // events
+
+    private _handleChangeTable (e: React.ChangeEvent<HTMLSelectElement>, newValue: string): void {
+
+        e.stopPropagation();
+        e.preventDefault();
+
+        this.setState({
+            "tablename": newValue
+        });
+
+    }
+
     // render
 
     public render (): React.JSX.Element {
@@ -83,9 +98,28 @@ export default class TableCommandsChoice extends React.Component<iPropsNode, iSt
             </div>;
 
         }
+        else if (0 >= this.state.tablename.length || !this.state.tables.find((value: string): boolean => {
+            return value === this.state.tablename;
+        })) {
+
+            return <div className="container">
+
+                <SelectLabel label="Choose table" value={ this.state.tablename } onChange={ this._handleChangeTable.bind(this) }>
+
+                    <option value="">-</option>
+
+                    { this.state.tables.map((value: string, key: number): React.JSX.Element => {
+                        return <option key={ key } value={ value }>{ value }</option>;
+                    }) }
+
+                </SelectLabel>
+
+            </div>
+
+        }
         else {
 
-            return <TableCommands name="presentation" />
+            return <TableCommands name={ this.state.tablename } />
 
         }
 

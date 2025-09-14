@@ -31170,7 +31170,8 @@ var TableCommandsChoice = /** @class */ (function (_super) {
         _this._sdk = (0,_sdk__WEBPACK_IMPORTED_MODULE_2__["default"])();
         _this.state = {
             "loading": true,
-            "tables": []
+            "tables": [],
+            "tablename": ""
         };
         return _this;
     }
@@ -31189,14 +31190,33 @@ var TableCommandsChoice = /** @class */ (function (_super) {
             });
         });
     };
+    // events
+    TableCommandsChoice.prototype._handleChangeTable = function (e, newValue) {
+        e.stopPropagation();
+        e.preventDefault();
+        this.setState({
+            "tablename": newValue
+        });
+    };
     // render
     TableCommandsChoice.prototype.render = function () {
+        var _this = this;
         if (this.state.loading) {
             return react__WEBPACK_IMPORTED_MODULE_0___default().createElement("div", { className: "container" },
                 react__WEBPACK_IMPORTED_MODULE_0___default().createElement(react_bootstrap_fontawesome__WEBPACK_IMPORTED_MODULE_1__.Alert, { variant: "warning" }, "Loading..."));
         }
+        else if (0 >= this.state.tablename.length || !this.state.tables.find(function (value) {
+            return value === _this.state.tablename;
+        })) {
+            return react__WEBPACK_IMPORTED_MODULE_0___default().createElement("div", { className: "container" },
+                react__WEBPACK_IMPORTED_MODULE_0___default().createElement(react_bootstrap_fontawesome__WEBPACK_IMPORTED_MODULE_1__.SelectLabel, { label: "Choose table", value: this.state.tablename, onChange: this._handleChangeTable.bind(this) },
+                    react__WEBPACK_IMPORTED_MODULE_0___default().createElement("option", { value: "" }, "-"),
+                    this.state.tables.map(function (value, key) {
+                        return react__WEBPACK_IMPORTED_MODULE_0___default().createElement("option", { key: key, value: value }, value);
+                    })));
+        }
         else {
-            return react__WEBPACK_IMPORTED_MODULE_0___default().createElement(_TableCommands__WEBPACK_IMPORTED_MODULE_3__["default"], { name: "presentation" });
+            return react__WEBPACK_IMPORTED_MODULE_0___default().createElement(_TableCommands__WEBPACK_IMPORTED_MODULE_3__["default"], { name: this.state.tablename });
         }
     };
     // name
@@ -31290,7 +31310,13 @@ var SDK = /** @class */ (function (_super) {
                 return Promise.resolve();
             }
             else {
-                return Promise.reject(new Error("Problem with request executeCommand has status '" + res.status + "' (" + res.statusText + ")"));
+                return new Promise(function (resolve, reject) {
+                    res.json().then(function (err) {
+                        return reject(new Error("[" + err.code + "] " + err.message));
+                    }).catch(function () {
+                        return reject(new Error("Problem with request executeCommand has status '" + res.status + "' (" + res.statusText + ")"));
+                    });
+                });
             }
         });
     };

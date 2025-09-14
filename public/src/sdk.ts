@@ -77,13 +77,23 @@ export class SDK extends EventEmitter<{
         return fetch("/{{plugin.name}}/api/execute-command", {
             "method": "put",
             "body": JSON.stringify(cmd)
-        }).then((res: Response): Promise<void> => {
+        }).then((res: Response): Promise<operations["executeCommand"]["responses"]["204"]["content"]["application/json"]> => {
 
             if (res.ok) {
                 return Promise.resolve();
             }
             else {
-                return Promise.reject(new Error("Problem with request executeCommand has status '" + res.status + "' (" + res.statusText + ")"));
+
+                return new Promise((resolve, reject: (err: Error) => void): void => {
+
+                    res.json().then((err: operations["executeCommand"]["responses"]["default"]["content"]["application/json"]): void => {
+                        return reject(new Error("[" + err.code + "] " + err.message));
+                    }).catch((): void => {
+                        return reject(new Error("Problem with request executeCommand has status '" + res.status + "' (" + res.statusText + ")"));
+                    });
+
+                });
+
             }
 
         });
