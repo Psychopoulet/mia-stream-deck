@@ -183,11 +183,19 @@ export interface components {
             /** @description Key + shift (default : false) */
             shift?: boolean;
         };
-        /** @description Execute a command line (like in a terminal) */
+        /** @description Execute a command line (like in a terminal) (see https://nodejs.org/api/child_process.html) */
         ActionCommand: {
             /** @enum {string} */
             type: "COMMAND";
             command: string;
+            /** @description Current working directory of the child process. Default: process.cwd(). */
+            cwd?: string;
+            /** @description Prepare child process to run independently of its parent process. Specific behavior depends on the platform (see options.detached). */
+            detached?: boolean;
+            /** @description Shell to execute the command with. See Shell requirements and Default Windows shell. Default: '/bin/sh' on Unix, process.env.ComSpec on Windows. */
+            shell?: string;
+            /** @description If true, runs command inside of a shell. */
+            insideShell?: boolean;
         };
         /** @description Execute a plugin method */
         ActionPlugin: {

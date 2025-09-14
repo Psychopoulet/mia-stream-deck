@@ -373,7 +373,7 @@
 			},
 			"ActionCommand": {
 				"type": "object",
-				"description": "Execute a command line (like in a terminal)",
+				"description": "Execute a command line (like in a terminal) (see https://nodejs.org/api/child_process.html)",
 				"properties": {
 					"type": {
 						"type": "string",
@@ -382,6 +382,22 @@
 					"command": {
 						"type": "string",
 						"minLength": 1
+					},
+					"cwd": {
+						"description": "Current working directory of the child process. Default: process.cwd().",
+						"type": "string"
+					},
+					"detached": {
+						"description": "Prepare child process to run independently of its parent process. Specific behavior depends on the platform (see options.detached).",
+						"type": "boolean"
+					},
+					"shell": {
+						"description": "Shell to execute the command with. See Shell requirements and Default Windows shell. Default: '/bin/sh' on Unix, process.env.ComSpec on Windows.",
+						"type": "string"
+					},
+					"insideShell": {
+						"description": "If true, runs command inside of a shell.",
+						"type": "boolean"
 					}
 				},
 				"required": [ "type", "command" ]

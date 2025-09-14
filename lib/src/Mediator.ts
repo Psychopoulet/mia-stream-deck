@@ -1,7 +1,7 @@
 // deps
 
     // natives
-    import { exec } from "node:child_process";
+    import { spawn } from "node:child_process";
     import { readFile } from "node:fs/promises";
     import { join } from "node:path";
 
@@ -9,6 +9,9 @@
     import { Mediator } from "node-pluginsmanager-plugin";
 
 // types & interfaces
+
+    // natives
+    import type { ChildProcess } from "node:child_process";
 
     // externals
     import type ContainerPattern from "node-containerpattern";
@@ -79,8 +82,6 @@ export default class MediatorStreamDeck extends Mediator {
 
     public getTables (): Promise<operations["getTables"]["responses"]["200"]["content"]["application/json"]> {
 
-        console.log("getTables");
-
         return Promise.resolve([
             "presentation"
         ]);
@@ -89,7 +90,9 @@ export default class MediatorStreamDeck extends Mediator {
 
     public getTableByName (urlParameters: operations["getTableByName"]["parameters"]): Promise<operations["getTableByName"]["responses"]["200"]["content"]["application/json"]> {
 
-        console.log("getTableByName", urlParameters.path.tablename);
+        if ("presentation" !== urlParameters.path.tablename) {
+            return Promise.resolve([]);
+        }
 
         return Promise.resolve([
             [
@@ -97,7 +100,9 @@ export default class MediatorStreamDeck extends Mediator {
                     "picture": "http://localhost:3000/public/pictures/warcraft3.png",
                     "action": {
                         "type": "COMMAND",
-                        "command": "cd \"C:\\Users\\FlowUP\\Documents\\projects\\warcraft3sounds\" && npm run start"
+                        "command": "npm run daemon-start",
+                        "cwd": "C:\\Users\\FlowUP\\Documents\\projects\\warcraft3sounds",
+                        "insideShell": true
                     }
                 },
                 {
@@ -159,39 +164,108 @@ export default class MediatorStreamDeck extends Mediator {
 
     public executeCommand (urlParameters: operations["executeCommand"]["parameters"], bodyParameters: operations["executeCommand"]["requestBody"]["content"]["application/json"]): Promise<operations["executeCommand"]["responses"]["204"]["content"]["application/json"]> {
 
-        console.log("executeCommand", bodyParameters);
-
         if ("COMMAND" === bodyParameters.action.type) {
 
             return new Promise((resolve: (value: unknown) => void, reject: (value: Error) => void): void => {
 
                 const command: components["schemas"]["ActionCommand"] = bodyParameters.action as components["schemas"]["ActionCommand"];
 
-                exec(command.command, (err: Error | null, stdout: string, stderr: string): void => {
+                console.log("command", command);
 
-                    if (err) {
+                let ended: boolean = false;
+                let running: boolean = false;
+                let stderr: string = "";
+                let stdout: string = "";
 
-                        console.log("err", err);
+                let options: Record<string, string | boolean> = {
+                    "windowsHide": true
+                };
 
-                        return reject(err);
+                if ("undefined" !== typeof command.cwd) {
+                    options.cwd = command.cwd;
+                }
+                if ("undefined" !== typeof command.detached) {
+                    options.detached = command.detached;
+                }
+                if ("undefined" !== typeof command.shell) {
+                    options.shell = command.shell;
+                }
+                else if ("undefined" !== typeof command.insideShell) {
+                    options.shell = command.insideShell;
+                }
+
+                const childProcess: ChildProcess = spawn(command.command, options);
+
+                childProcess.once("error", (err: Error): void => {
+
+                    console.log("childProcess", "error", err);
+
+                    if (!ended) {
+
+                        ended = true;
+
+                        if (running) {
+                            this.emit("command.fail", bodyParameters, err);
+                        }
+
+                        reject(err);
 
                     }
-                    else if (0 < stderr.length) {
 
-                        console.log("stderr", stderr);
+                }).once("spawn", (): void => {
 
-                        return reject(new Error(stderr));
+                    console.log("childProcess", "spawn");
 
-                    }
-                    else {
+                    this.emit("command.running", bodyParameters);
 
-                        console.log("stdout", stdout);
+                    running = true;
 
-                        return resolve(undefined);
+                }).once("close", (code: number | null, signal: NodeJS.Signals | null): void => {
+
+                    console.log("childProcess", "close", code, signal);
+
+                    if (!ended) {
+
+                        ended = true;
+
+                        if (code) {
+
+                            this.emit("command.fail", bodyParameters, stderr);
+
+                            return reject(new Error(stderr));
+
+                        }
+                        else {
+
+                            this.emit("command.success", bodyParameters);
+
+                            return resolve(stdout);
+
+                        }
 
                     }
 
                 });
+
+                if (childProcess.stderr) {
+
+                    childProcess.stderr?.setEncoding("utf-8");
+
+                    childProcess.stderr.on("data", (chunk: string): void => {
+                        stderr += chunk;
+                    });
+
+                }
+
+                if (childProcess.stdout) {
+
+                    childProcess.stdout?.setEncoding("utf-8");
+
+                    childProcess.stdout.on("data", (chunk: string): void => {
+                        stdout += chunk;
+                    });
+
+                }
 
             });
 
