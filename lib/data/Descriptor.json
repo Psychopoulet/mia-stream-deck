@@ -5,7 +5,6 @@
 		"version": "1.0.0"
 	},
 	"paths": {
-
 		"/mia-stream-deck/descriptor": {
 			"get": {
 				"description": "",
@@ -153,7 +152,6 @@
 				}
 			}
 		},
-
 		"/mia-stream-deck/api/tables": {
 			"get": {
 				"description": "",
@@ -261,10 +259,13 @@
 				}
 			}
 		}
-
 	},
 	"components": {
 		"schemas": {
+			"PluginName": {
+				"type": "string",
+				"enum": [ "mia-stream-deck" ]
+			},
 			"Error": {
 				"type": "object",
 				"description": "JSON Error description",
@@ -420,6 +421,58 @@
 					}
 				},
 				"required": [ "type", "plugin", "operationId" ]
+			},
+			"PushEventCommandRunning": {
+				"type": "object",
+				"properties": {
+					"plugin": { "$ref": "#/components/schemas/PluginName" },
+					"command": {
+						"type": "string",
+						"enum": [ "command.running" ]
+					},
+					"data": { "$ref": "#/components/schemas/Command" }
+				},
+				"required": [ "plugin", "command", "data" ]
+			},
+			"PushEventCommandSuccess": {
+				"type": "object",
+				"properties": {
+					"plugin": { "$ref": "#/components/schemas/PluginName" },
+					"command": {
+						"type": "string",
+						"enum": [ "command.success" ]
+					},
+					"data": {
+						"type": "object",
+						"properties": {
+							"command": { "$ref": "#/components/schemas/Command" },
+							"content": {
+								"type": "string"
+							}
+						},
+						"required": [ "command", "content" ]
+					}
+				},
+				"required": [ "plugin", "command", "data" ]
+			},
+			"PushEventCommandFail": {
+				"type": "object",
+				"properties": {
+					"plugin": { "$ref": "#/components/schemas/PluginName" },
+					"command": {
+						"type": "string",
+						"enum": [ "command.fail" ]
+					},
+					"data": {
+						"type": "object",
+						"properties": {
+							"command": { "$ref": "#/components/schemas/Command" },
+							"error": { "$ref": "#/components/schemas/Error" }
+						},
+						"required": [ "command", "error" ]
+					}
+				},
+				"required": [ "plugin", "command", "data" ]
 			}
 		}
 	},

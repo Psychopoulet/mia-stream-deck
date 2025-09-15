@@ -17,7 +17,7 @@ export class SDK extends EventEmitter<{
     "disconnected": [ number, string ];
     "command.running": [ components["schemas"]["Command"] ];
     "command.fail": [ components["schemas"]["Command"], components["schemas"]["Error"] ];
-    "command.success": [ components["schemas"]["Command"] ];
+    "command.success": [ components["schemas"]["Command"], string ];
 }> {
 
     public constructor () {
@@ -40,20 +40,24 @@ export class SDK extends EventEmitter<{
 
         socket.addEventListener("message", (message: MessageEvent): void => {
 
-            const data: Record<string, any> = JSON.parse(message.data);
+            const parsedMessage: components["schemas"]["PushEventCommandRunning"] | components["schemas"]["PushEventCommandSuccess"] | components["schemas"]["PushEventCommandFail"] = JSON.parse(message.data);
 
-            if ("{{plugin.name}}" === data.plugin) {
+            if ("mia-stream-deck" === parsedMessage.plugin) {
 
-                if ("command.fail" === data.command) {
+                switch (parsedMessage.command) {
 
-                    this.emit(data.command, data.data, {
-                        "code": data.data.code,
-                        "message": data.data.message
-                    });
+                    case "command.running":
+                        this.emit(parsedMessage.command, parsedMessage.data);
+                    break;
 
-                }
-                else {
-                    this.emit(data.command, data.data);
+                    case "command.success":
+                        this.emit(parsedMessage.command, parsedMessage.data.command, parsedMessage.data.content);
+                    break;
+
+                    case "command.fail":
+                        this.emit(parsedMessage.command, parsedMessage.data.command, parsedMessage.data.error);
+                    break;
+
                 }
 
             }

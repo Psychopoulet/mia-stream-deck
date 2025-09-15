@@ -136,9 +136,9 @@ export default class TableCommands extends React.Component<iProps, iState> {
 
     }
 
-    private _onCommandSuccess (cmd: components["schemas"]["Command"]): void {
+    private _onCommandSuccess (cmd: components["schemas"]["Command"], content: string): void {
 
-        console.log("_onCommandSuccess", cmd);
+        console.log("_onCommandSuccess", cmd, content);
 
         this.setState({
             "running": false

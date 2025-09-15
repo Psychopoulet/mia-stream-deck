@@ -144,6 +144,8 @@ export interface paths {
 export type webhooks = Record<string, never>;
 export interface components {
     schemas: {
+        /** @enum {string} */
+        PluginName: "mia-stream-deck";
         /** @description JSON Error description */
         Error: {
             code: string;
@@ -203,6 +205,30 @@ export interface components {
             type: "PLUGIN";
             plugin: string;
             operationId: string;
+        };
+        PushEventCommandRunning: {
+            plugin: components["schemas"]["PluginName"];
+            /** @enum {string} */
+            command: "command.running";
+            data: components["schemas"]["Command"];
+        };
+        PushEventCommandSuccess: {
+            plugin: components["schemas"]["PluginName"];
+            /** @enum {string} */
+            command: "command.success";
+            data: {
+                command: components["schemas"]["Command"];
+                content: string;
+            };
+        };
+        PushEventCommandFail: {
+            plugin: components["schemas"]["PluginName"];
+            /** @enum {string} */
+            command: "command.fail";
+            data: {
+                command: components["schemas"]["Command"];
+                error: components["schemas"]["Error"];
+            };
         };
     };
     responses: never;

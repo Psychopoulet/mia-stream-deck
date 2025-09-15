@@ -31079,8 +31079,8 @@ var TableCommands = /** @class */ (function (_super) {
             "running": false
         });
     };
-    TableCommands.prototype._onCommandSuccess = function (cmd) {
-        console.log("_onCommandSuccess", cmd);
+    TableCommands.prototype._onCommandSuccess = function (cmd, content) {
+        console.log("_onCommandSuccess", cmd, content);
         this.setState({
             "running": false
         });
@@ -31312,16 +31312,18 @@ var SDK = /** @class */ (function (_super) {
             _this.emit("disconnected", data.code, data.reason);
         });
         socket.addEventListener("message", function (message) {
-            var data = JSON.parse(message.data);
-            if ("{{plugin.name}}" === data.plugin) {
-                if ("command.fail" === data.command) {
-                    _this.emit(data.command, data.data, {
-                        "code": data.data.code,
-                        "message": data.data.message
-                    });
-                }
-                else {
-                    _this.emit(data.command, data.data);
+            var parsedMessage = JSON.parse(message.data);
+            if ("mia-stream-deck" === parsedMessage.plugin) {
+                switch (parsedMessage.command) {
+                    case "command.running":
+                        _this.emit(parsedMessage.command, parsedMessage.data);
+                        break;
+                    case "command.success":
+                        _this.emit(parsedMessage.command, parsedMessage.data.command, parsedMessage.data.content);
+                        break;
+                    case "command.fail":
+                        _this.emit(parsedMessage.command, parsedMessage.data.command, parsedMessage.data.error);
+                        break;
                 }
             }
         });
