@@ -49,7 +49,7 @@ export default class MediatorStreamDeck extends Mediator {
 
     public getFrontIndex (): Promise<operations["getFrontIndex"]["responses"]["200"]["content"]["text/html"]> {
 
-        return readFile(join(__dirname, "..", "..", "public", "index.html"), "utf-8").then((content: string): string => {
+        return readFile(join(__dirname, "..", "..", "public", "dist", "index.html"), "utf-8").then((content: string): string => {
 
             return content
 
@@ -63,7 +63,7 @@ export default class MediatorStreamDeck extends Mediator {
 
     public getFrontApp (): Promise<operations["getFrontApp"]["responses"]["200"]["content"]["application/javascript"]> {
 
-        return readFile(join(__dirname, "..", "..", "public", "bundle.js"), "utf-8").then((content: string): string => {
+        return readFile(join(__dirname, "..", "..", "public", "dist", "bundle.js"), "utf-8").then((content: string): string => {
 
             return content
 
@@ -77,7 +77,7 @@ export default class MediatorStreamDeck extends Mediator {
     }
 
     public getFrontAppMap (): Promise<operations["getFrontApp"]["responses"]["200"]["content"]["application/javascript"]> {
-        return readFile(join(__dirname, "..", "..", "public", "bundle.js.map"), "utf-8");
+        return readFile(join(__dirname, "..", "..", "public", "dist", "bundle.js.map"), "utf-8");
     }
 
     public getTables (): Promise<operations["getTables"]["responses"]["200"]["content"]["application/json"]> {

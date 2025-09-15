@@ -4,7 +4,7 @@
 		"target": "es5",
 		"module": "es6",
 
-		"outDir": "./public/",
+		"outDir": "./public/dist/",
 		"sourceMap": true,
 
 		"moduleResolution": "node",

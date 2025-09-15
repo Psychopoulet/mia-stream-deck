@@ -19,7 +19,7 @@
     "clean-api": "npx rimraf \"./lib/cjs\"",
     "build-api": "npm run-script clean-api && npm run-script transpile-openapi && npx tsc --project \"./tsconfig-api.json\"",
 
-    "clean-front": "npx rimraf \"./public/bundle.js",
+    "clean-front": "npx rimraf \"./public/dist/bundle.js",
     "build-front": "npm run-script clean-front && npm run-script transpile-openapi && npx webpack --config \"./webpack.config.js\"",
 
     "ci": "npm run-script tests && npx nyc report --reporter=text-lcov | coveralls"
@@ -29,7 +29,7 @@
     "/bin",
     "/lib/cjs",
     "/lib/data",
-    "/public"
+    "/public/dist"
   ],
   "engines": {
     "node": ">=16.0.0"

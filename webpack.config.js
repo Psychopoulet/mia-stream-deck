@@ -1,7 +1,7 @@
 // deps
 
 	// natives
-	const { join } = require("path");
+	const { join } = require("node:path");
 
 // consts
 
@@ -16,7 +16,7 @@ module.exports = {
   "entry": join(PUBLIC, "src", "index.tsx"),
   "output": {
     "filename": "bundle.js",
-    "path": PUBLIC
+    "path": join(PUBLIC, "dist")
   },
 
   "devtool": "source-map",
