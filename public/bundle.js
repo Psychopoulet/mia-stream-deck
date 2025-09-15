@@ -30935,15 +30935,24 @@ var App = /** @class */ (function (_super) {
         return _this;
     }
     App.prototype.componentDidMount = function () {
-        var _this = this;
-        this._sdk.on("connected", function () {
-            _this.setState({
-                "connected": true
-            });
-        }).on("disconnected", function () {
-            _this.setState({
-                "connected": false
-            });
+        this._sdk
+            .on("connected", this._onConnected.bind(this))
+            .on("disconnected", this._onDisconnected.bind(this));
+    };
+    App.prototype.componentWillUnmount = function () {
+        this._sdk
+            .off("connected", this._onConnected.bind(this))
+            .off("disconnected", this._onDisconnected.bind(this));
+    };
+    // handlers
+    App.prototype._onConnected = function () {
+        this.setState({
+            "connected": true
+        });
+    };
+    App.prototype._onDisconnected = function () {
+        this.setState({
+            "connected": false
         });
     };
     // render
@@ -31015,6 +31024,9 @@ var TableCommands = /** @class */ (function (_super) {
             "running": false,
             "table": []
         };
+        _this._onCommandRunning = _this._onCommandRunning.bind(_this);
+        _this._onCommandSuccess = _this._onCommandSuccess.bind(_this);
+        _this._onCommandFail = _this._onCommandFail.bind(_this);
         return _this;
     }
     TableCommands.prototype.componentDidMount = function () {
@@ -31023,6 +31035,10 @@ var TableCommands = /** @class */ (function (_super) {
             "table": [],
             "loading": true
         });
+        this._sdk
+            .on("command.running", this._onCommandRunning)
+            .on("command.fail", this._onCommandFail)
+            .on("command.success", this._onCommandSuccess);
         this._sdk.getTableByName("presentation").then(function (table) {
             _this.setState({
                 "table": table,
@@ -31042,18 +31058,37 @@ var TableCommands = /** @class */ (function (_super) {
             });
         });
     };
+    TableCommands.prototype.componentWillUnmount = function () {
+        this._sdk
+            .off("command.running", this._onCommandRunning)
+            .off("command.fail", this._onCommandFail)
+            .off("command.success", this._onCommandSuccess);
+    };
     // events
-    TableCommands.prototype._executeCommand = function (cmd) {
-        var _this = this;
+    TableCommands.prototype._onCommandRunning = function (cmd) {
+        console.log("_onCommandRunning", cmd);
         this.setState({
             "running": true
         });
-        this._sdk.executeCommand(cmd).then(function () {
-            alert("running");
-            _this.setState({
-                "running": false
-            });
-        }).catch(function (err) {
+    };
+    TableCommands.prototype._onCommandFail = function (cmd, err) {
+        console.log("_onCommandFail", cmd, err);
+        console.error(err);
+        alert(err.message);
+        this.setState({
+            "running": false
+        });
+    };
+    TableCommands.prototype._onCommandSuccess = function (cmd) {
+        console.log("_onCommandSuccess", cmd);
+        this.setState({
+            "running": false
+        });
+    };
+    // handlers
+    TableCommands.prototype._executeCommand = function (cmd) {
+        var _this = this;
+        this._sdk.executeCommand(cmd).catch(function (err) {
             console.error(err);
             alert(err.message);
             _this.setState({
@@ -31276,8 +31311,19 @@ var SDK = /** @class */ (function (_super) {
         socket.addEventListener("close", function (data) {
             _this.emit("disconnected", data.code, data.reason);
         });
-        socket.addEventListener("message", function (data) {
-            _this.emit("message", data.data);
+        socket.addEventListener("message", function (message) {
+            var data = JSON.parse(message.data);
+            if ("{{plugin.name}}" === data.plugin) {
+                if ("command.fail" === data.command) {
+                    _this.emit(data.command, data.data, {
+                        "code": data.data.code,
+                        "message": data.data.message
+                    });
+                }
+                else {
+                    _this.emit(data.command, data.data);
+                }
+            }
         });
         return _this;
     }

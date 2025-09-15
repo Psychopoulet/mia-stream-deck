@@ -15,7 +15,9 @@
 export class SDK extends EventEmitter<{
     "connected": [];
     "disconnected": [ number, string ];
-    "message": [ string ];
+    "command.running": [ components["schemas"]["Command"] ];
+    "command.fail": [ components["schemas"]["Command"], components["schemas"]["Error"] ];
+    "command.success": [ components["schemas"]["Command"] ];
 }> {
 
     public constructor () {
@@ -36,8 +38,26 @@ export class SDK extends EventEmitter<{
             this.emit("disconnected", data.code, data.reason);
         });
 
-        socket.addEventListener("message", (data: MessageEvent): void => {
-            this.emit("message", data.data);
+        socket.addEventListener("message", (message: MessageEvent): void => {
+
+            const data: Record<string, any> = JSON.parse(message.data);
+
+            if ("{{plugin.name}}" === data.plugin) {
+
+                if ("command.fail" === data.command) {
+
+                    this.emit(data.command, data.data, {
+                        "code": data.data.code,
+                        "message": data.data.message
+                    });
+
+                }
+                else {
+                    this.emit(data.command, data.data);
+                }
+
+            }
+
         });
 
     }

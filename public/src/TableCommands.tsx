@@ -52,6 +52,10 @@ export default class TableCommands extends React.Component<iProps, iState> {
             "table": []
         };
 
+        this._onCommandRunning = this._onCommandRunning.bind(this);
+        this._onCommandSuccess = this._onCommandSuccess.bind(this);
+        this._onCommandFail = this._onCommandFail.bind(this);
+
     }
 
     public componentDidMount (): void {
@@ -60,6 +64,11 @@ export default class TableCommands extends React.Component<iProps, iState> {
             "table": [],
             "loading": true
         });
+
+        this._sdk
+            .on("command.running", this._onCommandRunning)
+            .on("command.fail", this._onCommandFail)
+            .on("command.success", this._onCommandSuccess);
 
         this._sdk.getTableByName("presentation").then((table: components["schemas"]["Table"]): void => {
 
@@ -92,23 +101,56 @@ export default class TableCommands extends React.Component<iProps, iState> {
 
     }
 
+    public componentWillUnmount(): void {
+
+        this._sdk
+            .off("command.running", this._onCommandRunning)
+            .off("command.fail", this._onCommandFail)
+            .off("command.success", this._onCommandSuccess);
+
+    }
+
     // events
 
-    private _executeCommand (cmd: components["schemas"]["Command"]): void {
+    private _onCommandRunning (cmd: components["schemas"]["Command"]): void {
+
+        console.log("_onCommandRunning", cmd);
 
         this.setState({
             "running": true
         });
 
-        this._sdk.executeCommand(cmd).then((): void => {
+    }
 
-            alert("running");
+    private _onCommandFail (cmd: components["schemas"]["Command"], err: components["schemas"]["Error"]): void {
 
-            this.setState({
-                "running": false
-            });
+        console.log("_onCommandFail", cmd, err);
 
-        }).catch((err: Error): void => {
+        console.error(err);
+
+        alert(err.message);
+
+        this.setState({
+            "running": false
+        });
+
+    }
+
+    private _onCommandSuccess (cmd: components["schemas"]["Command"]): void {
+
+        console.log("_onCommandSuccess", cmd);
+
+        this.setState({
+            "running": false
+        });
+
+    }
+
+    // handlers
+
+    private _executeCommand (cmd: components["schemas"]["Command"]): void {
+
+        this._sdk.executeCommand(cmd).catch((err: Error): void => {
 
             console.error(err);
 
