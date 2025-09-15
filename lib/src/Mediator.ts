@@ -116,7 +116,8 @@ export default class MediatorStreamDeck extends Mediator {
                     "picture": "http://localhost:3000/public/pictures/warcraft3.png",
                     "action": {
                         "type": "COMMAND",
-                        "command": "vlc --intf dummy http://localhost:3000/public/sounds/PeonReady1.wav vlc://quit"
+                        "command": "vlc --intf dummy http://localhost:3000/public/sounds/PeonReady1.wav vlc://quit",
+                        "insideShell": true
                     }
                 }
             ], [
@@ -170,8 +171,6 @@ export default class MediatorStreamDeck extends Mediator {
 
                 const command: components["schemas"]["ActionCommand"] = bodyParameters.action as components["schemas"]["ActionCommand"];
 
-                console.log("command", command);
-
                 let ended: boolean = false;
                 let running: boolean = false;
                 let stderr: string = "";
@@ -198,8 +197,6 @@ export default class MediatorStreamDeck extends Mediator {
 
                 childProcess.once("error", (err: Error): void => {
 
-                    console.log("childProcess", "error", err);
-
                     if (!ended) {
 
                         ended = true;
@@ -214,15 +211,11 @@ export default class MediatorStreamDeck extends Mediator {
 
                 }).once("spawn", (): void => {
 
-                    console.log("childProcess", "spawn");
+                    running = true;
 
                     this.emit("command.running", bodyParameters);
 
-                    running = true;
-
                 }).once("close", (code: number | null, signal: NodeJS.Signals | null): void => {
-
-                    console.log("childProcess", "close", code, signal);
 
                     if (!ended) {
 
@@ -230,14 +223,14 @@ export default class MediatorStreamDeck extends Mediator {
 
                         if (code) {
 
-                            this.emit("command.fail", bodyParameters, stderr);
+                            this.emit("command.fail", bodyParameters, new Error(stderr));
 
                             return reject(new Error(stderr));
 
                         }
                         else {
 
-                            this.emit("command.success", bodyParameters);
+                            this.emit("command.success", bodyParameters, stdout);
 
                             return resolve(stdout);
 
