@@ -6,7 +6,7 @@
     import { join } from "node:path";
 
     // externals
-    import { Mediator } from "node-pluginsmanager-plugin";
+    import { Mediator, NotFoundError } from "node-pluginsmanager-plugin";
 
 // types & interfaces
 
@@ -25,27 +25,38 @@
 
 export default class MediatorStreamDeck extends Mediator {
 
-    protected _port: number;
+    // attributes
+
+        // private
+
+        private _port: number;
+        private _file: string;
+
+    // constructor
 
     public constructor (data: iDescriptorUserOptions) {
 
         super(data);
 
         this._port = 0;
+        this._file = "";
 
     }
 
     protected _initWorkSpace (container: ContainerPattern): Promise<void> {
 
         this._port = (container.get("conf") as ConfManager).get("port") as number;
+        this._file = join(this._externalRessourcesDirectory, "tables.json");
 
         return Promise.resolve();
 
     }
 
-    protected _releaseWorkSpace  (container: ContainerPattern): Promise<void> {
+    protected _releaseWorkSpace  (): Promise<void> {
         return Promise.resolve();
     }
+
+    // front files
 
     public getFrontIndex (): Promise<operations["getFrontIndex"]["responses"]["200"]["content"]["text/html"]> {
 
@@ -80,86 +91,32 @@ export default class MediatorStreamDeck extends Mediator {
         return readFile(join(__dirname, "..", "..", "public", "dist", "bundle.js.map"), "utf-8");
     }
 
+    // api
+
     public getTables (): Promise<operations["getTables"]["responses"]["200"]["content"]["application/json"]> {
 
-        return Promise.resolve([
-            "presentation"
-        ]);
+        return readFile(this._file, "utf-8").then((content: string) => {
+            return JSON.parse(content);
+        }).then((content: Record<string, components["schemas"]["Table"]>): Promise<operations["getTables"]["responses"]["200"]["content"]["application/json"]> => {
+            return Promise.resolve(Object.keys(content));
+        });
 
     }
 
     public getTableByName (urlParameters: operations["getTableByName"]["parameters"]): Promise<operations["getTableByName"]["responses"]["200"]["content"]["application/json"]> {
 
-        if ("presentation" !== urlParameters.path.tablename) {
-            return Promise.resolve([]);
-        }
+        return readFile(this._file, "utf-8").then((content: string) => {
+            return JSON.parse(content);
+        }).then((content: Record<string, components["schemas"]["Table"]>): Promise<operations["getTableByName"]["responses"]["200"]["content"]["application/json"]> => {
 
-        return Promise.resolve([
-            [
-                {
-                    "picture": "http://localhost:3000/public/pictures/warcraft3.png",
-                    "action": {
-                        "type": "COMMAND",
-                        "command": "npm run daemon-start",
-                        "cwd": "C:\\Users\\FlowUP\\Documents\\projects\\warcraft3sounds",
-                        "insideShell": true
-                    }
-                },
-                {
-                    "icon": "up",
-                    "action": {
-                        "type": "INPUT-KEY",
-                        "key": "up"
-                    }
-                },
-                {
-                    "picture": "http://localhost:3000/public/pictures/warcraft3.png",
-                    "action": {
-                        "type": "COMMAND",
-                        "command": "vlc --intf dummy http://localhost:3000/public/sounds/PeonReady1.wav vlc://quit",
-                        "insideShell": true
-                    }
-                }
-            ], [
-                {
-                    "icon": "left",
-                    "action": {
-                        "type": "INPUT-KEY",
-                        "key": "left"
-                    }
-                },
-                {
-                    "action": {
-                        "type": "EMPTY"
-                    }
-                },
-                {
-                    "icon": "right",
-                    "action": {
-                        "type": "INPUT-KEY",
-                        "key": "right"
-                    }
-                }
-            ], [
-                {
-                    "action": {
-                        "type": "EMPTY"
-                    }
-                },
-                {
-                    "icon": "down",
-                    "action": {
-                        "type": "INPUT-KEY",
-                        "key": "down"
-                    }
-                },
-                {
-                    "action": {
-                        "type": "EMPTY"
-                    }
-                }
-            ]
-        ]);
+            if (!content[urlParameters.path.tablename]) {
+                return Promise.reject(new NotFoundError("Table \"" + urlParameters.path.tablename + "\" not found"));
+            }
+            else {
+                return Promise.resolve(content[urlParameters.path.tablename]);
+            }
+
+        });
 
     }
 
