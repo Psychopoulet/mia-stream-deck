@@ -2,7 +2,7 @@
 
     // natives
     import { spawn } from "node:child_process";
-    import { readFile } from "node:fs/promises";
+    import { readFile, writeFile } from "node:fs/promises";
     import { join } from "node:path";
 
     // externals
@@ -120,108 +120,143 @@ export default class MediatorStreamDeck extends Mediator {
 
     }
 
+    public deleteTableByName (urlParameters: operations["deleteTableByName"]["parameters"]): Promise<operations["deleteTableByName"]["responses"]["204"]["content"]["application/json"]> {
+
+        return readFile(this._file, "utf-8").then((content: string) => {
+            return JSON.parse(content);
+        }).then((content: Record<string, components["schemas"]["Table"]>): Promise<operations["deleteTableByName"]["responses"]["204"]["content"]["application/json"]> => {
+
+            if (!content[urlParameters.path.tablename]) {
+                return Promise.reject(new NotFoundError("Table \"" + urlParameters.path.tablename + "\" not found"));
+            }
+            else {
+
+                delete content[urlParameters.path.tablename];
+
+                return writeFile(this._file, JSON.stringify(content), "utf-8");
+
+            }
+
+        });
+
+    }
+
     public executeCommand (urlParameters: operations["executeCommand"]["parameters"], bodyParameters: operations["executeCommand"]["requestBody"]["content"]["application/json"]): Promise<operations["executeCommand"]["responses"]["204"]["content"]["application/json"]> {
 
-        if ("COMMAND" === bodyParameters.action.type) {
+        if ("EMPTY" === bodyParameters.action.type) {
+            return Promise.resolve();
+        }
+        else if ("COMMAND" === bodyParameters.action.type) {
 
-            return new Promise((resolve: (value: unknown) => void, reject: (value: Error) => void): void => {
+            return this._executeActionCommand(bodyParameters).then((): Promise<void> => {
+                return Promise.resolve();
+            });
 
-                const command: components["schemas"]["ActionCommand"] = bodyParameters.action as components["schemas"]["ActionCommand"];
+        }
+        // "INPUT-STRING" => @WIP
+        // "INPUT-KEY" => @WIP
+        // "PLUGIN" => @WIP
 
-                let ended: boolean = false;
-                let running: boolean = false;
-                let stderr: string = "";
-                let stdout: string = "";
+        return Promise.resolve();
 
-                let options: Record<string, string | boolean> = {
-                    "windowsHide": true
-                };
+    }
 
-                if ("undefined" !== typeof command.cwd) {
-                    options.cwd = command.cwd;
-                }
-                if ("undefined" !== typeof command.detached) {
-                    options.detached = command.detached;
-                }
-                if ("undefined" !== typeof command.shell) {
-                    options.shell = command.shell;
-                }
-                else if ("undefined" !== typeof command.insideShell) {
-                    options.shell = command.insideShell;
-                }
+    private _executeActionCommand (bodyParameters: operations["executeCommand"]["requestBody"]["content"]["application/json"]): Promise<string> {
 
-                const childProcess: ChildProcess = spawn(command.command, options);
+        return new Promise((resolve: (value: string) => void, reject: (value: Error) => void): void => {
 
-                childProcess.once("error", (err: Error): void => {
+            const command: components["schemas"]["ActionCommand"] = bodyParameters.action as components["schemas"]["ActionCommand"];
 
-                    if (!ended) {
+            let ended: boolean = false;
+            let running: boolean = false;
+            let stderr: string = "";
+            let stdout: string = "";
 
-                        ended = true;
+            let options: Record<string, string | boolean> = {
+                "windowsHide": true
+            };
 
-                        if (running) {
-                            this.emit("command.fail", bodyParameters, err);
-                        }
+            if ("undefined" !== typeof command.cwd) {
+                options.cwd = command.cwd;
+            }
+            if ("undefined" !== typeof command.detached) {
+                options.detached = command.detached;
+            }
+            if ("undefined" !== typeof command.shell) {
+                options.shell = command.shell;
+            }
+            else if ("undefined" !== typeof command.insideShell) {
+                options.shell = command.insideShell;
+            }
 
-                        reject(err);
+            const childProcess: ChildProcess = spawn(command.command, options);
 
+            childProcess.once("error", (err: Error): void => {
+
+                if (!ended) {
+
+                    ended = true;
+
+                    if (running) {
+                        this.emit("command.fail", bodyParameters, err);
                     }
 
-                }).once("spawn", (): void => {
-
-                    running = true;
-
-                    this.emit("command.running", bodyParameters);
-
-                }).once("close", (code: number | null, signal: NodeJS.Signals | null): void => {
-
-                    if (!ended) {
-
-                        ended = true;
-
-                        if (code) {
-
-                            this.emit("command.fail", bodyParameters, new Error(stderr));
-
-                            return reject(new Error(stderr));
-
-                        }
-                        else {
-
-                            this.emit("command.success", bodyParameters, stdout);
-
-                            return resolve(stdout);
-
-                        }
-
-                    }
-
-                });
-
-                if (childProcess.stderr) {
-
-                    childProcess.stderr?.setEncoding("utf-8");
-
-                    childProcess.stderr.on("data", (chunk: string): void => {
-                        stderr += chunk;
-                    });
+                    reject(err);
 
                 }
 
-                if (childProcess.stdout) {
+            }).once("spawn", (): void => {
 
-                    childProcess.stdout?.setEncoding("utf-8");
+                running = true;
 
-                    childProcess.stdout.on("data", (chunk: string): void => {
-                        stdout += chunk;
-                    });
+                this.emit("command.running", bodyParameters);
+
+            }).once("close", (code: number | null, signal: NodeJS.Signals | null): void => {
+
+                if (!ended) {
+
+                    ended = true;
+
+                    if (code) {
+
+                        this.emit("command.fail", bodyParameters, new Error(stderr));
+
+                        return reject(new Error(stderr));
+
+                    }
+                    else {
+
+                        this.emit("command.success", bodyParameters, stdout);
+
+                        return resolve(stdout);
+
+                    }
 
                 }
 
             });
 
-        }
+            if (childProcess.stderr) {
 
-        return Promise.resolve();
+                childProcess.stderr?.setEncoding("utf-8");
+
+                childProcess.stderr.on("data", (chunk: string): void => {
+                    stderr += chunk;
+                });
+
+            }
+
+            if (childProcess.stdout) {
+
+                childProcess.stdout?.setEncoding("utf-8");
+
+                childProcess.stdout.on("data", (chunk: string): void => {
+                    stdout += chunk;
+                });
+
+            }
+
+        });
 
     }
 

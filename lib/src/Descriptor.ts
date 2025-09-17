@@ -117,7 +117,8 @@ export interface paths {
         get: operations["getTableByName"];
         put?: never;
         post?: never;
-        delete?: never;
+        /** Delete the command table */
+        delete: operations["deleteTableByName"];
         options?: never;
         head?: never;
         patch?: never;
@@ -431,6 +432,37 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["Table"];
+                };
+            };
+            /** @description An error occured */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+        };
+    };
+    deleteTableByName: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                tablename: components["schemas"]["TableName"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Table registered */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": unknown;
                 };
             };
             /** @description An error occured */

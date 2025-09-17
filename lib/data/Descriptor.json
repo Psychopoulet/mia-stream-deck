@@ -222,6 +222,39 @@
 						}
 					}
 				}
+			},
+			"delete": {
+				"description": "",
+				"summary": "Delete the command table",
+				"operationId": "deleteTableByName",
+				"parameters": [
+					{
+						"name": "tablename",
+						"in": "path",
+						"required": true,
+						"schema": {
+							"$ref": "#/components/schemas/TableName"
+						}
+					}
+				],
+				"responses": {
+					"204": {
+						"description": "Table registered",
+						"content": {
+							"application/json": {}
+						}
+					},
+					"default": {
+						"description": "An error occured",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Error"
+								}
+							}
+						}
+					}
+				}
 			}
 		},
 		"/mia-stream-deck/api/execute-command": {
