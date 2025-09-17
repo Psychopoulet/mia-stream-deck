@@ -17,7 +17,7 @@
     "transpile-openapi": "npx openapi-typescript ./lib/data/Descriptor.json -o ./lib/src/Descriptor.ts ",
 
     "clean-api": "npx rimraf \"./lib/cjs\"",
-    "build-api": "npm run-script clean-api && npm run-script transpile-openapi && npx tsc --project \"./tsconfig-api.json\"",
+    "build-api": "npm run-script clean-api && npm run-script transpile-openapi && npx tsc --project \"./tsconfig.json\"",
 
     "clean-front": "npx rimraf \"./public/dist/bundle.js",
     "build-front": "npm run-script clean-front && npm run-script transpile-openapi && npx webpack --config \"./webpack.config.js\"",
