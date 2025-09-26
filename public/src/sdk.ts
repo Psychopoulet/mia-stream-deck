@@ -8,7 +8,8 @@
 // types & interfaces
 
     // locals
-    import type { components, operations } from "../../lib/src/Descriptor";
+
+    import type { components, operations, paths } from "../../lib/src/Descriptor";
 
 // component
 
@@ -68,7 +69,9 @@ export class SDK extends EventEmitter<{
 
     public getTables (): Promise<operations["getTables"]["responses"]["200"]["content"]["application/json"]> {
 
-        return fetch("/mia-stream-deck/api/tables").then((res: Response): Promise<components["schemas"]["TableName"][]> => {
+        const url: keyof paths = "/mia-stream-deck/api/tables";
+
+        return fetch(url).then((res: Response): Promise<operations["getTables"]["responses"]["200"]["content"]["application/json"]> => {
 
             if (res.ok) {
                 return res.json();
@@ -83,7 +86,9 @@ export class SDK extends EventEmitter<{
 
     public getTableByName (tablename: components["schemas"]["TableName"]): Promise<operations["getTableByName"]["responses"]["200"]["content"]["application/json"]> {
 
-        return fetch("/mia-stream-deck/api/tables/" + tablename).then((res: Response): Promise<components["schemas"]["Table"]> => {
+        const url: keyof paths = "/mia-stream-deck/api/tables/{tablename}";
+
+        return fetch(url.replace("{tablename}", tablename)).then((res: Response): Promise<operations["getTableByName"]["responses"]["200"]["content"]["application/json"]> => {
 
             if (res.ok) {
                 return res.json();
@@ -98,7 +103,9 @@ export class SDK extends EventEmitter<{
 
     public executeCommand (cmd: components["schemas"]["Command"]): Promise<operations["executeCommand"]["responses"]["204"]["content"]["application/json"]> {
 
-        return fetch("/mia-stream-deck/api/execute-command", {
+        const url: keyof paths = "/mia-stream-deck/api/execute-command";
+
+        return fetch(url, {
             "method": "put",
             "body": JSON.stringify(cmd)
         }).then((res: Response): Promise<operations["executeCommand"]["responses"]["204"]["content"]["application/json"]> => {
