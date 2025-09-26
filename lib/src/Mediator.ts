@@ -16,7 +16,6 @@
 
     // externals
     import type ContainerPattern from "node-containerpattern";
-    import type ConfManager from "node-confmanager";
     import type { iDescriptorUserOptions } from "node-pluginsmanager-plugin";
 
     // locals
@@ -31,7 +30,6 @@ export default class MediatorStreamDeck extends Mediator {
 
         // private
 
-        private _port: number;
         private _file: string;
 
     // constructor
@@ -40,14 +38,12 @@ export default class MediatorStreamDeck extends Mediator {
 
         super(data);
 
-        this._port = 0;
         this._file = "";
 
     }
 
     protected _initWorkSpace (container: ContainerPattern): Promise<void> {
 
-        this._port = (container.get("conf") as ConfManager).get("port") as number;
         this._file = join(this._externalRessourcesDirectory, "tables.json");
 
         return Promise.resolve();
@@ -56,7 +52,6 @@ export default class MediatorStreamDeck extends Mediator {
 
     protected _releaseWorkSpace  (): Promise<void> {
 
-        this._port = 0;
         this._file = "";
 
         return Promise.resolve();
@@ -80,18 +75,7 @@ export default class MediatorStreamDeck extends Mediator {
     }
 
     public getFrontApp (): Promise<operations["getFrontApp"]["responses"]["200"]["content"]["application/javascript"]> {
-
-        return readFile(join(__dirname, "..", "..", "public", "dist", "bundle.js"), "utf-8").then((content: string): string => {
-
-            return content
-
-                .replace(/{{app.port}}/g, String(this._port))
-                .replace(/{{plugin.name}}/g, this.getPluginName())
-                .replace(/{{plugin.version}}/g, this.getPluginVersion())
-                .replace(/{{plugin.description}}/g, this.getPluginDescription());
-
-        });
-
+        return readFile(join(__dirname, "..", "..", "public", "dist", "bundle.js"), "utf-8");
     }
 
     public getFrontAppMap (): Promise<operations["getFrontApp"]["responses"]["200"]["content"]["application/javascript"]> {

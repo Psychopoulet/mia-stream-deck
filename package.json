@@ -50,7 +50,6 @@
     "eslint-plugin-personnallinter": "git+ssh://git@github.com/Psychopoulet/eslint-plugin-personnallinter",
     "husky": "9.1.7",
     "mocha": "11.7.2",
-    "node-confmanager": "1.9.0",
     "node-containerpattern": "1.8.0",
     "nyc": "17.1.0",
     "openapi-typescript": "7.9.1",

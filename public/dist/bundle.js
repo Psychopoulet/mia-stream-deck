@@ -31330,7 +31330,7 @@ var SDK = /** @class */ (function (_super) {
         return _this;
     }
     SDK.prototype.getTables = function () {
-        return fetch("/{{plugin.name}}/api/tables").then(function (res) {
+        return fetch("/mia-stream-deck/api/tables").then(function (res) {
             if (res.ok) {
                 return res.json();
             }
@@ -31340,7 +31340,7 @@ var SDK = /** @class */ (function (_super) {
         });
     };
     SDK.prototype.getTableByName = function (tablename) {
-        return fetch("/{{plugin.name}}/api/tables/" + tablename).then(function (res) {
+        return fetch("/mia-stream-deck/api/tables/" + tablename).then(function (res) {
             if (res.ok) {
                 return res.json();
             }
@@ -31350,7 +31350,7 @@ var SDK = /** @class */ (function (_super) {
         });
     };
     SDK.prototype.executeCommand = function (cmd) {
-        return fetch("/{{plugin.name}}/api/execute-command", {
+        return fetch("/mia-stream-deck/api/execute-command", {
             "method": "put",
             "body": JSON.stringify(cmd)
         }).then(function (res) {
