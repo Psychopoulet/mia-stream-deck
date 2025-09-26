@@ -7,6 +7,7 @@
 
     // externals
     import { Mediator, NotFoundError } from "node-pluginsmanager-plugin";
+    import robotjs from "@hurdlegroup/robotjs";
 
 // types & interfaces
 
@@ -19,6 +20,7 @@
     import type { iDescriptorUserOptions } from "node-pluginsmanager-plugin";
 
     // locals
+
     import type { operations, components } from "./Descriptor";
 
 // module
@@ -53,7 +55,12 @@ export default class MediatorStreamDeck extends Mediator {
     }
 
     protected _releaseWorkSpace  (): Promise<void> {
+
+        this._port = 0;
+        this._file = "";
+
         return Promise.resolve();
+
     }
 
     // front files
@@ -143,21 +150,37 @@ export default class MediatorStreamDeck extends Mediator {
 
     public executeCommand (urlParameters: operations["executeCommand"]["parameters"], bodyParameters: operations["executeCommand"]["requestBody"]["content"]["application/json"]): Promise<operations["executeCommand"]["responses"]["204"]["content"]["application/json"]> {
 
-        if ("EMPTY" === bodyParameters.action.type) {
-            return Promise.resolve();
-        }
-        else if ("COMMAND" === bodyParameters.action.type) {
+        return Promise.resolve().then((): Promise<void> => {
 
-            return this._executeActionCommand(bodyParameters).then((): Promise<void> => {
-                return Promise.resolve();
-            });
+            switch (bodyParameters.action.type) {
 
-        }
-        // "INPUT-STRING" => @WIP
-        // "INPUT-KEY" => @WIP
-        // "PLUGIN" => @WIP
+                // "INPUT-STRING" => @WIP
 
-        return Promise.resolve();
+                case "INPUT-KEY":
+
+                    return this._executeActionInputKey(bodyParameters);
+
+                case "COMMAND":
+
+                    return this._executeActionCommand(bodyParameters).then((): Promise<void> => {
+                        return Promise.resolve();
+                    });
+
+                // "PLUGIN" => @WIP
+
+                // EMPTY
+                default:
+                    return Promise.resolve();
+
+            }
+
+        }).catch((err: Error): Promise<void> => {
+
+            this._log("error", err.message);
+
+            return Promise.reject(err);
+
+        });
 
     }
 
@@ -201,7 +224,7 @@ export default class MediatorStreamDeck extends Mediator {
                         this.emit("command.fail", bodyParameters, err);
                     }
 
-                    reject(err);
+                    return reject(err);
 
                 }
 
@@ -253,6 +276,45 @@ export default class MediatorStreamDeck extends Mediator {
                 childProcess.stdout.on("data", (chunk: string): void => {
                     stdout += chunk;
                 });
+
+            }
+
+        });
+
+    }
+
+    private _executeActionInputKey (bodyParameters: operations["executeCommand"]["requestBody"]["content"]["application/json"]): Promise<void> {
+
+        return new Promise((resolve: () => void, reject: (err: Error) => void): void => {
+
+            try {
+
+                const command: components["schemas"]["ActionInputKey"] = bodyParameters.action as components["schemas"]["ActionInputKey"];
+
+                const modifiers: string[] = [];
+
+                if (command.alt) {
+                    modifiers.push("alt");
+                }
+                if (command.ctrl) {
+                    modifiers.push("control");
+                }
+                if (command.shift) {
+                    modifiers.push("shift");
+                }
+                if (command.command) {
+                    modifiers.push("command");
+                }
+
+                // https://www.piathome.com/homepage/docs/robotjs-key-syntax.html
+                robotjs.keyTap(command.key, modifiers);
+
+                return resolve();
+
+            }
+            catch (e) {
+
+                return reject(e as Error);
 
             }
 

@@ -178,13 +178,15 @@ export interface components {
         ActionInputKey: {
             /** @enum {string} */
             type: "INPUT-KEY";
-            key: string;
+            key: string | ("f1" | "f2" | "f3" | "f4" | "f5" | "f6" | "f7" | "f8" | "f9" | "f10" | "f11" | "f12" | "f13" | "f14" | "f15" | "f16" | "f17" | "f18" | "f19" | "f20" | "f21" | "f22" | "f23" | "f24" | "insert" | "home" | "pageup" | "delete" | "end" | "pagedown" | "scroll_lock" | "command" | "menu" | "alt" | "right_alt" | "control" | "left_control" | "right_control" | "shift" | "right_shift" | "space" | "backspace" | "enter" | "escape" | "tab" | "up" | "down" | "left" | "right" | "printscreen" | "capslock" | "numpad_lock" | "numpad_0" | "numpad_1" | "numpad_2" | "numpad_3" | "numpad_4" | "numpad_5" | "numpad_6" | "numpad_7" | "numpad_8" | "numpad_9" | "numpad_+" | "numpad_-" | "numpad_*" | "numpad_/" | "numpad_." | "audio_mute" | "audio_vol_up" | "audio_vol_down" | "audio_play" | "audio_stop" | "audio_pause" | "audio_prev" | "audio_next" | "audio_rewind" | "audio_forward" | "audio_repeat" | "audio_random" | "lights_mon_up" | "lights_mon_down" | "lights_kbd_toggle" | "lights_kbd_up" | "lights_kbd_down");
             /** @description Key + alt (default : false) */
             alt?: boolean;
             /** @description Key + ctrl (default : false) */
             ctrl?: boolean;
             /** @description Key + shift (default : false) */
             shift?: boolean;
+            /** @description Key + command (default : false) (mac only) */
+            command?: boolean;
         };
         /** @description Execute a command line (like in a terminal) (see https://nodejs.org/api/child_process.html) */
         ActionCommand: {
@@ -195,7 +197,7 @@ export interface components {
             cwd?: string;
             /** @description Prepare child process to run independently of its parent process. Specific behavior depends on the platform (see options.detached). */
             detached?: boolean;
-            /** @description Shell to execute the command with. See Shell requirements and Default Windows shell. Default: '/bin/sh' on Unix, process.env.ComSpec on Windows. */
+            /** @description Shell to execute the command with. See Shell requirements and Default Windows shell. Default: "/bin/sh" on Unix, process.env.ComSpec on Windows. */
             shell?: string;
             /** @description If true, runs command inside of a shell. */
             insideShell?: boolean;
