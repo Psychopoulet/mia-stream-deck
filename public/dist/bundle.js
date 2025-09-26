@@ -31301,7 +31301,7 @@ var SDK = /** @class */ (function (_super) {
     __extends(SDK, _super);
     function SDK() {
         var _this = _super.call(this) || this;
-        var socket = new WebSocket("ws://localhost:{{app.port}}");
+        var socket = new WebSocket("ws://" + window.location.host);
         socket.addEventListener("error", function (err) {
             console.error("socket error", err);
         });
