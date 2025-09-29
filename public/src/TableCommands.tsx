@@ -70,7 +70,7 @@ export default class TableCommands extends React.Component<iProps, iState> {
             .on("command.fail", this._onCommandFail)
             .on("command.success", this._onCommandSuccess);
 
-        this._sdk.getTableByName("presentation").then((table: components["schemas"]["Table"]): void => {
+        this._sdk.getTableByName(this.props.name).then((table: components["schemas"]["Table"]): void => {
 
             this.setState({
                 "table": table,

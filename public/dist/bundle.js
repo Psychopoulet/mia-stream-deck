@@ -31039,7 +31039,7 @@ var TableCommands = /** @class */ (function (_super) {
             .on("command.running", this._onCommandRunning)
             .on("command.fail", this._onCommandFail)
             .on("command.success", this._onCommandSuccess);
-        this._sdk.getTableByName("presentation").then(function (table) {
+        this._sdk.getTableByName(this.props.name).then(function (table) {
             _this.setState({
                 "table": table,
                 "loading": false
