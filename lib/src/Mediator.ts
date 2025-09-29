@@ -138,7 +138,13 @@ export default class MediatorStreamDeck extends Mediator {
 
             switch (bodyParameters.action.type) {
 
-                // "INPUT-STRING" => @WIP
+                case "EMPTY":
+
+                    return Promise.resolve();
+
+                case "INPUT-STRING":
+
+                    return this._executeActionInputString(bodyParameters);
 
                 case "INPUT-KEY":
 
@@ -150,11 +156,10 @@ export default class MediatorStreamDeck extends Mediator {
                         return Promise.resolve();
                     });
 
-                // "PLUGIN" => @WIP
+                // "PLUGIN"
 
-                // EMPTY
                 default:
-                    return Promise.resolve();
+                    return Promise.reject(new NotFoundError("Unknown \"" + bodyParameters.action.type + "\" action type"));
 
             }
 
@@ -163,6 +168,72 @@ export default class MediatorStreamDeck extends Mediator {
             this._log("error", err.message);
 
             return Promise.reject(err);
+
+        });
+
+    }
+
+    private _executeActionInputString (bodyParameters: operations["executeCommand"]["requestBody"]["content"]["application/json"]): Promise<void> {
+
+        return new Promise((resolve: () => void, reject: (err: Error) => void): void => {
+
+            try {
+
+                const command: components["schemas"]["ActionInputString"] = bodyParameters.action as components["schemas"]["ActionInputString"];
+
+                robotjs.typeString(command.string);
+
+                if (command.enter) {
+                    robotjs.keyTap("enter");
+                }
+
+                return resolve();
+
+            }
+            catch (e) {
+
+                return reject(e as Error);
+
+            }
+
+        });
+
+    }
+
+    private _executeActionInputKey (bodyParameters: operations["executeCommand"]["requestBody"]["content"]["application/json"]): Promise<void> {
+
+        return new Promise((resolve: () => void, reject: (err: Error) => void): void => {
+
+            try {
+
+                const command: components["schemas"]["ActionInputKey"] = bodyParameters.action as components["schemas"]["ActionInputKey"];
+
+                const modifiers: string[] = [];
+
+                if (command.alt) {
+                    modifiers.push("alt");
+                }
+                if (command.ctrl) {
+                    modifiers.push("control");
+                }
+                if (command.shift) {
+                    modifiers.push("shift");
+                }
+                if (command.command) {
+                    modifiers.push("command");
+                }
+
+                // https://www.piathome.com/homepage/docs/robotjs-key-syntax.html
+                robotjs.keyTap(command.key, modifiers);
+
+                return resolve();
+
+            }
+            catch (e) {
+
+                return reject(e as Error);
+
+            }
 
         });
 
@@ -260,45 +331,6 @@ export default class MediatorStreamDeck extends Mediator {
                 childProcess.stdout.on("data", (chunk: string): void => {
                     stdout += chunk;
                 });
-
-            }
-
-        });
-
-    }
-
-    private _executeActionInputKey (bodyParameters: operations["executeCommand"]["requestBody"]["content"]["application/json"]): Promise<void> {
-
-        return new Promise((resolve: () => void, reject: (err: Error) => void): void => {
-
-            try {
-
-                const command: components["schemas"]["ActionInputKey"] = bodyParameters.action as components["schemas"]["ActionInputKey"];
-
-                const modifiers: string[] = [];
-
-                if (command.alt) {
-                    modifiers.push("alt");
-                }
-                if (command.ctrl) {
-                    modifiers.push("control");
-                }
-                if (command.shift) {
-                    modifiers.push("shift");
-                }
-                if (command.command) {
-                    modifiers.push("command");
-                }
-
-                // https://www.piathome.com/homepage/docs/robotjs-key-syntax.html
-                robotjs.keyTap(command.key, modifiers);
-
-                return resolve();
-
-            }
-            catch (e) {
-
-                return reject(e as Error);
 
             }
 

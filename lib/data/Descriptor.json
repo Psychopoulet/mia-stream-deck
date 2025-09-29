@@ -391,7 +391,8 @@
 							{
 								"type": "string",
 								"description": "global key, like a single letter",
-								"minLength": 1
+								"minLength": 1,
+								"maxLength": 1
 							},
 							{
 								"type": "string",
