@@ -16,11 +16,12 @@
 
     // externals
     import type ContainerPattern from "node-containerpattern";
-    import type { iDescriptorUserOptions } from "node-pluginsmanager-plugin";
+    import type { iDescriptorUserOptions, Orchestrator, iUrlAllowedParameters } from "node-pluginsmanager-plugin";
+	import type Pluginsmanager from "node-pluginsmanager";
 
     // locals
-
     import type { operations, components } from "./Descriptor";
+    type tSubPluginMethod = (urlParameters?: iUrlAllowedParameters, bodyParameters?: any) => Promise<any>;
 
 // module
 
@@ -31,6 +32,7 @@ export default class MediatorStreamDeck extends Mediator {
         // private
 
         private _file: string;
+        private _pluginsManager: Pluginsmanager | null;
 
     // constructor
 
@@ -38,13 +40,17 @@ export default class MediatorStreamDeck extends Mediator {
 
         super(data);
 
+        // attributes
+
         this._file = "";
+        this._pluginsManager = null;
 
     }
 
     protected _initWorkSpace (container: ContainerPattern): Promise<void> {
 
         this._file = join(this._externalRessourcesDirectory, "tables.json");
+        this._pluginsManager = container.get("plugins-manager") as Pluginsmanager;
 
         return Promise.resolve();
 
@@ -53,6 +59,7 @@ export default class MediatorStreamDeck extends Mediator {
     protected _releaseWorkSpace  (): Promise<void> {
 
         this._file = "";
+        this._pluginsManager = null;
 
         return Promise.resolve();
 
@@ -152,14 +159,15 @@ export default class MediatorStreamDeck extends Mediator {
 
                 case "COMMAND":
 
-                    return this._executeActionCommand(bodyParameters).then((): Promise<void> => {
-                        return Promise.resolve();
-                    });
+                    return this._executeActionCommand(bodyParameters);
 
-                // "PLUGIN"
+                case "PLUGIN":
 
+                    return this._executeActionPlugin(bodyParameters);
+
+                // force catch not typed action type
                 default:
-                    return Promise.reject(new NotFoundError("Unknown \"" + bodyParameters.action.type + "\" action type"));
+                    return Promise.reject(new NotFoundError("Unknown \"" + (bodyParameters.action as Record<string, string>).type + "\" action type"));
 
             }
 
@@ -239,7 +247,7 @@ export default class MediatorStreamDeck extends Mediator {
 
     }
 
-    private _executeActionCommand (bodyParameters: operations["executeCommand"]["requestBody"]["content"]["application/json"]): Promise<string> {
+    private _executeActionCommand (bodyParameters: operations["executeCommand"]["requestBody"]["content"]["application/json"]): Promise<void> {
 
         return new Promise((resolve: (value: string) => void, reject: (value: Error) => void): void => {
 
@@ -333,6 +341,43 @@ export default class MediatorStreamDeck extends Mediator {
                 });
 
             }
+
+        // force return nothing
+        }).then((): Promise<void> => {
+            return Promise.resolve();
+        });
+
+    }
+
+    private _executeActionPlugin (bodyParameters: operations["executeCommand"]["requestBody"]["content"]["application/json"]): Promise<void> {
+
+        return new Promise((resolve: () => void, reject: (err: Error) => void): void => {
+
+            const command: components["schemas"]["ActionPlugin"] = bodyParameters.action as components["schemas"]["ActionPlugin"];
+
+            if (!(this._pluginsManager as Pluginsmanager).getPluginsNames().includes(command.plugin)) {
+                return reject(new NotFoundError("Unknown \"" + command.plugin + "\" plugin"));
+            }
+
+            const plugin: Orchestrator | undefined = (this._pluginsManager as Pluginsmanager).plugins.find((value: Orchestrator): boolean => {
+                return value.name === command.plugin;
+            });
+
+            if (!plugin) {
+                return reject(new NotFoundError("Unknown \"" + command.plugin + "\" plugin"));
+            }
+            else if ("undefined" === typeof (plugin as Record<string, any>)[command.operationId]) {
+                return reject(new NotFoundError("Unknown \"" + command.operationId + "\" operationId method \" for " + command.plugin + "\" plugin"));
+            }
+            else if ("function" !== typeof (plugin as Record<string, any>)[command.operationId]) {
+                return reject(new Error("\"" + command.operationId + "\" operationId method \" for " + command.plugin + "\" plugin is not a valid method"));
+            }
+
+            ((plugin as Record<string, any>)[command.operationId] as tSubPluginMethod)(command.urlParameters, command.bodyParameters).then((): void => {
+                return resolve();
+            }).catch((err: Error): void => {
+                return reject(err);
+            });
 
         });
 

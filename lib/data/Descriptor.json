@@ -477,6 +477,42 @@
 					"operationId": {
 						"type": "string",
 						"minLength": 1
+					},
+					"urlParameters": {
+						"type": "object",
+						"properties": {
+							"path": {
+								"type": "object",
+								"additionalProperties": {
+									"type": "string",
+									"minLength": 1
+								}
+							},
+							"query": {
+								"type": "object",
+								"additionalProperties": {
+									"type": "string",
+									"minLength": 1
+								}
+							},
+							"headers": {
+								"type": "object",
+								"additionalProperties": {
+									"type": "string",
+									"minLength": 1
+								}
+							},
+							"cookies": {
+								"type": "object",
+								"additionalProperties": {
+									"type": "string",
+									"minLength": 1
+								}
+							}
+						}
+					},
+					"bodyParameters": {
+						"description": "Can be any value"
 					}
 				},
 				"required": [ "type", "plugin", "operationId" ]

@@ -208,6 +208,22 @@ export interface components {
             type: "PLUGIN";
             plugin: string;
             operationId: string;
+            urlParameters?: {
+                path?: {
+                    [key: string]: string;
+                };
+                query?: {
+                    [key: string]: string;
+                };
+                headers?: {
+                    [key: string]: string;
+                };
+                cookies?: {
+                    [key: string]: string;
+                };
+            };
+            /** @description Can be any value */
+            bodyParameters?: unknown;
         };
         PushEventCommandRunning: {
             plugin: components["schemas"]["PluginName"];
