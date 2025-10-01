@@ -31005,6 +31005,17 @@ var __extends = (undefined && undefined.__extends) || (function () {
         d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
     };
 })();
+var __assign = (undefined && undefined.__assign) || function () {
+    __assign = Object.assign || function(t) {
+        for (var s, i = 1, n = arguments.length; i < n; i++) {
+            s = arguments[i];
+            for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p))
+                t[p] = s[p];
+        }
+        return t;
+    };
+    return __assign.apply(this, arguments);
+};
 // deps
 // externals
 
@@ -31097,32 +31108,6 @@ var TableCommands = /** @class */ (function (_super) {
         });
     };
     // render
-    TableCommands.prototype._renderCommand = function (cmd) {
-        var _this = this;
-        if ("EMPTY" === cmd.action.type) {
-            return react__WEBPACK_IMPORTED_MODULE_0___default().createElement((react__WEBPACK_IMPORTED_MODULE_0___default().Fragment), null);
-        }
-        if (cmd.icon) {
-            return react__WEBPACK_IMPORTED_MODULE_0___default().createElement(react_bootstrap_fontawesome__WEBPACK_IMPORTED_MODULE_1__.Button, { icon: cmd.icon, variant: "secondary", className: "w-100 h-100 d-block", outline: true, disabled: this.state.running, onClick: function (e) {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    return _this._executeCommand(cmd);
-                } });
-        }
-        else if (cmd.picture) {
-            return react__WEBPACK_IMPORTED_MODULE_0___default().createElement(react_bootstrap_fontawesome__WEBPACK_IMPORTED_MODULE_1__.Image, { crossOrigin: "anonymous", src: cmd.picture, className: "rounded h-100", onClick: function (e) {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    if (_this.state.running) {
-                        return;
-                    }
-                    return _this._executeCommand(cmd);
-                } });
-        }
-        else {
-            return react__WEBPACK_IMPORTED_MODULE_0___default().createElement("span", null, JSON.stringify(cmd));
-        }
-    };
     TableCommands.prototype.render = function () {
         var _this = this;
         if (this.state.loading) {
@@ -31146,6 +31131,50 @@ var TableCommands = /** @class */ (function (_super) {
                         } }, _this._renderCommand(row));
                 }));
             })));
+    };
+    TableCommands.prototype._renderCommand = function (cmd) {
+        if ("EMPTY" === cmd.action.type) {
+            return react__WEBPACK_IMPORTED_MODULE_0___default().createElement((react__WEBPACK_IMPORTED_MODULE_0___default().Fragment), null);
+        }
+        if (cmd.icon) {
+            return this._renderCommandIcon(cmd);
+        }
+        else if (cmd.picture) {
+            return this._renderCommandPicture(cmd);
+        }
+        else if (cmd.label) {
+            return this._renderCommandLabel(cmd);
+        }
+        else {
+            return this._renderCommandIcon(__assign(__assign({}, cmd), { "icon": "question" }));
+        }
+    };
+    TableCommands.prototype._renderCommandIcon = function (cmd) {
+        var _this = this;
+        return react__WEBPACK_IMPORTED_MODULE_0___default().createElement(react_bootstrap_fontawesome__WEBPACK_IMPORTED_MODULE_1__.Button, { title: cmd.label, icon: cmd.icon, variant: "secondary", className: "w-100 h-100 d-block", outline: true, disabled: this.state.running, onClick: function (e) {
+                e.preventDefault();
+                e.stopPropagation();
+                return _this._executeCommand(cmd);
+            } }, cmd.label);
+    };
+    TableCommands.prototype._renderCommandPicture = function (cmd) {
+        var _this = this;
+        return react__WEBPACK_IMPORTED_MODULE_0___default().createElement(react_bootstrap_fontawesome__WEBPACK_IMPORTED_MODULE_1__.Image, { crossOrigin: "anonymous", src: cmd.picture, className: "rounded h-100", onClick: function (e) {
+                e.preventDefault();
+                e.stopPropagation();
+                if (_this.state.running) {
+                    return;
+                }
+                return _this._executeCommand(cmd);
+            } });
+    };
+    TableCommands.prototype._renderCommandLabel = function (cmd) {
+        var _this = this;
+        return react__WEBPACK_IMPORTED_MODULE_0___default().createElement(react_bootstrap_fontawesome__WEBPACK_IMPORTED_MODULE_1__.Button, { title: cmd.label, variant: "secondary", className: "w-100 h-100 d-block", outline: true, disabled: this.state.running, onClick: function (e) {
+                e.preventDefault();
+                e.stopPropagation();
+                return _this._executeCommand(cmd);
+            } }, cmd.label);
     };
     // name
     TableCommands.displayName = "TableCommands";

@@ -166,52 +166,6 @@ export default class TableCommands extends React.Component<iProps, iState> {
 
     // render
 
-    private _renderCommand (cmd: components["schemas"]["Command"]): React.JSX.Element {
-
-        if ("EMPTY" === cmd.action.type) {
-            return <></>;
-        }
-
-        if (cmd.icon) {
-
-            return <Button
-                icon={ cmd.icon as tIcon } variant="secondary"
-                className="w-100 h-100 d-block" outline
-                disabled={ this.state.running }
-                onClick={ (e: React.MouseEvent<HTMLButtonElement>): void => {
-
-                e.preventDefault();
-                e.stopPropagation();
-
-                return this._executeCommand(cmd);
-
-            } } />
-
-        }
-        else if (cmd.picture) {
-
-            return <Image crossOrigin="anonymous" src={ cmd.picture }
-                className="rounded h-100"
-                onClick={ (e: React.MouseEvent<HTMLImageElement>): void => {
-
-                e.preventDefault();
-                e.stopPropagation();
-
-                if (this.state.running) {
-                    return;
-                }
-
-                return this._executeCommand(cmd);
-
-            } } />
-
-        }
-        else {
-            return <span>{ JSON.stringify(cmd) }</span>;
-        }
-
-    }
-
     public render (): React.JSX.Element {
 
         if (this.state.loading) {
@@ -263,6 +217,89 @@ export default class TableCommands extends React.Component<iProps, iState> {
             </TableBody>
 
         </Table>;
+
+    }
+
+    private _renderCommand (cmd: components["schemas"]["Command"]): React.JSX.Element {
+
+        if ("EMPTY" === cmd.action.type) {
+            return <></>;
+        }
+
+        if (cmd.icon) {
+            return this._renderCommandIcon(cmd);
+        }
+        else if (cmd.picture) {
+            return this._renderCommandPicture(cmd);
+        }
+        else if (cmd.label) {
+            return this._renderCommandLabel(cmd);
+        }
+        else {
+
+            return this._renderCommandIcon({
+                ...cmd,
+                "icon": "question"
+            });
+
+        }
+
+    }
+
+    private _renderCommandIcon (cmd: components["schemas"]["Command"]): React.JSX.Element {
+
+        return <Button title={ cmd.label }
+            icon={ cmd.icon as tIcon } variant="secondary"
+            className="w-100 h-100 d-block" outline
+            disabled={ this.state.running }
+            onClick={ (e: React.MouseEvent<HTMLButtonElement>): void => {
+
+            e.preventDefault();
+            e.stopPropagation();
+
+            return this._executeCommand(cmd);
+
+        } }>
+            { cmd.label }
+        </Button>;
+
+    }
+
+    private _renderCommandPicture (cmd: components["schemas"]["Command"]): React.JSX.Element {
+
+        return <Image crossOrigin="anonymous" src={ cmd.picture as string }
+            className="rounded h-100"
+            onClick={ (e: React.MouseEvent<HTMLImageElement>): void => {
+
+            e.preventDefault();
+            e.stopPropagation();
+
+            if (this.state.running) {
+                return;
+            }
+
+            return this._executeCommand(cmd);
+
+        } } />;
+
+    }
+
+    private _renderCommandLabel (cmd: components["schemas"]["Command"]): React.JSX.Element {
+
+        return <Button title={ cmd.label }
+            variant="secondary"
+            className="w-100 h-100 d-block" outline
+            disabled={ this.state.running }
+            onClick={ (e: React.MouseEvent<HTMLButtonElement>): void => {
+
+            e.preventDefault();
+            e.stopPropagation();
+
+            return this._executeCommand(cmd);
+
+        } }>
+            { cmd.label }
+        </Button>;
 
     }
 

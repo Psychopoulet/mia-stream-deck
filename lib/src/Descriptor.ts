@@ -159,6 +159,7 @@ export interface components {
         Command: {
             icon?: string;
             picture?: string;
+            label?: string;
             action: components["schemas"]["ActionEmpty"] | components["schemas"]["ActionInputString"] | components["schemas"]["ActionInputKey"] | components["schemas"]["ActionCommand"] | components["schemas"]["ActionPlugin"];
         };
         /** @description Empty command (an empty row in the table) */
