@@ -1,13 +1,13 @@
 {
 	"compilerOptions": {
 
-		"target": "es6",
-		"module": "commonjs",
+		"target": "es5",
+		"module": "es6",
 
-		"outDir": "./lib/cjs",
+		"outDir": "./public/dist/",
+		"sourceMap": true,
 
-		"declaration": true,
-		"declarationDir": "./lib/cjs",
+		"moduleResolution": "node",
 
 		"alwaysStrict": true,
 		"strict": true,
@@ -17,17 +17,14 @@
 		"noImplicitReturns": true,
 		"noImplicitThis": true,
 		"noUnusedLocals": true,
-		"noUnusedParameters": false,
 		"esModuleInterop": true,
-		"forceConsistentCasingInFileNames": true
+		"forceConsistentCasingInFileNames": true,
+
+		"jsx": "react"
 
 	},
-	"include": [
-		"./lib/src/main.cts",
-		"./lib/src/Server.ts",
-		"./lib/src/Mediator.ts"
-	],
 	"exclude": [
 		"node_modules"
-	]
+	],
+	"compileOnSave": false
 }

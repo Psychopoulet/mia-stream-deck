@@ -1,0 +1,586 @@
+{
+	"openapi": "3.0.2",
+	"info": {
+		"title": "mia-stream-deck",
+		"version": "1.0.0"
+	},
+	"paths": {
+		"/mia-stream-deck/descriptor": {
+			"get": {
+				"description": "",
+				"summary": "Plugin's descriptor",
+				"operationId": "getDescriptor",
+				"responses": {
+					"200": {
+						"description": "Plugin's descriptor",
+						"content": {
+							"application/json": {
+								"schema": {
+									"type": "object"
+								}
+							}
+						}
+					},
+					"default": {
+						"description": "An error occured",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Error"
+								}
+							}
+						}
+					}
+				}
+			}
+		},
+		"/mia-stream-deck/status": {
+			"get": {
+				"description": "",
+				"summary": "Plugin's status",
+				"operationId": "getStatus",
+				"responses": {
+					"200": {
+						"description": "Plugin's status",
+						"content": {
+							"application/json": {
+								"schema": {
+									"type": "string",
+									"enum": [ "ENABLED", "INITIALIZED" ]
+								}
+							}
+						}
+					},
+					"default": {
+						"description": "An error occured",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Error"
+								}
+							}
+						}
+					}
+				}
+			}
+		},
+
+		"/mia-stream-deck/public/index.html": {
+			"get": {
+				"description": "",
+				"summary": "Plugin's front",
+				"operationId": "getFrontIndex",
+				"responses": {
+					"200": {
+						"description": "Plugin's front",
+						"content": {
+							"text/html": {
+								"schema": {
+									"type": "string"
+								}
+							}
+						}
+					},
+					"default": {
+						"description": "An error occured",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Error"
+								}
+							}
+						}
+					}
+				}
+			}
+		},
+		"/mia-stream-deck/public/bundle.js": {
+			"get": {
+				"description": "",
+				"summary": "Plugin's front app",
+				"operationId": "getFrontApp",
+				"responses": {
+					"200": {
+						"description": "Plugin's front app",
+						"content": {
+							"application/javascript": {
+								"schema": {
+									"type": "string"
+								}
+							}
+						}
+					},
+					"default": {
+						"description": "An error occured",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Error"
+								}
+							}
+						}
+					}
+				}
+			}
+		},
+		"/mia-stream-deck/public/bundle.js.map": {
+			"get": {
+				"description": "",
+				"summary": "Plugin's front app map",
+				"operationId": "getFrontAppMap",
+				"responses": {
+					"200": {
+						"description": "Plugin's front app",
+						"content": {
+							"application/json": {
+								"schema": {
+									"type": "object"
+								}
+							}
+						}
+					},
+					"default": {
+						"description": "An error occured",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Error"
+								}
+							}
+						}
+					}
+				}
+			}
+		},
+		"/mia-stream-deck/api/tables": {
+			"get": {
+				"description": "",
+				"summary": "Get the tables' names",
+				"operationId": "getTables",
+				"responses": {
+					"200": {
+						"description": "Tables registered",
+						"content": {
+							"application/json": {
+								"schema": {
+									"type": "array",
+									"description": "Commands table names",
+									"items": {
+										"$ref": "#/components/schemas/TableName"
+									}
+								}
+							}
+						}
+					},
+					"default": {
+						"description": "An error occured",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Error"
+								}
+							}
+						}
+					}
+				}
+			}
+		},
+		"/mia-stream-deck/api/tables/{tablename}": {
+			"get": {
+				"description": "",
+				"summary": "Get the command table",
+				"operationId": "getTableByName",
+				"parameters": [
+					{
+						"name": "tablename",
+						"in": "path",
+						"required": true,
+						"schema": {
+							"$ref": "#/components/schemas/TableName"
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "Table registered",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Table"
+								}
+							}
+						}
+					},
+					"default": {
+						"description": "An error occured",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Error"
+								}
+							}
+						}
+					}
+				}
+			},
+			"delete": {
+				"description": "",
+				"summary": "Delete the command table",
+				"operationId": "deleteTableByName",
+				"parameters": [
+					{
+						"name": "tablename",
+						"in": "path",
+						"required": true,
+						"schema": {
+							"$ref": "#/components/schemas/TableName"
+						}
+					}
+				],
+				"responses": {
+					"204": {
+						"description": "Table registered",
+						"content": {
+							"application/json": {}
+						}
+					},
+					"default": {
+						"description": "An error occured",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Error"
+								}
+							}
+						}
+					}
+				}
+			}
+		},
+		"/mia-stream-deck/api/execute-command": {
+			"put": {
+				"description": "",
+				"summary": "Execute the command",
+				"operationId": "executeCommand",
+				"requestBody": {
+					"required": true,
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/Command"
+							}
+						}
+					}
+				},
+				"responses": {
+					"204": {
+						"description": "Command running",
+						"content": {
+							"application/json": {}
+						}
+					},
+					"default": {
+						"description": "An error occured",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Error"
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+	},
+	"components": {
+		"schemas": {
+			"PluginName": {
+				"type": "string",
+				"enum": [ "mia-stream-deck" ]
+			},
+			"Error": {
+				"type": "object",
+				"description": "JSON Error description",
+				"properties": {
+					"code": {
+						"type": "string"
+					},
+					"message": {
+						"type": "string"
+					}
+				},
+				"required": [ "code", "message" ]
+			},
+			"TableName": {
+				"type": "string",
+				"minLength": 1
+			},
+			"Table": {
+				"type": "array",
+				"description": "Commands table description, contains an array for the lines which contains an array for the rows. Each row is a command.",
+				"items": {
+					"type": "array",
+					"items": {
+						"$ref": "#/components/schemas/Command"
+					}
+				}
+			},
+			"Command": {
+				"type": "object",
+				"description": "Differents command types descriptions",
+				"properties": {
+					"icon": {
+						"type": "string",
+						"minLength": 1
+					},
+					"picture": {
+						"type": "string",
+						"minLength": 1
+					},
+					"label": {
+						"type": "string",
+						"minLength": 1
+					},
+					"action": {
+						"oneOf": [
+							{ "$ref": "#/components/schemas/ActionEmpty" },
+							{ "$ref": "#/components/schemas/ActionInputString" },
+							{ "$ref": "#/components/schemas/ActionInputKey" },
+							{ "$ref": "#/components/schemas/ActionCommand" },
+							{ "$ref": "#/components/schemas/ActionPlugin" }
+						]
+					}
+				},
+				"required": [ "action" ]
+			},
+			"ActionEmpty": {
+				"type": "object",
+				"description": "Empty command (an empty row in the table)",
+				"properties": {
+					"type": {
+						"type": "string",
+						"enum": [ "EMPTY" ]
+					}
+				},
+				"required": [ "type" ]
+			},
+			"ActionInputString": {
+				"type": "object",
+				"description": "Input string (keyboard simulator)",
+				"properties": {
+					"type": {
+						"type": "string",
+						"enum": [ "INPUT-STRING" ]
+					},
+					"string": {
+						"type": "string",
+						"minLength": 1
+					},
+					"enter": {
+						"description": "Add a 'enter' input at the end of the string (default : false)",
+						"type": "boolean"
+					}
+				},
+				"required": [ "type", "string" ]
+			},
+			"ActionInputKey": {
+				"type": "object",
+				"description": "Input specific key (keyboard simulator)",
+				"properties": {
+					"type": {
+						"type": "string",
+						"enum": [ "INPUT-KEY" ]
+					},
+					"key": {
+						"anyOf": [
+							{
+								"type": "string",
+								"description": "global key, like a single letter",
+								"minLength": 1,
+								"maxLength": 1
+							},
+							{
+								"type": "string",
+								"description": "specific key, like \"backspace\"",
+								"enum": [
+									"f1", "f2", "f3", "f4", "f5", "f6", "f7", "f8", "f9", "f10", "f11", "f12",
+									"f13", "f14", "f15", "f16", "f17", "f18", "f19", "f20", "f21", "f22", "f23", "f24",
+									"insert", "home", "pageup", "delete", "end", "pagedown", "scroll_lock",
+									"command", "menu", "alt", "right_alt", "control", "left_control", "right_control", "shift", "right_shift",
+									"space", "backspace", "enter", "escape", "tab", "up", "down", "left", "right", "printscreen", "capslock",
+									"numpad_lock", "numpad_0", "numpad_1", "numpad_2", "numpad_3", "numpad_4", "numpad_5", "numpad_6",
+									"numpad_7", "numpad_8", "numpad_9", "numpad_+", "numpad_-", "numpad_*", "numpad_/", "numpad_.",
+									"audio_mute", "audio_vol_up", "audio_vol_down", "audio_play", "audio_stop", "audio_pause", "audio_prev",
+									"audio_next", "audio_rewind", "audio_forward", "audio_repeat", "audio_random",
+									"lights_mon_up", "lights_mon_down", "lights_kbd_toggle", "lights_kbd_up", "lights_kbd_down"
+								]
+							}
+						]
+					},
+					"alt": {
+						"description": "Key + alt (default : false)",
+						"type": "boolean"
+					},
+					"ctrl": {
+						"description": "Key + ctrl (default : false)",
+						"type": "boolean"
+					},
+					"shift": {
+						"description": "Key + shift (default : false)",
+						"type": "boolean"
+					},
+					"command": {
+						"description": "Key + command (default : false) (mac only)",
+						"type": "boolean"
+					}
+				},
+				"required": [ "type", "key" ]
+			},
+			"ActionCommand": {
+				"type": "object",
+				"description": "Execute a command line (like in a terminal) (see https://nodejs.org/api/child_process.html)",
+				"properties": {
+					"type": {
+						"type": "string",
+						"enum": [ "COMMAND" ]
+					},
+					"command": {
+						"type": "string",
+						"minLength": 1
+					},
+					"cwd": {
+						"description": "Current working directory of the child process. Default: process.cwd().",
+						"type": "string"
+					},
+					"detached": {
+						"description": "Prepare child process to run independently of its parent process. Specific behavior depends on the platform (see options.detached).",
+						"type": "boolean"
+					},
+					"shell": {
+						"description": "Shell to execute the command with. See Shell requirements and Default Windows shell. Default: \"/bin/sh\" on Unix, process.env.ComSpec on Windows.",
+						"type": "string"
+					},
+					"insideShell": {
+						"description": "If true, runs command inside of a shell.",
+						"type": "boolean"
+					}
+				},
+				"required": [ "type", "command" ]
+			},
+			"ActionPlugin": {
+				"type": "object",
+				"description": "Execute a plugin method",
+				"properties": {
+					"type": {
+						"type": "string",
+						"enum": [ "PLUGIN" ]
+					},
+					"plugin": {
+						"type": "string",
+						"minLength": 1
+					},
+					"operationId": {
+						"type": "string",
+						"minLength": 1
+					},
+					"urlParameters": {
+						"type": "object",
+						"properties": {
+							"path": {
+								"type": "object",
+								"additionalProperties": {
+									"type": "string",
+									"minLength": 1
+								}
+							},
+							"query": {
+								"type": "object",
+								"additionalProperties": {
+									"type": "string",
+									"minLength": 1
+								}
+							},
+							"headers": {
+								"type": "object",
+								"additionalProperties": {
+									"type": "string",
+									"minLength": 1
+								}
+							},
+							"cookies": {
+								"type": "object",
+								"additionalProperties": {
+									"type": "string",
+									"minLength": 1
+								}
+							}
+						}
+					},
+					"bodyParameters": {
+						"description": "Can be any value"
+					}
+				},
+				"required": [ "type", "plugin", "operationId" ]
+			},
+			"PushEventCommandRunning": {
+				"type": "object",
+				"properties": {
+					"plugin": { "$ref": "#/components/schemas/PluginName" },
+					"command": {
+						"type": "string",
+						"enum": [ "command.running" ]
+					},
+					"data": { "$ref": "#/components/schemas/Command" }
+				},
+				"required": [ "plugin", "command", "data" ]
+			},
+			"PushEventCommandSuccess": {
+				"type": "object",
+				"properties": {
+					"plugin": { "$ref": "#/components/schemas/PluginName" },
+					"command": {
+						"type": "string",
+						"enum": [ "command.success" ]
+					},
+					"data": {
+						"type": "object",
+						"properties": {
+							"command": { "$ref": "#/components/schemas/Command" },
+							"content": {
+								"type": "string"
+							}
+						},
+						"required": [ "command", "content" ]
+					}
+				},
+				"required": [ "plugin", "command", "data" ]
+			},
+			"PushEventCommandFail": {
+				"type": "object",
+				"properties": {
+					"plugin": { "$ref": "#/components/schemas/PluginName" },
+					"command": {
+						"type": "string",
+						"enum": [ "command.fail" ]
+					},
+					"data": {
+						"type": "object",
+						"properties": {
+							"command": { "$ref": "#/components/schemas/Command" },
+							"error": { "$ref": "#/components/schemas/Error" }
+						},
+						"required": [ "command", "error" ]
+					}
+				},
+				"required": [ "plugin", "command", "data" ]
+			}
+		}
+	},
+	"servers": [
+		{
+			"url": "http://localhost:8000/",
+			"description": "test server"
+		}
+	]
+}
