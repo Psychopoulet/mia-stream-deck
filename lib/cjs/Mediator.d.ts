@@ -1,8 +1,14 @@
 import { Mediator } from "node-pluginsmanager-plugin";
 import type ContainerPattern from "node-containerpattern";
-import type { iDescriptorUserOptions } from "node-pluginsmanager-plugin";
-import type { operations } from "./Descriptor";
-export default class MediatorStreamDeck extends Mediator {
+import type { iEventsMinimal, iDescriptorUserOptions } from "node-pluginsmanager-plugin";
+import type { operations, components } from "./Descriptor";
+export default class MediatorStreamDeck extends Mediator<iEventsMinimal & {
+    "initialized": [ContainerPattern];
+    "released": [ContainerPattern];
+    "command.running": [components["schemas"]["Command"]];
+    "command.fail": [components["schemas"]["Command"], components["schemas"]["Error"]];
+    "command.success": [components["schemas"]["Command"], string];
+}> {
     private _file;
     private _pluginsManager;
     constructor(data: iDescriptorUserOptions);

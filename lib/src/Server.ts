@@ -69,14 +69,11 @@ export default class ServerStreamDeck extends Server {
 
     }
 
-    private _onCommandFail (command: components["schemas"]["Command"], err: Error): void {
+    private _onCommandFail (command: components["schemas"]["Command"], err: components["schemas"]["Error"]): void {
 
         const event: components["schemas"]["PushEventCommandFail"]["data"] = {
             "command": command,
-            "error": {
-                "code": "COMMAND",
-                "message": err.message
-            }
+            "error": err
         };
 
         this.push("command.fail", event);

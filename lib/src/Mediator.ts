@@ -16,7 +16,7 @@
 
     // externals
     import type ContainerPattern from "node-containerpattern";
-    import type { iDescriptorUserOptions, Orchestrator, iUrlAllowedParameters } from "node-pluginsmanager-plugin";
+    import type { iEventsMinimal, iDescriptorUserOptions, Orchestrator, iUrlAllowedParameters } from "node-pluginsmanager-plugin";
 	import type Pluginsmanager from "node-pluginsmanager";
 
     // locals
@@ -25,7 +25,13 @@
 
 // module
 
-export default class MediatorStreamDeck extends Mediator {
+export default class MediatorStreamDeck extends Mediator<iEventsMinimal & {
+        "initialized": [ ContainerPattern ];
+        "released": [ ContainerPattern ];
+        "command.running": [ components["schemas"]["Command"] ];
+        "command.fail": [ components["schemas"]["Command"], components["schemas"]["Error"] ];
+        "command.success": [ components["schemas"]["Command"], string ];
+    }> {
 
     // attributes
 
@@ -284,7 +290,12 @@ export default class MediatorStreamDeck extends Mediator {
                     ended = true;
 
                     if (running) {
-                        this.emit("command.fail", bodyParameters, err);
+
+                        this.emit("command.fail", bodyParameters, {
+                            "code": "COMMAND",
+                            "message": err.message
+                        });
+
                     }
 
                     return reject(err);
@@ -305,7 +316,10 @@ export default class MediatorStreamDeck extends Mediator {
 
                     if (code) {
 
-                        this.emit("command.fail", bodyParameters, new Error(stderr));
+                        this.emit("command.fail", bodyParameters, {
+                            "code": "COMMAND",
+                            "message": stderr
+                        });
 
                         return reject(new Error(stderr));
 
