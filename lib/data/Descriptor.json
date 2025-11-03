@@ -223,6 +223,39 @@
 					}
 				}
 			},
+			"put": {
+				"description": "",
+				"summary": "Add new table",
+				"operationId": "addTable",
+				"parameters": [
+					{
+						"name": "tablename",
+						"in": "path",
+						"required": true,
+						"schema": {
+							"$ref": "#/components/schemas/TableName"
+						}
+					}
+				],
+				"responses": {
+					"201": {
+						"description": "New table added",
+						"content": {
+							"application/json": {}
+						}
+					},
+					"default": {
+						"description": "An error occured",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Error"
+								}
+							}
+						}
+					}
+				}
+			},
 			"delete": {
 				"description": "",
 				"summary": "Delete the command table",
@@ -239,7 +272,7 @@
 				],
 				"responses": {
 					"204": {
-						"description": "Table registered",
+						"description": "Table deleted",
 						"content": {
 							"application/json": {}
 						}

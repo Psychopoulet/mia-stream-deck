@@ -99,7 +99,7 @@ export default class MediatorStreamDeck extends Mediator<iEventsMinimal & {
 
     public getTables (): Promise<operations["getTables"]["responses"]["200"]["content"]["application/json"]> {
 
-        return readFile(this._file, "utf-8").then((content: string) => {
+        return readFile(this._file, "utf-8").then((content: string): Record<string, components["schemas"]["Table"]> => {
             return JSON.parse(content);
         }).then((content: Record<string, components["schemas"]["Table"]>): Promise<operations["getTables"]["responses"]["200"]["content"]["application/json"]> => {
             return Promise.resolve(Object.keys(content));
@@ -109,7 +109,7 @@ export default class MediatorStreamDeck extends Mediator<iEventsMinimal & {
 
     public getTableByName (urlParameters: operations["getTableByName"]["parameters"]): Promise<operations["getTableByName"]["responses"]["200"]["content"]["application/json"]> {
 
-        return readFile(this._file, "utf-8").then((content: string) => {
+        return readFile(this._file, "utf-8").then((content: string): Record<string, components["schemas"]["Table"]> => {
             return JSON.parse(content);
         }).then((content: Record<string, components["schemas"]["Table"]>): Promise<operations["getTableByName"]["responses"]["200"]["content"]["application/json"]> => {
 
@@ -124,9 +124,23 @@ export default class MediatorStreamDeck extends Mediator<iEventsMinimal & {
 
     }
 
+    public addTable (urlParameters: operations["addTable"]["parameters"]): Promise<operations["addTable"]["responses"]["201"]["content"]["application/json"]> {
+
+        return readFile(this._file, "utf-8").then((content: string): Record<string, components["schemas"]["Table"]> => {
+            return JSON.parse(content);
+        }).then((content: Record<string, components["schemas"]["Table"]>): Promise<operations["addTable"]["responses"]["201"]["content"]["application/json"]> => {
+
+            content[urlParameters.path.tablename] = [];
+
+            return writeFile(this._file, JSON.stringify(content), "utf-8");
+
+        });
+
+    }
+
     public deleteTableByName (urlParameters: operations["deleteTableByName"]["parameters"]): Promise<operations["deleteTableByName"]["responses"]["204"]["content"]["application/json"]> {
 
-        return readFile(this._file, "utf-8").then((content: string) => {
+        return readFile(this._file, "utf-8").then((content: string): Record<string, components["schemas"]["Table"]> => {
             return JSON.parse(content);
         }).then((content: Record<string, components["schemas"]["Table"]>): Promise<operations["deleteTableByName"]["responses"]["204"]["content"]["application/json"]> => {
 

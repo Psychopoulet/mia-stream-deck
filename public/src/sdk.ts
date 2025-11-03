@@ -84,17 +84,55 @@ export class SDK extends EventEmitter<{
 
     }
 
-    public getTableByName (tablename: components["schemas"]["TableName"]): Promise<operations["getTableByName"]["responses"]["200"]["content"]["application/json"]> {
+    public addTable (tableName: string): Promise<operations["addTable"]["responses"]["201"]["content"]["application/json"]> {
 
         const url: keyof paths = "/mia-stream-deck/api/tables/{tablename}";
 
-        return fetch(url.replace("{tablename}", tablename)).then((res: Response): Promise<operations["getTableByName"]["responses"]["200"]["content"]["application/json"]> => {
+        return fetch(url.replace("{tablename}", tableName), {
+            "method": "PUT"
+        }).then((res: Response): Promise<operations["addTable"]["responses"]["201"]["content"]["application/json"]> => {
+
+            if (res.ok) {
+                return Promise.resolve();
+            }
+            else {
+                return Promise.reject(new Error("Problem with request addTable has status '" + res.status + "' (" + res.statusText + ")"));
+            }
+
+        });
+
+    }
+
+    public getTableByName (tableName: components["schemas"]["TableName"]): Promise<operations["getTableByName"]["responses"]["200"]["content"]["application/json"]> {
+
+        const url: keyof paths = "/mia-stream-deck/api/tables/{tablename}";
+
+        return fetch(url.replace("{tablename}", tableName)).then((res: Response): Promise<operations["getTableByName"]["responses"]["200"]["content"]["application/json"]> => {
 
             if (res.ok) {
                 return res.json();
             }
             else {
                 return Promise.reject(new Error("Problem with request getTableByName has status '" + res.status + "' (" + res.statusText + ")"));
+            }
+
+        });
+
+    }
+
+    public deleteTableByName (tableName: string): Promise<operations["deleteTableByName"]["responses"]["204"]["content"]["application/json"]> {
+
+        const url: keyof paths = "/mia-stream-deck/api/tables/{tablename}";
+
+        return fetch(url.replace("{tablename}", tableName), {
+            "method": "DELETE"
+        }).then((res: Response): Promise<operations["deleteTableByName"]["responses"]["204"]["content"]["application/json"]> => {
+
+            if (res.ok) {
+                return Promise.resolve();
+            }
+            else {
+                return Promise.reject(new Error("Problem with request addTable has status '" + res.status + "' (" + res.statusText + ")"));
             }
 
         });

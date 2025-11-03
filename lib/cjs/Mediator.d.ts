@@ -19,6 +19,7 @@ export default class MediatorStreamDeck extends Mediator<iEventsMinimal & {
     getFrontAppMap(): Promise<operations["getFrontApp"]["responses"]["200"]["content"]["application/javascript"]>;
     getTables(): Promise<operations["getTables"]["responses"]["200"]["content"]["application/json"]>;
     getTableByName(urlParameters: operations["getTableByName"]["parameters"]): Promise<operations["getTableByName"]["responses"]["200"]["content"]["application/json"]>;
+    addTable(urlParameters: operations["addTable"]["parameters"]): Promise<operations["addTable"]["responses"]["201"]["content"]["application/json"]>;
     deleteTableByName(urlParameters: operations["deleteTableByName"]["parameters"]): Promise<operations["deleteTableByName"]["responses"]["204"]["content"]["application/json"]>;
     executeCommand(urlParameters: operations["executeCommand"]["parameters"], bodyParameters: operations["executeCommand"]["requestBody"]["content"]["application/json"]): Promise<operations["executeCommand"]["responses"]["204"]["content"]["application/json"]>;
     private _executeActionInputString;
