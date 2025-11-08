@@ -54,7 +54,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/mia-stream-deck/public/bundle.js": {
+    "/mia-stream-deck/public/bundle.min.js": {
         parameters: {
             query?: never;
             header?: never;
@@ -71,7 +71,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/mia-stream-deck/public/bundle.js.map": {
+    "/mia-stream-deck/public/bundle.min.js.map": {
         parameters: {
             query?: never;
             header?: never;

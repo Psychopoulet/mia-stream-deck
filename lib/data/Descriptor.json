@@ -94,7 +94,7 @@
 				}
 			}
 		},
-		"/mia-stream-deck/public/bundle.js": {
+		"/mia-stream-deck/public/bundle.min.js": {
 			"get": {
 				"description": "",
 				"summary": "Plugin's front app",
@@ -123,7 +123,7 @@
 				}
 			}
 		},
-		"/mia-stream-deck/public/bundle.js.map": {
+		"/mia-stream-deck/public/bundle.min.js.map": {
 			"get": {
 				"description": "",
 				"summary": "Plugin's front app map",

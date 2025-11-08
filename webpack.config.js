@@ -3,6 +3,9 @@
 	// natives
 	const { join } = require("node:path");
 
+  // externals
+  const TerserPlugin = require("terser-webpack-plugin");
+
 // consts
 
   const PUBLIC = join(__dirname, "public");
@@ -14,8 +17,9 @@ module.exports = {
   "mode": "development",
 
   "entry": join(PUBLIC, "src", "index.tsx"),
+
   "output": {
-    "filename": "bundle.js",
+    "filename": "bundle.min.js",
     "path": join(PUBLIC, "dist")
   },
 
@@ -27,14 +31,28 @@ module.exports = {
         "test": /\.tsx?$/,
         "exclude": [ /node_modules/ ],
         "use": [
-            {
-                "loader": "ts-loader",
-                "options": {
-                    "configFile": join(__dirname, "tsconfig-front.json")
-                }
-            }
+          {
+              "loader": "ts-loader",
+              "options": {
+                "configFile": join(__dirname, "tsconfig-front.json")
+              }
+          }
         ]
       }
+    ]
+  },
+  "optimization": {
+    "minimize": true,
+    "minimizer": [
+      new TerserPlugin({
+        "parallel": true,
+        "terserOptions": {
+          "format": {
+            "comments": false
+          }
+        },
+        "extractComments": false
+      })
     ]
   },
 

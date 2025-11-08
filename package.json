@@ -58,6 +58,7 @@
     "react-bootstrap-fontawesome": "git+ssh://git@github.com/Psychopoulet/react-bootstrap-fontawesome",
     "react-dom": "19.2.0",
     "rimraf": "6.1.0",
+    "terser-webpack-plugin": "5.3.14",
     "ts-loader": "9.5.4",
     "typescript": "5.9.3",
     "used-deps-analyzer": "0.1.8",
