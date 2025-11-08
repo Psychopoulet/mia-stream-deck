@@ -246,41 +246,45 @@ export default class TableCommandsChoice extends React.Component<iPropsNode, iSt
 
                 <Button icon="plus" variant="success" block
                     onClick={ this._handleAddNewTableName.bind(this) }
-                    disabled={ this.state.running }
+                    disabled={ this.state.running || 0 >= this.state.newTableName.length }
                 >
                     Add new table
                 </Button>
 
-                <SelectLabel label="Choose table"
-                    value={ this.state.selectedTableName } onChange={ this._handleChangeTable.bind(this) }
-                    disabled={ this.state.running || 0 >= this.state.tables.length }
-                >
+                { 0 >= this.state.tables.length ? undefined : <>
 
-                    <option value="">-</option>
-
-                    { this.state.tables.map((value: string, key: number): React.JSX.Element => {
-                        return <option key={ key } value={ value }>{ value }</option>;
-                    }) }
-
-                </SelectLabel>
-
-                <ButtonGroup block>
-
-                    <Button icon="eye" variant="success"
-                        onClick={ this._handleSeeTable.bind(this) }
-                        disabled={ this.state.running || 0 >= this.state.selectedTableName.length }
+                    <SelectLabel label="Choose table"
+                        value={ this.state.selectedTableName } onChange={ this._handleChangeTable.bind(this) }
+                        disabled={ this.state.running || 0 >= this.state.tables.length }
                     >
-                        See table
-                    </Button>
 
-                    <Button icon="trash" variant="danger"
-                        onClick={ this._handleDeleteTable.bind(this) }
-                        disabled={ this.state.running || 0 >= this.state.selectedTableName.length }
-                    >
-                        Delete table
-                    </Button>
+                        <option value="">-</option>
 
-                </ButtonGroup>
+                        { this.state.tables.map((value: string, key: number): React.JSX.Element => {
+                            return <option key={ key } value={ value }>{ value }</option>;
+                        }) }
+
+                    </SelectLabel>
+
+                    <ButtonGroup block>
+
+                        <Button icon="eye" variant="success"
+                            onClick={ this._handleSeeTable.bind(this) }
+                            disabled={ this.state.running || 0 >= this.state.selectedTableName.length }
+                        >
+                            See table
+                        </Button>
+
+                        <Button icon="trash" variant="danger"
+                            onClick={ this._handleDeleteTable.bind(this) }
+                            disabled={ this.state.running || 0 >= this.state.selectedTableName.length }
+                        >
+                            Delete table
+                        </Button>
+
+                    </ButtonGroup>
+
+                </> }
 
             </div>
 
