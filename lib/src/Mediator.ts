@@ -17,7 +17,7 @@
     // externals
     import type ContainerPattern from "node-containerpattern";
     import type { iEventsMinimal, iDescriptorUserOptions, Orchestrator, iUrlAllowedParameters } from "node-pluginsmanager-plugin";
-	import type Pluginsmanager from "node-pluginsmanager";
+    import type Pluginsmanager from "node-pluginsmanager";
 
     // locals
     import type { operations, components } from "./Descriptor";
@@ -62,7 +62,7 @@ export default class MediatorStreamDeck extends Mediator<iEventsMinimal & {
 
     }
 
-    protected _releaseWorkSpace  (): Promise<void> {
+    protected _releaseWorkSpace (): Promise<void> {
 
         this._file = "";
         this._pluginsManager = null;
@@ -278,7 +278,7 @@ export default class MediatorStreamDeck extends Mediator<iEventsMinimal & {
             let stderr: string = "";
             let stdout: string = "";
 
-            let options: Record<string, string | boolean> = {
+            const options: Record<string, string | boolean> = {
                 "windowsHide": true
             };
 
@@ -322,7 +322,7 @@ export default class MediatorStreamDeck extends Mediator<iEventsMinimal & {
 
                 this.emit("command.running", bodyParameters);
 
-            }).once("close", (code: number | null, signal: NodeJS.Signals | null): void => {
+            }).once("close", (code: number | null): void => {
 
                 if (!ended) {
 
