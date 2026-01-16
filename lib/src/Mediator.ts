@@ -21,7 +21,7 @@
 
     // locals
     import type { operations, components } from "./Descriptor";
-    type tSubPluginMethod = (urlParameters?: iUrlAllowedParameters, bodyParameters?: any) => Promise<any>;
+    type tSubPluginMethod = (urlParameters?: iUrlAllowedParameters, bodyParameters?: unknown) => Promise<unknown>;
 
 // module
 
@@ -100,7 +100,7 @@ export default class MediatorStreamDeck extends Mediator<iEventsMinimal & {
     public getTables (): Promise<operations["getTables"]["responses"]["200"]["content"]["application/json"]> {
 
         return readFile(this._file, "utf-8").then((content: string): Record<string, components["schemas"]["Table"]> => {
-            return JSON.parse(content);
+            return JSON.parse(content) as Record<string, components["schemas"]["Table"]>;
         }).then((content: Record<string, components["schemas"]["Table"]>): Promise<operations["getTables"]["responses"]["200"]["content"]["application/json"]> => {
             return Promise.resolve(Object.keys(content));
         });
@@ -110,7 +110,7 @@ export default class MediatorStreamDeck extends Mediator<iEventsMinimal & {
     public getTableByName (urlParameters: operations["getTableByName"]["parameters"]): Promise<operations["getTableByName"]["responses"]["200"]["content"]["application/json"]> {
 
         return readFile(this._file, "utf-8").then((content: string): Record<string, components["schemas"]["Table"]> => {
-            return JSON.parse(content);
+            return JSON.parse(content) as Record<string, components["schemas"]["Table"]>;
         }).then((content: Record<string, components["schemas"]["Table"]>): Promise<operations["getTableByName"]["responses"]["200"]["content"]["application/json"]> => {
 
             if (!content[urlParameters.path.tablename]) {
@@ -127,7 +127,7 @@ export default class MediatorStreamDeck extends Mediator<iEventsMinimal & {
     public addTable (urlParameters: operations["addTable"]["parameters"]): Promise<operations["addTable"]["responses"]["201"]["content"]["application/json"]> {
 
         return readFile(this._file, "utf-8").then((content: string): Record<string, components["schemas"]["Table"]> => {
-            return JSON.parse(content);
+            return JSON.parse(content) as Record<string, components["schemas"]["Table"]>;
         }).then((content: Record<string, components["schemas"]["Table"]>): Promise<operations["addTable"]["responses"]["201"]["content"]["application/json"]> => {
 
             content[urlParameters.path.tablename] = [];
@@ -141,7 +141,7 @@ export default class MediatorStreamDeck extends Mediator<iEventsMinimal & {
     public deleteTableByName (urlParameters: operations["deleteTableByName"]["parameters"]): Promise<operations["deleteTableByName"]["responses"]["204"]["content"]["application/json"]> {
 
         return readFile(this._file, "utf-8").then((content: string): Record<string, components["schemas"]["Table"]> => {
-            return JSON.parse(content);
+            return JSON.parse(content) as Record<string, components["schemas"]["Table"]>;
         }).then((content: Record<string, components["schemas"]["Table"]>): Promise<operations["deleteTableByName"]["responses"]["204"]["content"]["application/json"]> => {
 
             if (!content[urlParameters.path.tablename]) {
@@ -211,7 +211,7 @@ export default class MediatorStreamDeck extends Mediator<iEventsMinimal & {
 
                 robotjs.typeString(command.string);
 
-                if (command.enter) {
+                if (command.enter ?? false) {
                     robotjs.keyTap("enter");
                 }
 
@@ -238,16 +238,16 @@ export default class MediatorStreamDeck extends Mediator<iEventsMinimal & {
 
                 const modifiers: string[] = [];
 
-                if (command.alt) {
+                if (command.alt ?? false) {
                     modifiers.push("alt");
                 }
-                if (command.ctrl) {
+                if (command.ctrl ?? false) {
                     modifiers.push("control");
                 }
-                if (command.shift) {
+                if (command.shift ?? false) {
                     modifiers.push("shift");
                 }
-                if (command.command) {
+                if (command.command ?? false) {
                     modifiers.push("command");
                 }
 
@@ -312,7 +312,7 @@ export default class MediatorStreamDeck extends Mediator<iEventsMinimal & {
 
                     }
 
-                    return reject(err);
+                    reject(err);
 
                 }
 
