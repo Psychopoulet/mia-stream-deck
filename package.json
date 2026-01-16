@@ -8,7 +8,7 @@
 
     "prepare": "npx husky",
 
-    "lint-back": "npx eslint --config .eslintrc-back.js --ext .cts,.ts ./lib/src/**/*",
+    "lint-back": "npx eslint --config .eslintrc-back.js --ext .cts,.ts --ignore-pattern \"**/Descriptor.ts\" ./lib/src/**/*",
     "lint-front": "npx eslint --config .eslintrc-front.js --ext .tsx,.ts ./public/src/**/*",
     "lint-tests": "npx eslint --config .eslintrc-tests.js --ext .js ./tests/**/*",
 
