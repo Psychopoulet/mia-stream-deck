@@ -79,12 +79,12 @@
   "author": "Sébastien VIDAL",
   "contributors": [],
   "license": "ISC",
-  "homepage": "https://github.com/Psychopoulet/MIA-stream-deck#readme",
+  "homepage": "https://github.com/Psychopoulet/mia-stream-deck#readme",
   "repository": {
     "type": "git",
-    "url": "git://github.com/Psychopoulet/MIA-stream-deck"
+    "url": "git://github.com/Psychopoulet/mia-stream-deck"
   },
   "bugs": {
-    "url": "https://github.com/Psychopoulet/MIA-stream-deck/issues"
+    "url": "https://github.com/Psychopoulet/mia-stream-deck/issues"
   }
 }
