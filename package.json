@@ -1,12 +1,25 @@
 {
+
   "name": "mia-stream-deck",
   "version": "1.0.0",
   "description": "Stream deck plugin for MIA",
+
+  "type": "commonjs",
   "typings": "./lib/cjs/main.d.cts",
   "main": "./lib/cjs/main.cjs",
+
+  "exports": {
+    ".": {
+      "require": {
+        "types": "./lib/cjs/main.d.cts",
+        "default": "./lib/cjs/main.cjs"
+      }
+    }
+  },
+
   "scripts": {
 
-    "prepare": "npx husky",
+    "prepare": "npx husky || true",
 
     "lint-back": "npx eslint --config .eslintrc-back.js --ext .cts,.ts --ignore-pattern \"**/Descriptor.ts\" ./lib/src/**/*",
     "lint-front": "npx eslint --config .eslintrc-front.js --ext .tsx,.ts ./public/src/**/*",
@@ -29,6 +42,8 @@
     "ci": "npm run-script tests && npx nyc report --reporter=text-lcov | coveralls"
 
   },
+
+  "bin": {},
   "files": [
     "/bin",
     "/lib/cjs",
@@ -36,8 +51,9 @@
     "/public/dist"
   ],
   "engines": {
-    "node": ">=20.0.0"
+    "node": ">=22.22.0"
   },
+
   "dependencies": {
     "node-pluginsmanager-plugin": "6.5.0",
     "@hurdlegroup/robotjs": "0.12.3"
@@ -69,6 +85,8 @@
     "webpack": "5.104.1",
     "webpack-cli": "6.0.1"
   },
+  "optionalDependencies": {},
+
   "husky": {
     "hooks": {
       "pre-commit": "npm run-script lint",
@@ -79,6 +97,7 @@
   "author": "Sébastien VIDAL",
   "contributors": [],
   "license": "ISC",
+
   "homepage": "https://github.com/Psychopoulet/mia-stream-deck#readme",
   "repository": {
     "type": "git",
@@ -87,4 +106,5 @@
   "bugs": {
     "url": "https://github.com/Psychopoulet/mia-stream-deck/issues"
   }
+
 }

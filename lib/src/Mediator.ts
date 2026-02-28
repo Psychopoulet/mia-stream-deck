@@ -211,7 +211,7 @@ export default class MediatorStreamDeck extends Mediator<iEventsMinimal & {
 
                 robotjs.typeString(command.string);
 
-                if (command.enter ?? false) {
+                if (command.enter) {
                     robotjs.keyTap("enter");
                 }
 
@@ -238,16 +238,16 @@ export default class MediatorStreamDeck extends Mediator<iEventsMinimal & {
 
                 const modifiers: string[] = [];
 
-                if (command.alt ?? false) {
+                if (command.alt) {
                     modifiers.push("alt");
                 }
-                if (command.ctrl ?? false) {
+                if (command.ctrl) {
                     modifiers.push("control");
                 }
-                if (command.shift ?? false) {
+                if (command.shift) {
                     modifiers.push("shift");
                 }
-                if (command.command ?? false) {
+                if (command.command) {
                     modifiers.push("command");
                 }
 
