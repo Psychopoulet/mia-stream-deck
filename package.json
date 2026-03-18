@@ -2,7 +2,7 @@
 
   "name": "mia-stream-deck",
   "version": "1.0.0",
-  "description": "Stream deck plugin for MIA",
+  "description": "Stream deck plugin for MIA.",
 
   "type": "commonjs",
   "typings": "./lib/cjs/main.d.cts",
@@ -21,34 +21,33 @@
 
     "prepare": "npx husky || true",
 
-    "lint-back": "npx eslint --config .eslintrc-back.js --ext .cts,.ts --ignore-pattern \"**/Descriptor.ts\" ./lib/src/**/*",
+    "lint-back": "npx eslint --config .eslintrc-back.js --ext .ts,.cts,.mts ./lib/src/**/*",
     "lint-front": "npx eslint --config .eslintrc-front.js --ext .tsx,.ts ./public/src/**/*",
-    "lint-tests": "npx eslint --config .eslintrc-tests.js --ext .js ./tests/**/*",
-
+    "lint-tests": "npx eslint --config .eslintrc-tests.js --ext .js,.cjs,.mjs ./test/**/*",
     "lint": "npm run lint-back && npm run lint-front && npm run lint-tests",
-    "check-requires": "npx used-deps-analyzer \"./package.json\" \"./lib/src\" --no-dev --overkill \"fs-extra\" \"node-promfs\"",
-    "check-updates": "npx check-version-modules",
-    "unit-tests": "npm run-script build && npx nyc --reporter=html --reporter=text mocha",
-    "tests": "npm run-script lint && npm run-script check-requires && npm run-script check-updates && npm run-script unit-tests",
+
+    "clean-back": "npx rimraf ./lib/cjs",
+    "clean-front": "npx rimraf ./public/cjs",
+    "clean": "npm run clean-back && npm run clean-front",
 
     "transpile-openapi": "npx openapi-typescript ./lib/data/Descriptor.json -o ./lib/src/Descriptor.ts ",
 
-    "clean-api": "npx rimraf \"./lib/cjs\"",
-    "build-api": "npm run-script clean-api && npm run-script transpile-openapi && npx tsc --project \"./tsconfig.json\"",
-
-    "clean-front": "npx rimraf \"./public/dist/bundle.js",
+    "build-back": "npm run-script clean-back && npm run-script transpile-openapi && npx tsc --project ./tsconfig.json",
     "build-front": "npm run-script clean-front && npm run-script transpile-openapi && npx webpack --config \"./webpack.config.js\"",
+    "build": "npm run build-back && npm run build-front",
 
-    "ci": "npm run-script tests && npx nyc report --reporter=text-lcov | coveralls"
+    "check-requires": "npx used-deps-analyzer \"./package.json\" \"./lib/src\" --no-dev --overkill \"fs-extra\" \"node-promfs\"",
+    "check-updates": "npx check-version-modules --no-fail-at-major --fail-at-minor --fail-at-patch",
+    "unit-tests": "npm run-script build && npx nyc --reporter=html --reporter=text mocha",
+
+    "tests": "npm run-script lint && npm run-script check-requires && npm run-script check-updates && npm run-script unit-tests"
 
   },
 
-  "bin": {},
   "files": [
-    "/bin",
-    "/lib/cjs",
-    "/lib/data",
-    "/public/dist"
+    "lib/cjs",
+    "lib/data",
+    "public/dist"
   ],
   "engines": {
     "node": ">=22.22.0"
@@ -85,13 +84,11 @@
     "webpack": "5.105.4",
     "webpack-cli": "7.0.2"
   },
-  "optionalDependencies": {},
 
   "husky": {
     "hooks": {
-      "pre-commit": "npm run-script lint",
-      "pre-push": "npm run-script unit-tests",
-      "pre-receive": "npm run-script tests"
+      "pre-commit": "npm run lint",
+      "pre-push": "npm run unit-tests"
     }
   },
   "author": "Sébastien VIDAL",
@@ -101,7 +98,7 @@
   "homepage": "https://github.com/Psychopoulet/mia-stream-deck#readme",
   "repository": {
     "type": "git",
-    "url": "git://github.com/Psychopoulet/mia-stream-deck"
+    "url": "git://github.com/Psychopoulet/mia-stream-deck.git"
   },
   "bugs": {
     "url": "https://github.com/Psychopoulet/mia-stream-deck/issues"
