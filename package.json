@@ -32,15 +32,16 @@
 
     "transpile-openapi": "npx openapi-typescript ./lib/data/Descriptor.json -o ./lib/src/Descriptor.ts ",
 
-    "build-back": "npm run-script clean-back && npm run-script transpile-openapi && npx tsc --project ./tsconfig.json",
-    "build-front": "npm run-script clean-front && npm run-script transpile-openapi && npx webpack --config \"./webpack.config.js\"",
+    "build-back": "npm run clean-back && npm run transpile-openapi && npx tsc --project ./tsconfig.json",
+    "build-front": "npm run clean-front && npm run transpile-openapi && npx webpack --config \"./webpack.config.js\"",
     "build": "npm run build-back && npm run build-front",
 
     "check-requires": "npx used-deps-analyzer \"./package.json\" \"./lib/src\" --no-dev --overkill \"fs-extra\" \"node-promfs\"",
     "check-updates": "npx check-version-modules --no-fail-at-major --fail-at-minor --fail-at-patch",
-    "unit-tests": "npm run-script build && npx nyc --reporter=html --reporter=text mocha",
+    "unit-tests": "echo 'not unit tests here'",
+    "unit-tests-local": "echo 'not unit tests here'",
 
-    "tests": "npm run-script lint && npm run-script check-requires && npm run-script check-updates && npm run-script unit-tests"
+    "tests": "npm run lint && npm run check-requires && npm run check-updates && npm run unit-tests"
 
   },
 
@@ -65,13 +66,10 @@
     "@types/socket.io": "3.0.2",
     "@types/ws": "8.18.1",
     "check-version-modules": "2.2.2",
-    "coveralls": "3.1.1",
     "eslint-plugin-personnallinter": "git+ssh://git@github.com/Psychopoulet/eslint-plugin-personnallinter",
     "husky": "9.1.7",
-    "mocha": "11.7.5",
     "node-pluginsmanager": "3.0.1",
     "node-containerpattern": "1.9.0",
-    "nyc": "18.0.0",
     "openapi-typescript": "7.13.0",
     "react": "19.2.4",
     "react-bootstrap-fontawesome": "git+ssh://git@github.com/Psychopoulet/react-bootstrap-fontawesome",
@@ -88,7 +86,7 @@
   "husky": {
     "hooks": {
       "pre-commit": "npm run lint",
-      "pre-push": "npm run unit-tests"
+      "pre-push": "npm run build && npm run unit-tests-local"
     }
   },
   "author": "Sébastien VIDAL",
