@@ -56,7 +56,7 @@ export default class MediatorStreamDeck extends Mediator<iEventsMinimal & {
     protected _initWorkSpace (container: ContainerPattern): Promise<void> {
 
         this._file = join(this._externalResourcesDirectory, "tables.json");
-        this._pluginsManager = container.get("plugins-manager") as Pluginsmanager;
+        this._pluginsManager = container.get<Pluginsmanager>("plugins-manager");
 
         return Promise.resolve();
 
