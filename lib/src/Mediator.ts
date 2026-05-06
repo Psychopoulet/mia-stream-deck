@@ -88,7 +88,17 @@ export default class MediatorStreamDeck extends Mediator<iEventsMinimal & {
     }
 
     public getFrontApp (): Promise<operations["getFrontApp"]["responses"]["200"]["content"]["application/javascript"]> {
-        return readFile(join(__dirname, "..", "..", "public", "dist", "bundle.min.js"), "utf-8");
+
+        return readFile(join(__dirname, "..", "..", "public", "dist", "bundle.min.js"), "utf-8").then((content: string): string => {
+
+            return content
+
+                .replace(/{{plugin.name}}/g, this.getPluginName())
+                .replace(/{{plugin.version}}/g, this.getPluginVersion())
+                .replace(/{{plugin.description}}/g, this.getPluginDescription());
+
+        });
+
     }
 
     public getFrontAppMap (): Promise<operations["getFrontApp"]["responses"]["200"]["content"]["application/javascript"]> {
