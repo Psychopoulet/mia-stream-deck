@@ -1,5 +1,3 @@
-"use strict";
-
 // deps
 
 	// externals
@@ -8,7 +6,7 @@
 
 	// locals
     import getSDK from "./sdk";
-    import TableCommandsChoice from "./TableCommandsChoice";
+    import TableCommandsChoice from "./components/TableCommandsChoice";
 
 // types & interfaces
 
@@ -57,6 +55,8 @@ export default class App extends React.Component<iPropsNode, iState> {
             .on("disconnected", this._onDisconnected)
             .on("error", this._onError);
 
+        this._sdk.connect();
+
     }
 
     public componentWillUnmount (): void {
@@ -65,6 +65,8 @@ export default class App extends React.Component<iPropsNode, iState> {
             .off("connected", this._onConnected)
             .off("disconnected", this._onDisconnected)
             .off("error", this._onError);
+
+        this._sdk.disconnect();
 
     }
 
@@ -96,13 +98,24 @@ export default class App extends React.Component<iPropsNode, iState> {
 
     // interface handlers
 
-    private _handleCloseError (): void {
+    private readonly _handleCloseError = (e: React.MouseEvent<HTMLButtonElement>): void => {
+
+        e.preventDefault();
+        e.stopPropagation();
 
         this.setState({
             "error": null
         });
 
-    }
+    };
+
+    private readonly _handleError = (err: Error): void => {
+
+        this.setState({
+            "error": err
+        });
+
+    };
 
 	// render
 
@@ -119,13 +132,13 @@ export default class App extends React.Component<iPropsNode, iState> {
 
             return <div className="container-fluid">
 
-                { this.state.error && <Modal appId="{{plugin.name}}-app" title="Error" variant="danger" centered size="sm" onClose={ this._handleCloseError.bind(this) }>
+                { this.state.error && <Modal appId="{{plugin.name}}-app" title="Error" variant="danger" centered size="sm" onClose={ this._handleCloseError }>
                     <ModalBody>
                         { this.state.error.message || "An error occurred" }
                     </ModalBody>
                 </Modal> }
 
-				return <TableCommandsChoice />
+				return <TableCommandsChoice onError={ this._handleError } />;
 
             </div>;
 
