@@ -51,10 +51,6 @@ export default class TableCommands extends React.Component<iProps, iState> {
             "table": []
         };
 
-        this._onCommandRunning = this._onCommandRunning.bind(this);
-        this._onCommandSuccess = this._onCommandSuccess.bind(this);
-        this._onCommandFail = this._onCommandFail.bind(this);
-
     }
 
     public componentDidMount (): void {

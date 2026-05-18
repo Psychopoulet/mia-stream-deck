@@ -119,7 +119,7 @@ export default class TableCommandsChoice extends React.Component<iProps, iState>
 
     // events
 
-    private _handleChangeNewTableName (e: React.ChangeEvent<HTMLInputElement>, newValue: string): void {
+    private readonly _handleChangeNewTableName = (e: React.ChangeEvent<HTMLInputElement>, newValue: string): void => {
 
         e.stopPropagation();
         e.preventDefault();
@@ -128,9 +128,9 @@ export default class TableCommandsChoice extends React.Component<iProps, iState>
             "newTableName": newValue
         });
 
-    }
+    };
 
-    private _handleAddNewTableName (e: React.MouseEvent<HTMLButtonElement>): void {
+    private readonly _handleAddNewTableName = (e: React.MouseEvent<HTMLButtonElement>): void => {
 
         e.stopPropagation();
         e.preventDefault();
@@ -161,9 +161,9 @@ export default class TableCommandsChoice extends React.Component<iProps, iState>
 
         });
 
-    }
+    };
 
-    private _handleChangeTable (e: React.ChangeEvent<HTMLSelectElement>, newValue: string): void {
+    private readonly _handleChangeTable = (e: React.ChangeEvent<HTMLSelectElement>, newValue: string): void => {
 
         e.stopPropagation();
         e.preventDefault();
@@ -172,9 +172,9 @@ export default class TableCommandsChoice extends React.Component<iProps, iState>
             "selectedTableName": newValue
         });
 
-    }
+    };
 
-    private _handleSeeTable (e: React.MouseEvent<HTMLButtonElement>): void {
+    private readonly _handleSeeTable = (e: React.MouseEvent<HTMLButtonElement>): void => {
 
         e.stopPropagation();
         e.preventDefault();
@@ -186,9 +186,9 @@ export default class TableCommandsChoice extends React.Component<iProps, iState>
             "seeTableName": true
         });
 
-    }
+    };
 
-    private _handleDeleteTable (e: React.MouseEvent<HTMLButtonElement>): void {
+    private readonly _handleDeleteTable = (e: React.MouseEvent<HTMLButtonElement>): void => {
 
         e.stopPropagation();
         e.preventDefault();
@@ -215,7 +215,7 @@ export default class TableCommandsChoice extends React.Component<iProps, iState>
 
         });
 
-    }
+    };
 
     // render
 
@@ -236,12 +236,12 @@ export default class TableCommandsChoice extends React.Component<iProps, iState>
             return <div className="container">
 
                 <InputTextLabel label="New table name"
-                    value={ this.state.newTableName } onChange={ this._handleChangeNewTableName.bind(this) } minLength={ 1 }
+                    value={ this.state.newTableName } onChange={ this._handleChangeNewTableName } minLength={ 1 }
                     disabled={ this.state.running }
                 />
 
                 <Button icon="plus" variant="success" block
-                    onClick={ this._handleAddNewTableName.bind(this) }
+                    onClick={ this._handleAddNewTableName }
                     disabled={ this.state.running || 0 >= this.state.newTableName.length }
                 >
                     Add new table
@@ -250,7 +250,7 @@ export default class TableCommandsChoice extends React.Component<iProps, iState>
                 { 0 >= this.state.tables.length ? undefined : <>
 
                     <SelectLabel label="Choose table"
-                        value={ this.state.selectedTableName } onChange={ this._handleChangeTable.bind(this) }
+                        value={ this.state.selectedTableName } onChange={ this._handleChangeTable }
                         disabled={ this.state.running || 0 >= this.state.tables.length }
                     >
 
@@ -265,14 +265,14 @@ export default class TableCommandsChoice extends React.Component<iProps, iState>
                     <ButtonGroup block>
 
                         <Button icon="eye" variant="success"
-                            onClick={ this._handleSeeTable.bind(this) }
+                            onClick={ this._handleSeeTable }
                             disabled={ this.state.running || 0 >= this.state.selectedTableName.length }
                         >
                             See table
                         </Button>
 
                         <Button icon="trash" variant="danger"
-                            onClick={ this._handleDeleteTable.bind(this) }
+                            onClick={ this._handleDeleteTable }
                             disabled={ this.state.running || 0 >= this.state.selectedTableName.length }
                         >
                             Delete table
