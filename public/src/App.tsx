@@ -4,7 +4,7 @@
 
 	// externals
     import React from "react";
-    import { Alert } from "react-bootstrap-fontawesome";
+    import { Alert, Modal, ModalBody } from "react-bootstrap-fontawesome";
 
 	// locals
     import getSDK from "./sdk";
@@ -20,6 +20,7 @@
 
 	interface iState {
 		"connected": boolean;
+        "error": Error | null;
 	}
 
 // component
@@ -34,31 +35,36 @@ export default class App extends React.Component<iPropsNode, iState> {
 
 		private _sdk: SDK = getSDK();
 
-	// constructor
+    // constructor
 
-	public constructor (props: iPropsNode) {
+    public constructor (props: iPropsNode) {
 
-		super(props);
+        super(props);
 
-		this.state = {
-			"connected": false
-		};
+        // state
 
-	}
+        this.state = {
+            "connected": false,
+            "error": null
+        };
 
-	public componentDidMount (): void {
+    }
+
+    public componentDidMount (): void {
 
         this._sdk
             .on("connected", this._onConnected.bind(this))
-            .on("disconnected", this._onDisconnected.bind(this));
+            .on("disconnected", this._onDisconnected.bind(this))
+            .on("error", this._onError.bind(this));
 
-	}
+    }
 
-    public componentWillUnmount(): void {
+    public componentWillUnmount (): void {
 
         this._sdk
             .off("connected", this._onConnected.bind(this))
-            .off("disconnected", this._onDisconnected.bind(this));
+            .off("disconnected", this._onDisconnected.bind(this))
+            .off("error", this._onError.bind(this));
 
     }
 
@@ -80,22 +86,50 @@ export default class App extends React.Component<iPropsNode, iState> {
 
 	}
 
+    private _onError (err: Error | null): void {
+
+        this.setState({
+            "error": err
+        });
+
+    }
+
+    // interface handlers
+
+    private _handleCloseError (): void {
+
+        this.setState({
+            "error": null
+        });
+
+    }
+
 	// render
 
 	public render (): React.JSX.Element {
 
-		if (!this.state.connected) {
+        if (!this.state.connected) {
 
-			return <div className="container">
-				<Alert variant="warning">Not connected yet...</Alert>
-			</div>;
+            return <div className="container">
+                <Alert variant="warning">Not connected yet...</Alert>
+            </div>;
 
-		}
-		else {
+        }
+        else {
 
-			return <TableCommandsChoice />
+            return <div className="container-fluid">
 
-		}
+                { this.state.error && <Modal appId="{{plugin.name}}-app" title="Error" variant="danger" centered size="sm" onClose={ this._handleCloseError.bind(this) }>
+                    <ModalBody>
+                        { this.state.error.message || "An error occurred" }
+                    </ModalBody>
+                </Modal> }
+
+				return <TableCommandsChoice />
+
+            </div>;
+
+        }
 
 	}
 

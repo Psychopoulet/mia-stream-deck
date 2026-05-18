@@ -25,7 +25,10 @@ export class SDK extends EventEmitter<{
 
         super();
 
-        const socket = new WebSocket("ws://" + window.location.host);
+        const socket = new WebSocket(
+            ("https:" === window.location.protocol ? "wss:" : "ws:")
+            + "//" + window.location.host
+        );
 
         socket.addEventListener("error", (err: Event): void => {
             console.error("socket error", err);

@@ -101,7 +101,7 @@ export default class MediatorStreamDeck extends Mediator<iEventsMinimal & {
 
     }
 
-    public getFrontAppMap (): Promise<operations["getFrontApp"]["responses"]["200"]["content"]["application/javascript"]> {
+    public getFrontAppMap (): Promise<string> { // tricks return to avoid costful parsing
         return readFile(join(__dirname, "..", "..", "public", "dist", "bundle.min.js.map"), "utf-8");
     }
 
