@@ -9,14 +9,18 @@
     type Timeout = ReturnType<typeof setTimeout>;
 
     // locals
-    import type { components, operations, paths } from "../../lib/src/Descriptor";
+    import type { components, operations, paths } from "./Descriptor";
+    type tEvents = components["schemas"]["PushEventPluginInitialized"] | components["schemas"]["PushEventPluginReleased"] | components["schemas"]["PushEventPluginError"]
+        | components["schemas"]["PushEventCommandRunning"] | components["schemas"]["PushEventCommandSuccess"] | components["schemas"]["PushEventCommandFail"];
 
 // component
 
 export class SDK extends EventEmitter<{
     "connected": [];
     "disconnected": [ number, string ];
-    "error": [ Error ];
+    "initialized": [];
+    "released": [];
+    "error": [ components["schemas"]["PushEventPluginError"]["data"] ];
     "command.running": [ components["schemas"]["Command"] ];
     "command.fail": [ components["schemas"]["Command"], components["schemas"]["Error"] ];
     "command.success": [ components["schemas"]["Command"], string ];
@@ -82,18 +86,33 @@ export class SDK extends EventEmitter<{
 
             // avoid catching error on reconnection
             if (evt instanceof ErrorEvent) {
-                this.emit("error", new Error(evt.message));
+
+                this.emit("error", {
+                    "code": "unknown",
+                    "message": evt.message
+                });
+
             }
 
         };
 
         this._socket.onmessage = (message: MessageEvent): void => {
 
-            const parsedMessage: components["schemas"]["PushEventCommandRunning"] | components["schemas"]["PushEventCommandSuccess"] | components["schemas"]["PushEventCommandFail"] = JSON.parse(message.data);
+            const parsedMessage: tEvents = JSON.parse(message.data) as tEvents;
 
             if ("mia-stream-deck" === parsedMessage.plugin) {
 
                 switch (parsedMessage.command) {
+
+                    case "initialized":
+                        this.emit("initialized");
+                    break;
+                    case "released":
+                        this.emit("released");
+                    break;
+                    case "error":
+                        this.emit("error", parsedMessage.data);
+                    break;
 
                     case "command.running":
                         this.emit(parsedMessage.command, parsedMessage.data);
@@ -105,6 +124,10 @@ export class SDK extends EventEmitter<{
 
                     case "command.fail":
                         this.emit(parsedMessage.command, parsedMessage.data.command, parsedMessage.data.error);
+                    break;
+
+                    default:
+                        // nothing to do here
                     break;
 
                 }
@@ -141,14 +164,25 @@ export class SDK extends EventEmitter<{
 
         const url: keyof paths = "/mia-stream-deck/api/tables";
 
-        return fetch(url).then((res: Response): Promise<operations["getTables"]["responses"]["200"]["content"]["application/json"]> => {
+        return fetch(url, {
+            "headers": {
+                "Content-Type": "application/json"
+            }
+        }).then((res: Response): Promise<operations["getTables"]["responses"]["200"]["content"]["application/json"]> => {
 
             if (res.ok) {
                 return res.json();
             }
-            else {
-                return Promise.reject(new Error("Problem with request getTables has status '" + res.status + "' (" + res.statusText + ")"));
-            }
+
+            return new Promise((resolve: unknown, reject: (error: Error) => void): void => {
+
+                res.json().then((content: operations["getTables"]["responses"]["default"]["content"]["application/json"]): void => {
+                    return reject(new Error(content.message));
+                }).catch((): void => {
+                    return reject(new Error("Problem with request getTables has status '" + res.status + "' (" + res.statusText + ")"));
+                });
+
+            });
 
         });
 
@@ -159,15 +193,25 @@ export class SDK extends EventEmitter<{
         const url: keyof paths = "/mia-stream-deck/api/tables/{tablename}";
 
         return fetch(url.replace("{tablename}", tableName), {
-            "method": "PUT"
+            "method": "PUT",
+            "headers": {
+                "Content-Type": "application/json"
+            }
         }).then((res: Response): Promise<operations["addTable"]["responses"]["201"]["content"]["application/json"]> => {
 
             if (res.ok) {
-                return Promise.resolve();
+                return res.json();
             }
-            else {
-                return Promise.reject(new Error("Problem with request addTable has status '" + res.status + "' (" + res.statusText + ")"));
-            }
+
+            return new Promise((resolve: unknown, reject: (error: Error) => void): void => {
+
+                res.json().then((content: operations["addTable"]["responses"]["default"]["content"]["application/json"]): void => {
+                    return reject(new Error(content.message));
+                }).catch((): void => {
+                    return reject(new Error("Problem with request addTable has status '" + res.status + "' (" + res.statusText + ")"));
+                });
+
+            });
 
         });
 
@@ -177,14 +221,25 @@ export class SDK extends EventEmitter<{
 
         const url: keyof paths = "/mia-stream-deck/api/tables/{tablename}";
 
-        return fetch(url.replace("{tablename}", tableName)).then((res: Response): Promise<operations["getTableByName"]["responses"]["200"]["content"]["application/json"]> => {
+        return fetch(url.replace("{tablename}", tableName), {
+            "headers": {
+                "Content-Type": "application/json"
+            }
+        }).then((res: Response): Promise<operations["getTableByName"]["responses"]["200"]["content"]["application/json"]> => {
 
             if (res.ok) {
                 return res.json();
             }
-            else {
-                return Promise.reject(new Error("Problem with request getTableByName has status '" + res.status + "' (" + res.statusText + ")"));
-            }
+
+            return new Promise((resolve: unknown, reject: (error: Error) => void): void => {
+
+                res.json().then((content: operations["getTableByName"]["responses"]["default"]["content"]["application/json"]): void => {
+                    return reject(new Error(content.message));
+                }).catch((): void => {
+                    return reject(new Error("Problem with request getTableByName has status '" + res.status + "' (" + res.statusText + ")"));
+                });
+
+            });
 
         });
 
@@ -195,15 +250,25 @@ export class SDK extends EventEmitter<{
         const url: keyof paths = "/mia-stream-deck/api/tables/{tablename}";
 
         return fetch(url.replace("{tablename}", tableName), {
-            "method": "DELETE"
+            "method": "DELETE",
+            "headers": {
+                "Content-Type": "application/json"
+            }
         }).then((res: Response): Promise<operations["deleteTableByName"]["responses"]["204"]["content"]["application/json"]> => {
 
             if (res.ok) {
-                return Promise.resolve();
+                return res.json();
             }
-            else {
-                return Promise.reject(new Error("Problem with request addTable has status '" + res.status + "' (" + res.statusText + ")"));
-            }
+
+            return new Promise((resolve: unknown, reject: (error: Error) => void): void => {
+
+                res.json().then((content: operations["deleteTableByName"]["responses"]["default"]["content"]["application/json"]): void => {
+                    return reject(new Error(content.message));
+                }).catch((): void => {
+                    return reject(new Error("Problem with request deleteTableByName has status '" + res.status + "' (" + res.statusText + ")"));
+                });
+
+            });
 
         });
 
@@ -215,25 +280,25 @@ export class SDK extends EventEmitter<{
 
         return fetch(url, {
             "method": "put",
+            "headers": {
+                "Content-Type": "application/json"
+            },
             "body": JSON.stringify(cmd)
         }).then((res: Response): Promise<operations["executeCommand"]["responses"]["204"]["content"]["application/json"]> => {
 
             if (res.ok) {
-                return Promise.resolve();
+                return res.json();
             }
-            else {
 
-                return new Promise((resolve, reject: (err: Error) => void): void => {
+            return new Promise((resolve: unknown, reject: (error: Error) => void): void => {
 
-                    res.json().then((err: operations["executeCommand"]["responses"]["default"]["content"]["application/json"]): void => {
-                        return reject(new Error("[" + err.code + "] " + err.message));
-                    }).catch((): void => {
-                        return reject(new Error("Problem with request executeCommand has status '" + res.status + "' (" + res.statusText + ")"));
-                    });
-
+                res.json().then((content: operations["executeCommand"]["responses"]["default"]["content"]["application/json"]): void => {
+                    return reject(new Error(content.message));
+                }).catch((): void => {
+                    return reject(new Error("Problem with request executeCommand has status '" + res.status + "' (" + res.statusText + ")"));
                 });
 
-            }
+            });
 
         });
 
