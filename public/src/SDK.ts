@@ -13,6 +13,15 @@
     type tEvents = components["schemas"]["PushEventPluginInitialized"] | components["schemas"]["PushEventPluginReleased"] | components["schemas"]["PushEventPluginError"]
         | components["schemas"]["PushEventCommandRunning"] | components["schemas"]["PushEventCommandSuccess"] | components["schemas"]["PushEventCommandFail"];
 
+    type NonNeverKeys<T> = {
+        [K in keyof T]: T[K] extends never ? never : K
+    }[keyof T];
+
+    type HttpMethodsOf<P extends keyof paths> = Exclude<
+        NonNeverKeys<paths[P]>,
+        "parameters"
+    >;
+
 // component
 
 export class SDK extends EventEmitter<{
@@ -158,13 +167,78 @@ export class SDK extends EventEmitter<{
 
     }
 
-    // api methods
+    // api
+
+    public getPluginDescriptor (): Promise<operations["getPluginDescriptor"]["responses"]["200"]["content"]["application/json"]> {
+
+        const url: keyof paths = "/mia-stream-deck/api/descriptor";
+        const method: HttpMethodsOf<typeof url> = "get";
+
+        return fetch(url, {
+            "method": method,
+            "headers": {
+                "Content-Type": "application/json"
+            }
+        }).then((res: Response): Promise<operations["getPluginDescriptor"]["responses"]["200"]["content"]["application/json"]> => {
+
+            if (res.ok) {
+                return res.json();
+            }
+
+            return new Promise((resolve: unknown, reject: (error: Error) => void): void => {
+
+                res.json().then((content: operations["getPluginDescriptor"]["responses"]["default"]["content"]["application/json"]): void => {
+                    return reject(new Error(content.message));
+                }).catch((): void => {
+                    return reject(new Error("Problem with request getPluginDescriptor has status '" + res.status + "' (" + res.statusText + ")"));
+                });
+
+            });
+
+        });
+
+    }
+
+    public getPluginStatus (): Promise<operations["getPluginStatus"]["responses"]["200"]["content"]["application/json"]> {
+
+        const url: keyof paths = "/mia-stream-deck/api/status";
+        const method: HttpMethodsOf<typeof url> = "get";
+
+        return fetch(url, {
+            "method": method,
+            "headers": {
+                "Content-Type": "application/json"
+            }
+        }).then((res: Response): Promise<operations["getPluginStatus"]["responses"]["200"]["content"]["application/json"]> => {
+
+            if (res.ok) {
+                return res.json();
+            }
+            else if (404 === res.status) {
+                return Promise.resolve("RELEASED");
+            }
+
+            return new Promise((resolve: unknown, reject: (error: Error) => void): void => {
+
+                res.json().then((content: operations["getPluginStatus"]["responses"]["default"]["content"]["application/json"]): void => {
+                    return reject(new Error(content.message));
+                }).catch((): void => {
+                    return reject(new Error("Problem with request getPluginStatus has status '" + res.status + "' (" + res.statusText + ")"));
+                });
+
+            });
+
+        });
+
+    }
 
     public getTables (): Promise<operations["getTables"]["responses"]["200"]["content"]["application/json"]> {
 
         const url: keyof paths = "/mia-stream-deck/api/tables";
+        const method: HttpMethodsOf<typeof url> = "get";
 
         return fetch(url, {
+            "method": method,
             "headers": {
                 "Content-Type": "application/json"
             }
@@ -191,9 +265,10 @@ export class SDK extends EventEmitter<{
     public addTable (tableName: string): Promise<operations["addTable"]["responses"]["201"]["content"]["application/json"]> {
 
         const url: keyof paths = "/mia-stream-deck/api/tables/{tablename}";
+        const method: HttpMethodsOf<typeof url> = "put";
 
         return fetch(url.replace("{tablename}", tableName), {
-            "method": "PUT",
+            "method": method,
             "headers": {
                 "Content-Type": "application/json"
             }
@@ -220,8 +295,10 @@ export class SDK extends EventEmitter<{
     public getTableByName (tableName: components["schemas"]["TableName"]): Promise<operations["getTableByName"]["responses"]["200"]["content"]["application/json"]> {
 
         const url: keyof paths = "/mia-stream-deck/api/tables/{tablename}";
+        const method: HttpMethodsOf<typeof url> = "get";
 
         return fetch(url.replace("{tablename}", tableName), {
+            "method": method,
             "headers": {
                 "Content-Type": "application/json"
             }
@@ -248,9 +325,10 @@ export class SDK extends EventEmitter<{
     public deleteTableByName (tableName: string): Promise<operations["deleteTableByName"]["responses"]["204"]["content"]["application/json"]> {
 
         const url: keyof paths = "/mia-stream-deck/api/tables/{tablename}";
+        const method: HttpMethodsOf<typeof url> = "delete";
 
         return fetch(url.replace("{tablename}", tableName), {
-            "method": "DELETE",
+            "method": method,
             "headers": {
                 "Content-Type": "application/json"
             }
@@ -277,9 +355,10 @@ export class SDK extends EventEmitter<{
     public executeCommand (cmd: components["schemas"]["Command"]): Promise<operations["executeCommand"]["responses"]["204"]["content"]["application/json"]> {
 
         const url: keyof paths = "/mia-stream-deck/api/execute-command";
+        const method: HttpMethodsOf<typeof url> = "put";
 
         return fetch(url, {
-            "method": "put",
+            "method": method,
             "headers": {
                 "Content-Type": "application/json"
             },

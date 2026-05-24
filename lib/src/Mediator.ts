@@ -26,13 +26,13 @@
 // module
 
 export default class MediatorStreamDeck extends Mediator<iEventsMinimal & {
-        "initialized": [ ContainerPattern ];
-        "released": [ ContainerPattern ];
-        "error": [ components["schemas"]["PushEventPluginError"]["data"] ];
-        "command.running": [ components["schemas"]["Command"] ];
-        "command.fail": [ components["schemas"]["Command"], components["schemas"]["Error"] ];
-        "command.success": [ components["schemas"]["Command"], string ];
-    }> {
+    "initialized": [ ContainerPattern ];
+    "released": [ ContainerPattern ];
+    "error": [ components["schemas"]["PushEventPluginError"]["data"] ];
+    "command.running": [ components["schemas"]["Command"] ];
+    "command.fail": [ components["schemas"]["Command"], components["schemas"]["Error"] ];
+    "command.success": [ components["schemas"]["Command"], string ];
+}> {
 
     // attributes
 

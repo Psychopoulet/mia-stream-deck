@@ -5,7 +5,7 @@
     import { Alert, Button, Image, Table, TableBody } from "react-bootstrap-fontawesome";
 
     // locals
-    import getSDK from "../sdk";
+    import getSDK from "../SDK";
 
 // types & interfaces
 
@@ -14,7 +14,7 @@
 
     // locals
     import type { components } from "../../../lib/src/Descriptor";
-    import type { SDK } from "../sdk";
+    import type { SDK } from "../SDK";
 
     interface iProps extends iPropsNode {
         "onError": (err: Error) => void;
