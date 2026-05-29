@@ -176,6 +176,7 @@
 								"schema": {
 									"type": "array",
 									"description": "Commands table names",
+									"uniqueItems": true,
 									"items": {
 										"$ref": "#/components/schemas/TableName"
 									}
@@ -363,8 +364,10 @@
 			"Table": {
 				"type": "array",
 				"description": "Commands table description, contains an array for the lines which contains an array for the rows. Each row is a command.",
+				"uniqueItems": true,
 				"items": {
 					"type": "array",
+					"uniqueItems": true,
 					"items": {
 						"$ref": "#/components/schemas/Command"
 					}
