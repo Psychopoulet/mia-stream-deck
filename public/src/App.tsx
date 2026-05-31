@@ -180,7 +180,7 @@ export default class App extends React.Component<iPropsNode, iState> {
                     </ModalBody>
                 </Modal> }
 
-				return <TableCommandsChoice onError={ this._handleError } />;
+				<TableCommandsChoice onError={ this._handleError } />
 
             </div>;
 
