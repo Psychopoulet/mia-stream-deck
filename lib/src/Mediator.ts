@@ -76,7 +76,7 @@ export default class MediatorStreamDeck extends Mediator<iEventsMinimal & {
 
     public getFrontIndex (): Promise<operations["getFrontIndex"]["responses"]["200"]["content"]["text/html"]> {
 
-        return readFile(join(__dirname, "..", "..", "public", "dist", "index.html"), "utf-8").then((content: string): string => {
+        return readFile(join(__dirname, "..", "..", "public", "index.html"), "utf-8").then((content: string): string => {
 
             return content
 
