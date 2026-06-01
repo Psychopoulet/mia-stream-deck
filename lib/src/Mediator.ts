@@ -124,7 +124,7 @@ export default class MediatorStreamDeck extends Mediator<iEventsMinimal & {
             return JSON.parse(content) as Record<string, components["schemas"]["Table"]>;
         }).then((content: Record<string, components["schemas"]["Table"]>): Promise<operations["getTableByName"]["responses"]["200"]["content"]["application/json"]> => {
 
-            if (!content[urlParameters.path.tablename]) {
+            if ("undefined" === typeof content[urlParameters.path.tablename]) {
                 return Promise.reject(new NotFoundError("Table \"" + urlParameters.path.tablename + "\" not found"));
             }
             else {
@@ -155,14 +155,16 @@ export default class MediatorStreamDeck extends Mediator<iEventsMinimal & {
             return JSON.parse(content) as Record<string, components["schemas"]["Table"]>;
         }).then((content: Record<string, components["schemas"]["Table"]>): Promise<operations["deleteTableByName"]["responses"]["204"]["content"]["application/json"]> => {
 
-            if (!content[urlParameters.path.tablename]) {
+            if ("undefined" === typeof content[urlParameters.path.tablename]) {
                 return Promise.reject(new NotFoundError("Table \"" + urlParameters.path.tablename + "\" not found"));
             }
             else {
 
-                delete content[urlParameters.path.tablename];
-
-                return writeFile(this._file, JSON.stringify(content), "utf-8");
+                return writeFile(this._file, JSON.stringify(Object.fromEntries(
+                    Object.entries(content).filter(([key]) => {
+                        return key !== urlParameters.path.tablename
+                    })
+                )), "utf-8");
 
             }
 
