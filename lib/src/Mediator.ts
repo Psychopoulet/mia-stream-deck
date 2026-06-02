@@ -231,9 +231,9 @@ export default class MediatorStreamDeck extends Mediator<iEventsMinimal & {
                 return resolve();
 
             }
-            catch (e) {
+            catch (e: unknown) {
 
-                return reject(e as Error);
+                return reject(e instanceof Error ? e : new Error(String(e)));
 
             }
 
@@ -251,16 +251,16 @@ export default class MediatorStreamDeck extends Mediator<iEventsMinimal & {
 
                 const modifiers: string[] = [];
 
-                if (command.alt) {
+                if ("boolean" === typeof command.alt && command.alt) {
                     modifiers.push("alt");
                 }
-                if (command.ctrl) {
+                if ("boolean" === typeof command.ctrl && command.ctrl) {
                     modifiers.push("control");
                 }
-                if (command.shift) {
+                if ("boolean" === typeof command.shift && command.shift) {
                     modifiers.push("shift");
                 }
-                if (command.command) {
+                if ("boolean" === typeof command.command && command.command) {
                     modifiers.push("command");
                 }
 
@@ -270,9 +270,9 @@ export default class MediatorStreamDeck extends Mediator<iEventsMinimal & {
                 return resolve();
 
             }
-            catch (e) {
+            catch (e: unknown) {
 
-                return reject(e as Error);
+                return reject(e instanceof Error ? e : new Error(String(e)));
 
             }
 
@@ -337,27 +337,27 @@ export default class MediatorStreamDeck extends Mediator<iEventsMinimal & {
 
             }).once("close", (code: number | null): void => {
 
-                if (!ended) {
+                if (ended) {
+                    return;
+                }
 
-                    ended = true;
+                ended = true;
 
-                    if (code) {
+                if ("number" === typeof code && code) {
 
-                        this.emit("command.fail", bodyParameters, {
-                            "code": "COMMAND",
-                            "message": stderr
-                        });
+                    this.emit("command.fail", bodyParameters, {
+                        "code": "COMMAND",
+                        "message": stderr
+                    });
 
-                        return reject(new Error(stderr));
+                    reject(new Error(stderr));
 
-                    }
-                    else {
+                }
+                else {
 
-                        this.emit("command.success", bodyParameters, stdout);
+                    this.emit("command.success", bodyParameters, stdout);
 
-                        return resolve(stdout);
-
-                    }
+                    resolve(stdout);
 
                 }
 
@@ -392,7 +392,7 @@ export default class MediatorStreamDeck extends Mediator<iEventsMinimal & {
 
     private _executeActionPlugin (bodyParameters: operations["executeCommand"]["requestBody"]["content"]["application/json"]): Promise<void> {
 
-        return new Promise((resolve: () => void, reject: (err: Error) => void): void => {
+        return new Promise((resolve: () => void, reject: (err: Error) => void): void => { // eslint-disable-line consistent-return
 
             const command: components["schemas"]["ActionPlugin"] = bodyParameters.action as components["schemas"]["ActionPlugin"];
 
