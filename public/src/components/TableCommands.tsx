@@ -95,15 +95,15 @@ export default class TableCommands extends React.Component<iProps, iState> {
 
     // events
 
-    private _onCommandRunning (): void {
+    private readonly _onCommandRunning = (): void => {
 
         this.setState({
             "running": true
         });
 
-    }
+    };
 
-    private _onCommandFail (cmd: components["schemas"]["Command"], err: components["schemas"]["Error"]): void {
+    private readonly _onCommandFail = (cmd: components["schemas"]["Command"], err: components["schemas"]["Error"]): void => {
 
         alert(err.message);
 
@@ -113,15 +113,15 @@ export default class TableCommands extends React.Component<iProps, iState> {
 
         this.props.onError(new Error(err.message));
 
-    }
+    };
 
-    private _onCommandSuccess (): void {
+    private readonly _onCommandSuccess = (): void => {
 
         this.setState({
             "running": false
         });
 
-    }
+    };
 
     // handlers
 
@@ -201,13 +201,13 @@ export default class TableCommands extends React.Component<iProps, iState> {
             return <></>;
         }
 
-        if (cmd.icon) {
+        if ("string" === typeof cmd.icon) {
             return this._renderCommandIcon(cmd);
         }
-        else if (cmd.picture) {
+        else if ("string" === typeof cmd.picture) {
             return this._renderCommandPicture(cmd);
         }
-        else if (cmd.label) {
+        else if ("string" === typeof cmd.label) {
             return this._renderCommandLabel(cmd);
         }
         else {
@@ -240,7 +240,7 @@ export default class TableCommands extends React.Component<iProps, iState> {
 
     }
 
-    private _renderCommandPicture (cmd: components["schemas"]["Command"]): React.JSX.Element | undefined {
+    private _renderCommandPicture (cmd: components["schemas"]["Command"]): React.JSX.Element {
 
         return <Image crossOrigin="anonymous" src={ cmd.picture as string }
             className="rounded h-100"
@@ -249,11 +249,9 @@ export default class TableCommands extends React.Component<iProps, iState> {
             e.preventDefault();
             e.stopPropagation();
 
-            if (this.state.running) {
-                return;
+            if (!this.state.running) {
+                this._executeCommand(cmd);
             }
-
-            return this._executeCommand(cmd);
 
         } } />;
 
