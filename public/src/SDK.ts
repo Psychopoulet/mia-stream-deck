@@ -139,9 +139,9 @@ export class SDK extends EventEmitter<{
 
         };
 
-        this._socket.onmessage = (event: MessageEvent): void => {
+        this._socket.onmessage = (event: MessageEvent<string>): void => {
 
-            const parsedMessage: tEvents = JSON.parse(event.data as string) as tEvents;
+            const parsedMessage: tEvents = JSON.parse(event.data) as tEvents;
 
             if ("mia-stream-deck" === parsedMessage.plugin as string) { // must be forced string type to avoid useless type error
 
