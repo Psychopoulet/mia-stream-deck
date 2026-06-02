@@ -1,14 +1,12 @@
-"use strict";
-
 // deps
 
-	// externals
+    // externals
     import React from "react";
-	import { createRoot } from "react-dom/client";
+    import { createRoot } from "react-dom/client";
 
-	// locals
-	import App from "./App";
+    // locals
+    import App from "./App";
 
 // private
 
-createRoot(document.getElementById("MIAApp") as HTMLElement).render(<App />);
+createRoot(document.getElementById("{{plugin.name}}-app") as HTMLElement).render(<App />);

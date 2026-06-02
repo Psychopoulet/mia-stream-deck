@@ -1,102 +1,191 @@
-"use strict";
-
 // deps
 
-	// externals
+    // externals
     import React from "react";
-    import { Alert } from "react-bootstrap-fontawesome";
+    import { Alert, Modal, ModalBody } from "react-bootstrap-fontawesome";
 
-	// locals
-    import getSDK from "./sdk";
-    import TableCommandsChoice from "./TableCommandsChoice";
+    // locals
+    import getSDK from "./SDK";
+    import TableCommandsChoice from "./components/TableCommandsChoice";
 
 // types & interfaces
 
-	// externals
+    // externals
     import type { iPropsNode } from "react-bootstrap-fontawesome";
 
-	// locals
-    import type { SDK } from "./sdk";
+    // locals
+    import type { SDK } from "./SDK";
+    import type { components, operations } from "./Descriptor";
 
-	interface iState {
-		"connected": boolean;
-	}
+    interface iState {
+        "status": "CONNECTED" | "DISCONNECTED" | operations["getPluginStatus"]["responses"]["200"]["content"]["application/json"];
+        "error": components["schemas"]["PushEventPluginError"]["data"] | null;
+    }
 
 // component
 
 export default class App extends React.Component<iPropsNode, iState> {
 
-	// name
+    // name
 
-		public static displayName: string = "App";
+        public static displayName: string = "App";
 
-	// private
+    // private
 
-		private _sdk: SDK = getSDK();
+        private readonly _sdk: SDK = getSDK();
 
-	// constructor
+    // constructor
 
-	public constructor (props: iPropsNode) {
+    public constructor (props: iPropsNode) {
 
-		super(props);
+        super(props);
 
-		this.state = {
-			"connected": false
-		};
+        // state
 
-	}
+        this.state = {
+            "status": "DISCONNECTED",
+            "error": null
+        };
 
-	public componentDidMount (): void {
+    }
 
-        this._sdk
-            .on("connected", this._onConnected.bind(this))
-            .on("disconnected", this._onDisconnected.bind(this));
-
-	}
-
-    public componentWillUnmount(): void {
+    public componentDidMount (): void {
 
         this._sdk
-            .off("connected", this._onConnected.bind(this))
-            .off("disconnected", this._onDisconnected.bind(this));
+            .on("connected", this._onConnected)
+            .on("disconnected", this._onDisconnected)
+            .on("error", this._onError);
+
+        this._sdk.connect();
+
+    }
+
+    public componentWillUnmount (): void {
+
+        this._sdk
+            .off("connected", this._onConnected)
+            .off("disconnected", this._onDisconnected)
+            .off("error", this._onError);
+
+        this._sdk.disconnect();
 
     }
 
     // handlers
 
-	private _onConnected (): void {
+    private readonly _onConnected = (): void => {
 
-		this.setState({
-			"connected": true
-		});
+        this.setState({
+            "status": "CONNECTED"
+        });
 
-	}
+        this._sdk.getPluginStatus().then((status): void => {
 
-	private _onDisconnected (): void {
+            this.setState({
+                "status": status
+            });
 
-		this.setState({
-			"connected": false
-		});
+        }).catch((err: Error): void => {
 
-	}
+            this.setState({
+                "error": {
+                    "code": "UNKNOWN_ERROR",
+                    "message": err.message
+                }
+            });
 
-	// render
+        });
 
-	public render (): React.JSX.Element {
+    };
 
-		if (!this.state.connected) {
+    private readonly _onDisconnected = (): void => {
 
-			return <div className="container">
-				<Alert variant="warning">Not connected yet...</Alert>
-			</div>;
+        this.setState({
+            "status": "DISCONNECTED"
+        });
 
-		}
-		else {
+    };
 
-			return <TableCommandsChoice />
+    private readonly _onError = (err: components["schemas"]["PushEventPluginError"]["data"]): void => {
 
-		}
+        this.setState({
+            "error": err
+        });
 
-	}
+    };
 
-};
+    // interface handlers
+
+    private readonly _handleCloseError = (e: React.MouseEvent<HTMLButtonElement>): void => {
+
+        e.preventDefault();
+        e.stopPropagation();
+
+        this.setState({
+            "error": null
+        });
+
+    };
+
+    private readonly _handleError = (err: Error): void => {
+
+        this.setState({
+            "error": {
+                "code": "unknown",
+                "message": err.message
+            }
+        });
+
+    };
+
+    // render
+
+    public render (): React.JSX.Element {
+
+        if ("DISCONNECTED" === this.state.status) {
+
+            return <div className="container">
+                <Alert variant="danger">Not connected yet...</Alert>
+            </div>;
+
+        }
+        else if ("CONNECTED" === this.state.status) {
+
+            return <div className="container">
+                <Alert variant="info">Checking status...</Alert>
+            </div>;
+
+        }
+        else if ("RELEASED" === this.state.status) {
+
+            return <div className="container">
+                <Alert variant="warning">Not enabled...</Alert>
+            </div>;
+
+        }
+        else if ("ENABLED" === this.state.status) {
+
+            return <div className="container">
+                <Alert variant="info">Not initialized yet...</Alert>
+            </div>;
+
+        }
+        else {
+
+            return <div className="container-fluid">
+
+                { this.state.error && <Modal appId="{{plugin.name}}-app" title="Error" variant="danger" centered size="sm" onClose={ this._handleCloseError }>
+                    <ModalBody>
+                        { this.state.error.message || "An error occurred" }
+                    </ModalBody>
+                </Modal> }
+
+                <TableCommandsChoice onError={ this._handleError } />
+
+            </div>;
+
+        }
+
+    }
+
+}

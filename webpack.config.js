@@ -3,43 +3,61 @@
 	// natives
 	const { join } = require("node:path");
 
+    // externals
+    const TerserPlugin = require("terser-webpack-plugin");
+
 // consts
 
-  const PUBLIC = join(__dirname, "public");
+    const PUBLIC = join(__dirname, "public");
 
 // module
 
 module.exports = {
 
-  "mode": "development",
+    "mode": "production",
 
-  "entry": join(PUBLIC, "src", "index.tsx"),
-  "output": {
-    "filename": "bundle.js",
-    "path": join(PUBLIC, "dist")
-  },
+    "entry": join(PUBLIC, "src", "index.tsx"),
 
-  "devtool": "source-map",
+    "output": {
+        "filename": "bundle.min.js",
+        "path": join(PUBLIC, "dist")
+    },
 
-  "module": {
-    "rules": [
-      {
-        "test": /\.tsx?$/,
-        "exclude": [ /node_modules/ ],
-        "use": [
+    "devtool": "source-map",
+
+    "module": {
+        "rules": [
             {
-                "loader": "ts-loader",
-                "options": {
-                    "configFile": join(__dirname, "tsconfig-front.json")
-                }
+                "test": /\.tsx?$/,
+                "exclude": [ /node_modules/ ],
+                "use": [
+                    {
+                            "loader": "ts-loader",
+                            "options": {
+                                "configFile": join(__dirname, "tsconfig-front.json")
+                            }
+                    }
+                ]
             }
         ]
-      }
-    ]
-  },
+    },
+    "optimization": {
+        "minimize": true,
+        "minimizer": [
+            new TerserPlugin({
+                "parallel": true,
+                "terserOptions": {
+                    "format": {
+                        "comments": false
+                    }
+                },
+                "extractComments": false
+            })
+        ]
+    },
 
-  "resolve": {
-    "extensions": [ ".tsx", ".ts", ".js" ],
-  }
+    "resolve": {
+        "extensions": [ ".tsx", ".ts", ".js" ],
+    }
 
 };

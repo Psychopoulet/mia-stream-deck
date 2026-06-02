@@ -1,5 +1,3 @@
-"use strict";
-
 // deps
 
     // externals
@@ -7,7 +5,7 @@
     import { Alert, Button, Image, Table, TableBody } from "react-bootstrap-fontawesome";
 
     // locals
-    import getSDK from "./sdk";
+    import getSDK from "../SDK";
 
 // types & interfaces
 
@@ -15,10 +13,11 @@
     import type { iPropsNode, tIcon } from "react-bootstrap-fontawesome";
 
     // locals
-    import type { components } from "../../lib/src/Descriptor";
-    import type { SDK } from "./sdk";
+    import type { components } from "../../../lib/src/Descriptor";
+    import type { SDK } from "../SDK";
 
     interface iProps extends iPropsNode {
+        "onError": (err: Error) => void;
         "name": string;
     }
 
@@ -38,7 +37,7 @@ export default class TableCommands extends React.Component<iProps, iState> {
 
     // private
 
-        private _sdk: SDK = getSDK();
+        private readonly _sdk: SDK = getSDK();
 
     // constructor
 
@@ -51,10 +50,6 @@ export default class TableCommands extends React.Component<iProps, iState> {
             "running": false,
             "table": []
         };
-
-        this._onCommandRunning = this._onCommandRunning.bind(this);
-        this._onCommandSuccess = this._onCommandSuccess.bind(this);
-        this._onCommandFail = this._onCommandFail.bind(this);
 
     }
 
@@ -79,29 +74,17 @@ export default class TableCommands extends React.Component<iProps, iState> {
 
         }).catch((err: Error): void => {
 
-            console.error(err);
-
-            alert(err.message);
-
             this.setState({
                 "loading": false
             });
 
-        }).catch((err: Error): void => {
-
-            console.error(err);
-
-            alert(err.message);
-
-            this.setState({
-                "loading": false
-            });
+            this.props.onError(err);
 
         });
 
     }
 
-    public componentWillUnmount(): void {
+    public componentWillUnmount (): void {
 
         this._sdk
             .off("command.running", this._onCommandRunning)
@@ -112,21 +95,15 @@ export default class TableCommands extends React.Component<iProps, iState> {
 
     // events
 
-    private _onCommandRunning (cmd: components["schemas"]["Command"]): void {
-
-        console.log("_onCommandRunning", cmd);
+    private readonly _onCommandRunning = (): void => {
 
         this.setState({
             "running": true
         });
 
-    }
+    };
 
-    private _onCommandFail (cmd: components["schemas"]["Command"], err: components["schemas"]["Error"]): void {
-
-        console.log("_onCommandFail", cmd, err);
-
-        console.error(err);
+    private readonly _onCommandFail = (cmd: components["schemas"]["Command"], err: components["schemas"]["Error"]): void => {
 
         alert(err.message);
 
@@ -134,17 +111,17 @@ export default class TableCommands extends React.Component<iProps, iState> {
             "running": false
         });
 
-    }
+        this.props.onError(new Error(err.message));
 
-    private _onCommandSuccess (cmd: components["schemas"]["Command"], content: string): void {
+    };
 
-        console.log("_onCommandSuccess", cmd, content);
+    private readonly _onCommandSuccess = (): void => {
 
         this.setState({
             "running": false
         });
 
-    }
+    };
 
     // handlers
 
@@ -152,13 +129,11 @@ export default class TableCommands extends React.Component<iProps, iState> {
 
         this._sdk.executeCommand(cmd).catch((err: Error): void => {
 
-            console.error(err);
-
-            alert(err.message);
-
             this.setState({
                 "running": false
             });
+
+            this.props.onError(err);
 
         });
 
@@ -178,7 +153,7 @@ export default class TableCommands extends React.Component<iProps, iState> {
 
         let countMaxRows: number = 0;
 
-        this.state.table.forEach((line: components["schemas"]["Command"][]): void => {
+        this.state.table.forEach((line: Array<components["schemas"]["Command"]>): void => {
 
             if (countMaxRows < line.length) {
                 countMaxRows = line.length;
@@ -193,7 +168,7 @@ export default class TableCommands extends React.Component<iProps, iState> {
 
             <TableBody>
 
-                { this.state.table.map((line: components["schemas"]["Command"][], indexLine: number): React.JSX.Element => {
+                { this.state.table.map((line: Array<components["schemas"]["Command"]>, indexLine: number): React.JSX.Element => {
 
                     return <tr key={ indexLine }>
 
@@ -220,19 +195,19 @@ export default class TableCommands extends React.Component<iProps, iState> {
 
     }
 
-    private _renderCommand (cmd: components["schemas"]["Command"]): React.JSX.Element {
+    private _renderCommand (cmd: components["schemas"]["Command"]): React.JSX.Element | undefined {
 
         if ("EMPTY" === cmd.action.type) {
             return <></>;
         }
 
-        if (cmd.icon) {
+        if ("string" === typeof cmd.icon) {
             return this._renderCommandIcon(cmd);
         }
-        else if (cmd.picture) {
+        else if ("string" === typeof cmd.picture) {
             return this._renderCommandPicture(cmd);
         }
-        else if (cmd.label) {
+        else if ("string" === typeof cmd.label) {
             return this._renderCommandLabel(cmd);
         }
         else {
@@ -274,11 +249,9 @@ export default class TableCommands extends React.Component<iProps, iState> {
             e.preventDefault();
             e.stopPropagation();
 
-            if (this.state.running) {
-                return;
+            if (!this.state.running) {
+                this._executeCommand(cmd);
             }
-
-            return this._executeCommand(cmd);
 
         } } />;
 
@@ -303,4 +276,4 @@ export default class TableCommands extends React.Component<iProps, iState> {
 
     }
 
-};
+}

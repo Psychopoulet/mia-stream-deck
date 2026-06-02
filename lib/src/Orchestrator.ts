@@ -34,7 +34,7 @@ export default class OrchestratorStreamDeck extends Orchestrator {
 
     protected _initWorkSpace (): Promise<void> {
 
-        const tablesFile: string = join(this._externalRessourcesDirectory, "tables.json");
+        const tablesFile: string = join(this._externalResourcesDirectory, "tables.json");
 
         return new Promise((resolve: (isFile: boolean) => void): void => {
 
@@ -44,7 +44,7 @@ export default class OrchestratorStreamDeck extends Orchestrator {
 
         }).then((isFile: boolean): Promise<void> => {
 
-            return isFile ? Promise.resolve() : mkdir(this._externalRessourcesDirectory, {
+            return isFile ? Promise.resolve() : mkdir(this._externalResourcesDirectory, {
                 "recursive": true
             }).then((): Promise<void> => {
                 return writeFile(tablesFile, "{}", "utf-8");

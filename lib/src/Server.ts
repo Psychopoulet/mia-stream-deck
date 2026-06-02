@@ -5,30 +5,22 @@
 
 // types & interfaces
 
-    // externals
-    import type { iMediatorUserOptions } from "node-pluginsmanager-plugin";
-
     // locals
-    import type { components } from "./Descriptor";
     import type MediatorStreamDeck from "./Mediator";
+    import type { components } from "./Descriptor";
 
 // module
 
 export default class ServerStreamDeck extends Server {
 
-    public constructor (opts: iMediatorUserOptions) {
-
-        super(opts);
-
-        this._onCommandRunning = this._onCommandRunning.bind(this);
-        this._onCommandSuccess = this._onCommandSuccess.bind(this);
-        this._onCommandFail = this._onCommandFail.bind(this);
-
-    }
-
     public _initWorkSpace (): Promise<void> {
 
         (this._Mediator as MediatorStreamDeck)
+
+            .on("initialized", this._onPluginInitialized)
+            .on("released", this._onPluginReleased)
+            .on("error", this._onPluginError)
+
             .on("command.running", this._onCommandRunning)
             .on("command.success", this._onCommandSuccess)
             .on("command.fail", this._onCommandFail);
@@ -40,6 +32,11 @@ export default class ServerStreamDeck extends Server {
     public _releaseWorkSpace (): Promise<void> {
 
         (this._Mediator as MediatorStreamDeck)
+
+            .off("initialized", this._onPluginInitialized)
+            .off("released", this._onPluginReleased)
+            .off("error", this._onPluginError)
+
             .off("command.running", this._onCommandRunning)
             .off("command.success", this._onCommandSuccess)
             .off("command.fail", this._onCommandFail);
@@ -50,15 +47,33 @@ export default class ServerStreamDeck extends Server {
 
     // events
 
-    private _onCommandRunning (command: components["schemas"]["Command"]): void {
+    private readonly _onPluginInitialized = (): void => {
+
+        this.push("initialized");
+
+    };
+
+    private readonly _onPluginReleased = (): void => {
+
+        this.push("released");
+
+    };
+
+    private readonly _onPluginError = (data: components["schemas"]["PushEventPluginError"]["data"]): void => {
+
+        this.push("error", data);
+
+    };
+
+    private readonly _onCommandRunning = (command: components["schemas"]["Command"]): void => {
 
         const event: components["schemas"]["PushEventCommandRunning"]["data"] = command;
 
         this.push("command.running", event);
 
-    }
+    };
 
-    private _onCommandSuccess (command: components["schemas"]["Command"], content: string): void {
+    private readonly _onCommandSuccess = (command: components["schemas"]["Command"], content: string): void => {
 
         const event: components["schemas"]["PushEventCommandSuccess"]["data"] = {
             "content": content,
@@ -67,20 +82,17 @@ export default class ServerStreamDeck extends Server {
 
         this.push("command.success", event);
 
-    }
+    };
 
-    private _onCommandFail (command: components["schemas"]["Command"], err: Error): void {
+    private readonly _onCommandFail = (command: components["schemas"]["Command"], err: components["schemas"]["Error"]): void => {
 
         const event: components["schemas"]["PushEventCommandFail"]["data"] = {
             "command": command,
-            "error": {
-                "code": "COMMAND",
-                "message": err.message
-            }
+            "error": err
         };
 
         this.push("command.fail", event);
 
-    }
+    };
 
 }

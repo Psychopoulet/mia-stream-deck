@@ -16,16 +16,23 @@
 
     // externals
     import type ContainerPattern from "node-containerpattern";
-    import type { iDescriptorUserOptions, Orchestrator, iUrlAllowedParameters } from "node-pluginsmanager-plugin";
-	import type Pluginsmanager from "node-pluginsmanager";
+    import type { iEventsMinimal, iDescriptorUserOptions, Orchestrator, iUrlAllowedParameters } from "node-pluginsmanager-plugin";
+    import type Pluginsmanager from "node-pluginsmanager";
 
     // locals
     import type { operations, components } from "./Descriptor";
-    type tSubPluginMethod = (urlParameters?: iUrlAllowedParameters, bodyParameters?: any) => Promise<any>;
+    type tSubPluginMethod = (urlParameters?: iUrlAllowedParameters, bodyParameters?: unknown) => Promise<unknown>;
 
 // module
 
-export default class MediatorStreamDeck extends Mediator {
+export default class MediatorStreamDeck extends Mediator<iEventsMinimal & {
+    "initialized": [ ContainerPattern ];
+    "released": [ ContainerPattern ];
+    "error": [ components["schemas"]["PushEventPluginError"]["data"] ];
+    "command.running": [ components["schemas"]["Command"] ];
+    "command.fail": [ components["schemas"]["Command"], components["schemas"]["Error"] ];
+    "command.success": [ components["schemas"]["Command"], string ];
+}> {
 
     // attributes
 
@@ -49,14 +56,14 @@ export default class MediatorStreamDeck extends Mediator {
 
     protected _initWorkSpace (container: ContainerPattern): Promise<void> {
 
-        this._file = join(this._externalRessourcesDirectory, "tables.json");
-        this._pluginsManager = container.get("plugins-manager") as Pluginsmanager;
+        this._file = join(this._externalResourcesDirectory, "tables.json");
+        this._pluginsManager = container.get<Pluginsmanager>("plugins-manager");
 
         return Promise.resolve();
 
     }
 
-    protected _releaseWorkSpace  (): Promise<void> {
+    protected _releaseWorkSpace (): Promise<void> {
 
         this._file = "";
         this._pluginsManager = null;
@@ -69,7 +76,7 @@ export default class MediatorStreamDeck extends Mediator {
 
     public getFrontIndex (): Promise<operations["getFrontIndex"]["responses"]["200"]["content"]["text/html"]> {
 
-        return readFile(join(__dirname, "..", "..", "public", "dist", "index.html"), "utf-8").then((content: string): string => {
+        return readFile(join(__dirname, "..", "..", "public", "index.html"), "utf-8").then((content: string): string => {
 
             return content
 
@@ -82,19 +89,29 @@ export default class MediatorStreamDeck extends Mediator {
     }
 
     public getFrontApp (): Promise<operations["getFrontApp"]["responses"]["200"]["content"]["application/javascript"]> {
-        return readFile(join(__dirname, "..", "..", "public", "dist", "bundle.js"), "utf-8");
+
+        return readFile(join(__dirname, "..", "..", "public", "dist", "bundle.min.js"), "utf-8").then((content: string): string => {
+
+            return content
+
+                .replace(/{{plugin.name}}/g, this.getPluginName())
+                .replace(/{{plugin.version}}/g, this.getPluginVersion())
+                .replace(/{{plugin.description}}/g, this.getPluginDescription());
+
+        });
+
     }
 
-    public getFrontAppMap (): Promise<operations["getFrontApp"]["responses"]["200"]["content"]["application/javascript"]> {
-        return readFile(join(__dirname, "..", "..", "public", "dist", "bundle.js.map"), "utf-8");
+    public getFrontAppMap (): Promise<string> { // tricks return to avoid costful parsing
+        return readFile(join(__dirname, "..", "..", "public", "dist", "bundle.min.js.map"), "utf-8");
     }
 
     // api
 
     public getTables (): Promise<operations["getTables"]["responses"]["200"]["content"]["application/json"]> {
 
-        return readFile(this._file, "utf-8").then((content: string) => {
-            return JSON.parse(content);
+        return readFile(this._file, "utf-8").then((content: string): Record<string, components["schemas"]["Table"]> => {
+            return JSON.parse(content) as Record<string, components["schemas"]["Table"]>;
         }).then((content: Record<string, components["schemas"]["Table"]>): Promise<operations["getTables"]["responses"]["200"]["content"]["application/json"]> => {
             return Promise.resolve(Object.keys(content));
         });
@@ -103,11 +120,11 @@ export default class MediatorStreamDeck extends Mediator {
 
     public getTableByName (urlParameters: operations["getTableByName"]["parameters"]): Promise<operations["getTableByName"]["responses"]["200"]["content"]["application/json"]> {
 
-        return readFile(this._file, "utf-8").then((content: string) => {
-            return JSON.parse(content);
+        return readFile(this._file, "utf-8").then((content: string): Record<string, components["schemas"]["Table"]> => {
+            return JSON.parse(content) as Record<string, components["schemas"]["Table"]>;
         }).then((content: Record<string, components["schemas"]["Table"]>): Promise<operations["getTableByName"]["responses"]["200"]["content"]["application/json"]> => {
 
-            if (!content[urlParameters.path.tablename]) {
+            if ("undefined" === typeof content[urlParameters.path.tablename]) {
                 return Promise.reject(new NotFoundError("Table \"" + urlParameters.path.tablename + "\" not found"));
             }
             else {
@@ -118,20 +135,36 @@ export default class MediatorStreamDeck extends Mediator {
 
     }
 
+    public addTable (urlParameters: operations["addTable"]["parameters"]): Promise<operations["addTable"]["responses"]["201"]["content"]["application/json"]> {
+
+        return readFile(this._file, "utf-8").then((content: string): Record<string, components["schemas"]["Table"]> => {
+            return JSON.parse(content) as Record<string, components["schemas"]["Table"]>;
+        }).then((content: Record<string, components["schemas"]["Table"]>): Promise<operations["addTable"]["responses"]["201"]["content"]["application/json"]> => {
+
+            content[urlParameters.path.tablename] = [];
+
+            return writeFile(this._file, JSON.stringify(content), "utf-8");
+
+        });
+
+    }
+
     public deleteTableByName (urlParameters: operations["deleteTableByName"]["parameters"]): Promise<operations["deleteTableByName"]["responses"]["204"]["content"]["application/json"]> {
 
-        return readFile(this._file, "utf-8").then((content: string) => {
-            return JSON.parse(content);
+        return readFile(this._file, "utf-8").then((content: string): Record<string, components["schemas"]["Table"]> => {
+            return JSON.parse(content) as Record<string, components["schemas"]["Table"]>;
         }).then((content: Record<string, components["schemas"]["Table"]>): Promise<operations["deleteTableByName"]["responses"]["204"]["content"]["application/json"]> => {
 
-            if (!content[urlParameters.path.tablename]) {
+            if ("undefined" === typeof content[urlParameters.path.tablename]) {
                 return Promise.reject(new NotFoundError("Table \"" + urlParameters.path.tablename + "\" not found"));
             }
             else {
 
-                delete content[urlParameters.path.tablename];
-
-                return writeFile(this._file, JSON.stringify(content), "utf-8");
+                return writeFile(this._file, JSON.stringify(Object.fromEntries(
+                    Object.entries(content).filter(([ key ]) => {
+                        return key !== urlParameters.path.tablename;
+                    })
+                )), "utf-8");
 
             }
 
@@ -191,16 +224,16 @@ export default class MediatorStreamDeck extends Mediator {
 
                 robotjs.typeString(command.string);
 
-                if (command.enter) {
+                if ("boolean" === typeof command.enter && command.enter) {
                     robotjs.keyTap("enter");
                 }
 
                 return resolve();
 
             }
-            catch (e) {
+            catch (e: unknown) {
 
-                return reject(e as Error);
+                return reject(e instanceof Error ? e : new Error(String(e)));
 
             }
 
@@ -218,16 +251,16 @@ export default class MediatorStreamDeck extends Mediator {
 
                 const modifiers: string[] = [];
 
-                if (command.alt) {
+                if ("boolean" === typeof command.alt && command.alt) {
                     modifiers.push("alt");
                 }
-                if (command.ctrl) {
+                if ("boolean" === typeof command.ctrl && command.ctrl) {
                     modifiers.push("control");
                 }
-                if (command.shift) {
+                if ("boolean" === typeof command.shift && command.shift) {
                     modifiers.push("shift");
                 }
-                if (command.command) {
+                if ("boolean" === typeof command.command && command.command) {
                     modifiers.push("command");
                 }
 
@@ -237,9 +270,9 @@ export default class MediatorStreamDeck extends Mediator {
                 return resolve();
 
             }
-            catch (e) {
+            catch (e: unknown) {
 
-                return reject(e as Error);
+                return reject(e instanceof Error ? e : new Error(String(e)));
 
             }
 
@@ -258,7 +291,7 @@ export default class MediatorStreamDeck extends Mediator {
             let stderr: string = "";
             let stdout: string = "";
 
-            let options: Record<string, string | boolean> = {
+            const options: Record<string, string | boolean> = {
                 "windowsHide": true
             };
 
@@ -284,10 +317,15 @@ export default class MediatorStreamDeck extends Mediator {
                     ended = true;
 
                     if (running) {
-                        this.emit("command.fail", bodyParameters, err);
+
+                        this.emit("command.fail", bodyParameters, {
+                            "code": "COMMAND",
+                            "message": err.message
+                        });
+
                     }
 
-                    return reject(err);
+                    reject(err);
 
                 }
 
@@ -297,26 +335,29 @@ export default class MediatorStreamDeck extends Mediator {
 
                 this.emit("command.running", bodyParameters);
 
-            }).once("close", (code: number | null, signal: NodeJS.Signals | null): void => {
+            }).once("close", (code: number | null): void => {
 
-                if (!ended) {
+                if (ended) {
+                    return;
+                }
 
-                    ended = true;
+                ended = true;
 
-                    if (code) {
+                if ("number" === typeof code && code) {
 
-                        this.emit("command.fail", bodyParameters, new Error(stderr));
+                    this.emit("command.fail", bodyParameters, {
+                        "code": "COMMAND",
+                        "message": stderr
+                    });
 
-                        return reject(new Error(stderr));
+                    reject(new Error(stderr));
 
-                    }
-                    else {
+                }
+                else {
 
-                        this.emit("command.success", bodyParameters, stdout);
+                    this.emit("command.success", bodyParameters, stdout);
 
-                        return resolve(stdout);
-
-                    }
+                    resolve(stdout);
 
                 }
 
@@ -324,7 +365,7 @@ export default class MediatorStreamDeck extends Mediator {
 
             if (childProcess.stderr) {
 
-                childProcess.stderr?.setEncoding("utf-8");
+                childProcess.stderr.setEncoding("utf-8");
 
                 childProcess.stderr.on("data", (chunk: string): void => {
                     stderr += chunk;
@@ -334,7 +375,7 @@ export default class MediatorStreamDeck extends Mediator {
 
             if (childProcess.stdout) {
 
-                childProcess.stdout?.setEncoding("utf-8");
+                childProcess.stdout.setEncoding("utf-8");
 
                 childProcess.stdout.on("data", (chunk: string): void => {
                     stdout += chunk;
@@ -351,7 +392,7 @@ export default class MediatorStreamDeck extends Mediator {
 
     private _executeActionPlugin (bodyParameters: operations["executeCommand"]["requestBody"]["content"]["application/json"]): Promise<void> {
 
-        return new Promise((resolve: () => void, reject: (err: Error) => void): void => {
+        return new Promise((resolve: () => void, reject: (err: Error) => void): void => { // eslint-disable-line consistent-return
 
             const command: components["schemas"]["ActionPlugin"] = bodyParameters.action as components["schemas"]["ActionPlugin"];
 
@@ -366,18 +407,24 @@ export default class MediatorStreamDeck extends Mediator {
             if (!plugin) {
                 return reject(new NotFoundError("Unknown \"" + command.plugin + "\" plugin"));
             }
-            else if ("undefined" === typeof (plugin as Record<string, any>)[command.operationId]) {
-                return reject(new NotFoundError("Unknown \"" + command.operationId + "\" operationId method \" for " + command.plugin + "\" plugin"));
-            }
-            else if ("function" !== typeof (plugin as Record<string, any>)[command.operationId]) {
-                return reject(new Error("\"" + command.operationId + "\" operationId method \" for " + command.plugin + "\" plugin is not a valid method"));
-            }
+            else {
 
-            ((plugin as Record<string, any>)[command.operationId] as tSubPluginMethod)(command.urlParameters, command.bodyParameters).then((): void => {
-                return resolve();
-            }).catch((err: Error): void => {
-                return reject(err);
-            });
+                const pluginWithtypedSubPluginMethod: Record<string, tSubPluginMethod> = plugin as unknown as Record<string, tSubPluginMethod>;
+
+                if ("undefined" === typeof pluginWithtypedSubPluginMethod[command.operationId]) {
+                    return reject(new NotFoundError("Unknown \"" + command.operationId + "\" operationId method \" for " + command.plugin + "\" plugin"));
+                }
+                else if ("function" !== typeof pluginWithtypedSubPluginMethod[command.operationId]) {
+                    return reject(new Error("\"" + command.operationId + "\" operationId method \" for " + command.plugin + "\" plugin is not a valid method"));
+                }
+
+                pluginWithtypedSubPluginMethod[command.operationId](command.urlParameters, command.bodyParameters).then((): void => {
+                    return resolve();
+                }).catch((err: Error): void => {
+                    return reject(err);
+                });
+
+            }
 
         });
 
