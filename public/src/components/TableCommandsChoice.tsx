@@ -44,8 +44,8 @@ export default class TableCommandsChoice extends React.Component<iProps, iState>
 
     // private
 
-        private _sdk: SDK = getSDK();
-        private _research: URLSearchParams = new URLSearchParams(window.location.search);
+        private readonly _sdk: SDK = getSDK();
+        private readonly _research: URLSearchParams = new URLSearchParams(window.location.search);
 
     // constructor
 
@@ -282,10 +282,10 @@ export default class TableCommandsChoice extends React.Component<iProps, iState>
 
                 </> }
 
-            </div>
+            </div>;
 
         }
 
     }
 
-};
+}
