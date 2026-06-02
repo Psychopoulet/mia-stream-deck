@@ -37,7 +37,7 @@ export default class TableCommands extends React.Component<iProps, iState> {
 
     // private
 
-        private _sdk: SDK = getSDK();
+        private readonly _sdk: SDK = getSDK();
 
     // constructor
 
@@ -84,7 +84,7 @@ export default class TableCommands extends React.Component<iProps, iState> {
 
     }
 
-    public componentWillUnmount(): void {
+    public componentWillUnmount (): void {
 
         this._sdk
             .off("command.running", this._onCommandRunning)
@@ -95,7 +95,7 @@ export default class TableCommands extends React.Component<iProps, iState> {
 
     // events
 
-    private _onCommandRunning (cmd: components["schemas"]["Command"]): void {
+    private _onCommandRunning (): void {
 
         this.setState({
             "running": true
@@ -115,7 +115,7 @@ export default class TableCommands extends React.Component<iProps, iState> {
 
     }
 
-    private _onCommandSuccess (cmd: components["schemas"]["Command"], content: string): void {
+    private _onCommandSuccess (): void {
 
         this.setState({
             "running": false
@@ -153,7 +153,7 @@ export default class TableCommands extends React.Component<iProps, iState> {
 
         let countMaxRows: number = 0;
 
-        this.state.table.forEach((line: components["schemas"]["Command"][]): void => {
+        this.state.table.forEach((line: Array<components["schemas"]["Command"]>): void => {
 
             if (countMaxRows < line.length) {
                 countMaxRows = line.length;
@@ -168,7 +168,7 @@ export default class TableCommands extends React.Component<iProps, iState> {
 
             <TableBody>
 
-                { this.state.table.map((line: components["schemas"]["Command"][], indexLine: number): React.JSX.Element => {
+                { this.state.table.map((line: Array<components["schemas"]["Command"]>, indexLine: number): React.JSX.Element => {
 
                     return <tr key={ indexLine }>
 
@@ -278,4 +278,4 @@ export default class TableCommands extends React.Component<iProps, iState> {
 
     }
 
-};
+}

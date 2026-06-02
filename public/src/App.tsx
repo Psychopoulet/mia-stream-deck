@@ -1,38 +1,38 @@
 // deps
 
-	// externals
+    // externals
     import React from "react";
     import { Alert, Modal, ModalBody } from "react-bootstrap-fontawesome";
 
-	// locals
+    // locals
     import getSDK from "./SDK";
     import TableCommandsChoice from "./components/TableCommandsChoice";
 
 // types & interfaces
 
-	// externals
+    // externals
     import type { iPropsNode } from "react-bootstrap-fontawesome";
 
-	// locals
+    // locals
     import type { SDK } from "./SDK";
     import type { components, operations } from "./Descriptor";
 
-	interface iState {
+    interface iState {
         "status": "CONNECTED" | "DISCONNECTED" | operations["getPluginStatus"]["responses"]["200"]["content"]["application/json"];
         "error": components["schemas"]["PushEventPluginError"]["data"] | null;
-	}
+    }
 
 // component
 
 export default class App extends React.Component<iPropsNode, iState> {
 
-	// name
+    // name
 
-		public static displayName: string = "App";
+        public static displayName: string = "App";
 
-	// private
+    // private
 
-		private _sdk: SDK = getSDK();
+        private readonly _sdk: SDK = getSDK();
 
     // constructor
 
@@ -138,9 +138,9 @@ export default class App extends React.Component<iPropsNode, iState> {
 
     };
 
-	// render
+    // render
 
-	public render (): React.JSX.Element {
+    public render (): React.JSX.Element {
 
         if ("DISCONNECTED" === this.state.status) {
 
@@ -180,12 +180,12 @@ export default class App extends React.Component<iPropsNode, iState> {
                     </ModalBody>
                 </Modal> }
 
-				<TableCommandsChoice onError={ this._handleError } />
+                <TableCommandsChoice onError={ this._handleError } />
 
             </div>;
 
         }
 
-	}
+    }
 
-};
+}

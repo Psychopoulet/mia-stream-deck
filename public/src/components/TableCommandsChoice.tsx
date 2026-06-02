@@ -28,7 +28,7 @@
     interface iState {
         "loading": boolean;
         "running": boolean;
-        "tables": components["schemas"]["TableName"][];
+        "tables": Array<components["schemas"]["TableName"]>;
         "seeTableName": boolean;
         "selectedTableName": string;
         "newTableName": string;
@@ -66,7 +66,7 @@ export default class TableCommandsChoice extends React.Component<iProps, iState>
 
     public componentDidMount (): void {
 
-        this._sdk.getTables().then((tablenames: components["schemas"]["TableName"][]): void => {
+        this._sdk.getTables().then((tablenames: Array<components["schemas"]["TableName"]>): void => {
 
             let seeTableName: boolean = false;
             let selectedTableName: string = "";
@@ -76,8 +76,8 @@ export default class TableCommandsChoice extends React.Component<iProps, iState>
             if (this._research.has("tablename")) {
 
                 // if registered, set it as the wanted table to see
-                if (tablenames.find((value: string): boolean => {
-                    return value === this._research.get("tablename");
+                if (tablenames.find((value: components["schemas"]["TableName"]): boolean => {
+                    return value === (this._research.get("tablename") as components["schemas"]["TableName"]);
                 })) {
 
                     seeTableName = true;
@@ -139,11 +139,11 @@ export default class TableCommandsChoice extends React.Component<iProps, iState>
             "running": true
         });
 
-        this._sdk.addTable(this.state.newTableName).then((): Promise<components["schemas"]["TableName"][]> => {
+        this._sdk.addTable(this.state.newTableName).then((): Promise<Array<components["schemas"]["TableName"]>> => {
 
             return this._sdk.getTables();
 
-        }).then((tablenames: components["schemas"]["TableName"][]): void => {
+        }).then((tablenames: Array<components["schemas"]["TableName"]>): void => {
 
             this.setState({
                 "running": false,
@@ -193,11 +193,11 @@ export default class TableCommandsChoice extends React.Component<iProps, iState>
         e.stopPropagation();
         e.preventDefault();
 
-        this._sdk.deleteTableByName(this.state.selectedTableName).then((): Promise<components["schemas"]["TableName"][]> => {
+        this._sdk.deleteTableByName(this.state.selectedTableName).then((): Promise<Array<components["schemas"]["TableName"]>> => {
 
             return this._sdk.getTables();
 
-        }).then((tablenames: components["schemas"]["TableName"][]): void => {
+        }).then((tablenames: Array<components["schemas"]["TableName"]>): void => {
 
             this.setState({
                 "running": false,
