@@ -195,7 +195,7 @@ export default class TableCommands extends React.Component<iProps, iState> {
 
     }
 
-    private _renderCommand (cmd: components["schemas"]["Command"]): React.JSX.Element {
+    private _renderCommand (cmd: components["schemas"]["Command"]): React.JSX.Element | undefined {
 
         if ("EMPTY" === cmd.action.type) {
             return <></>;
@@ -240,7 +240,7 @@ export default class TableCommands extends React.Component<iProps, iState> {
 
     }
 
-    private _renderCommandPicture (cmd: components["schemas"]["Command"]): React.JSX.Element {
+    private _renderCommandPicture (cmd: components["schemas"]["Command"]): React.JSX.Element | undefined {
 
         return <Image crossOrigin="anonymous" src={ cmd.picture as string }
             className="rounded h-100"

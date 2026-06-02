@@ -139,11 +139,11 @@ export class SDK extends EventEmitter<{
 
         };
 
-        this._socket.onmessage = (message: MessageEvent): void => {
+        this._socket.onmessage = (event: MessageEvent): void => {
 
-            const parsedMessage: tEvents = JSON.parse(message.data) as tEvents;
+            const parsedMessage: tEvents = JSON.parse(event.data as string) as tEvents;
 
-            if ("mia-stream-deck" === parsedMessage.plugin) {
+            if ("mia-stream-deck" === parsedMessage.plugin as string) { // must be forced string type to avoid useless type error
 
                 switch (parsedMessage.command) {
 
@@ -273,7 +273,7 @@ export class SDK extends EventEmitter<{
             }
         }).then((res: Response): Promise<operations["addTable"]["responses"]["201"]["content"]["application/json"]> => {
 
-            return this._parseResponse(res) as Promise<operations["addTable"]["responses"]["201"]["content"]["application/json"]>;
+            return this._parseResponse(res);
 
         });
 
@@ -309,7 +309,7 @@ export class SDK extends EventEmitter<{
             }
         }).then((res: Response): Promise<operations["deleteTableByName"]["responses"]["204"]["content"]["application/json"]> => {
 
-            return this._parseResponse(res) as Promise<operations["deleteTableByName"]["responses"]["204"]["content"]["application/json"]>;
+            return this._parseResponse(res);
 
         });
 
@@ -328,7 +328,7 @@ export class SDK extends EventEmitter<{
             "body": JSON.stringify(cmd)
         }).then((res: Response): Promise<operations["executeCommand"]["responses"]["204"]["content"]["application/json"]> => {
 
-            return this._parseResponse(res) as Promise<operations["executeCommand"]["responses"]["204"]["content"]["application/json"]>;
+            return this._parseResponse(res);
 
         });
 
@@ -340,9 +340,7 @@ let _sdk: SDK | null = null;
 
 export default function getSDK (): SDK {
 
-    if (null === _sdk) {
-        _sdk = new SDK();
-    }
+    _sdk ??= new SDK();
 
     return _sdk;
 

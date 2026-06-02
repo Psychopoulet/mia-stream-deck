@@ -75,13 +75,15 @@ export default class TableCommandsChoice extends React.Component<iProps, iState>
             // if there is a wanted tablename in the url
             if (this._research.has("tablename")) {
 
+                const wantedTableName: components["schemas"]["TableName"] = this._research.get("tablename") as components["schemas"]["TableName"];
+
                 // if registered, set it as the wanted table to see
-                if (tablenames.find((value: components["schemas"]["TableName"]): boolean => {
-                    return value === (this._research.get("tablename") as components["schemas"]["TableName"]);
+                if (tablenames.some((value: components["schemas"]["TableName"]): boolean => {
+                    return value === wantedTableName;
                 })) {
 
                     seeTableName = true;
-                    selectedTableName = this._research.get("tablename") as string;
+                    selectedTableName = wantedTableName;
                     newTableName = "";
 
                 }
@@ -91,7 +93,7 @@ export default class TableCommandsChoice extends React.Component<iProps, iState>
 
                     seeTableName = false;
                     selectedTableName = "";
-                    newTableName = this._research.get("tablename") as string;
+                    newTableName = wantedTableName;
 
                 }
 
