@@ -161,8 +161,8 @@ export default class MediatorStreamDeck extends Mediator<iEventsMinimal & {
             else {
 
                 return writeFile(this._file, JSON.stringify(Object.fromEntries(
-                    Object.entries(content).filter(([key]) => {
-                        return key !== urlParameters.path.tablename
+                    Object.entries(content).filter(([ key ]) => {
+                        return key !== urlParameters.path.tablename;
                     })
                 )), "utf-8");
 
@@ -224,7 +224,7 @@ export default class MediatorStreamDeck extends Mediator<iEventsMinimal & {
 
                 robotjs.typeString(command.string);
 
-                if (command.enter) {
+                if ("boolean" === typeof command.enter && command.enter) {
                     robotjs.keyTap("enter");
                 }
 
@@ -365,7 +365,7 @@ export default class MediatorStreamDeck extends Mediator<iEventsMinimal & {
 
             if (childProcess.stderr) {
 
-                childProcess.stderr?.setEncoding("utf-8");
+                childProcess.stderr.setEncoding("utf-8");
 
                 childProcess.stderr.on("data", (chunk: string): void => {
                     stderr += chunk;
@@ -375,7 +375,7 @@ export default class MediatorStreamDeck extends Mediator<iEventsMinimal & {
 
             if (childProcess.stdout) {
 
-                childProcess.stdout?.setEncoding("utf-8");
+                childProcess.stdout.setEncoding("utf-8");
 
                 childProcess.stdout.on("data", (chunk: string): void => {
                     stdout += chunk;
@@ -407,18 +407,24 @@ export default class MediatorStreamDeck extends Mediator<iEventsMinimal & {
             if (!plugin) {
                 return reject(new NotFoundError("Unknown \"" + command.plugin + "\" plugin"));
             }
-            else if ("undefined" === typeof (plugin as Record<string, any>)[command.operationId]) {
-                return reject(new NotFoundError("Unknown \"" + command.operationId + "\" operationId method \" for " + command.plugin + "\" plugin"));
-            }
-            else if ("function" !== typeof (plugin as Record<string, any>)[command.operationId]) {
-                return reject(new Error("\"" + command.operationId + "\" operationId method \" for " + command.plugin + "\" plugin is not a valid method"));
-            }
+            else {
 
-            ((plugin as Record<string, any>)[command.operationId] as tSubPluginMethod)(command.urlParameters, command.bodyParameters).then((): void => {
-                return resolve();
-            }).catch((err: Error): void => {
-                return reject(err);
-            });
+                const pluginWithtypedSubPluginMethod: Record<string, tSubPluginMethod> = plugin as unknown as Record<string, tSubPluginMethod>;
+
+                if ("undefined" === typeof pluginWithtypedSubPluginMethod[command.operationId]) {
+                    return reject(new NotFoundError("Unknown \"" + command.operationId + "\" operationId method \" for " + command.plugin + "\" plugin"));
+                }
+                else if ("function" !== typeof pluginWithtypedSubPluginMethod[command.operationId]) {
+                    return reject(new Error("\"" + command.operationId + "\" operationId method \" for " + command.plugin + "\" plugin is not a valid method"));
+                }
+
+                pluginWithtypedSubPluginMethod[command.operationId](command.urlParameters, command.bodyParameters).then((): void => {
+                    return resolve();
+                }).catch((err: Error): void => {
+                    return reject(err);
+                });
+
+            }
 
         });
 
