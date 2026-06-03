@@ -319,7 +319,7 @@
 					}
 				},
 				"responses": {
-					"204": {
+					"201": {
 						"description": "Command running",
 						"content": {
 							"application/json": {}
