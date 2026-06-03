@@ -172,7 +172,7 @@ export default class MediatorStreamDeck extends Mediator<iEventsMinimal & {
 
     }
 
-    public executeCommand (urlParameters: operations["executeCommand"]["parameters"], bodyParameters: operations["executeCommand"]["requestBody"]["content"]["application/json"]): Promise<operations["executeCommand"]["responses"]["204"]["content"]["application/json"]> {
+    public executeCommand (urlParameters: operations["executeCommand"]["parameters"], bodyParameters: operations["executeCommand"]["requestBody"]["content"]["application/json"]): Promise<operations["executeCommand"]["responses"]["201"]["content"]["application/json"]> {
 
         return Promise.resolve().then((): Promise<void> => {
 

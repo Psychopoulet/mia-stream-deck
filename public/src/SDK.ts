@@ -315,7 +315,7 @@ export class SDK extends EventEmitter<{
 
     }
 
-    public executeCommand (cmd: components["schemas"]["Command"]): Promise<operations["executeCommand"]["responses"]["204"]["content"]["application/json"]> {
+    public executeCommand (cmd: components["schemas"]["Command"]): Promise<operations["executeCommand"]["responses"]["201"]["content"]["application/json"]> {
 
         const url: keyof paths = "/mia-stream-deck/api/execute-command";
         const method: HttpMethodsOf<typeof url> = "put";
@@ -326,7 +326,7 @@ export class SDK extends EventEmitter<{
                 "Content-Type": "application/json"
             },
             "body": JSON.stringify(cmd)
-        }).then((res: Response): Promise<operations["executeCommand"]["responses"]["204"]["content"]["application/json"]> => {
+        }).then((res: Response): Promise<operations["executeCommand"]["responses"]["201"]["content"]["application/json"]> => {
 
             return this._parseResponse(res);
 
