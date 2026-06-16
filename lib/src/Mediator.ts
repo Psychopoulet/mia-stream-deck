@@ -1,7 +1,6 @@
 // deps
 
     // natives
-    import { spawn } from "node:child_process";
     import { readFile, writeFile } from "node:fs/promises";
     import { join } from "node:path";
 
@@ -10,9 +9,6 @@
     import robotjs from "@hurdlegroup/robotjs";
 
 // types & interfaces
-
-    // natives
-    import type { ChildProcess } from "node:child_process";
 
     // externals
     import type ContainerPattern from "node-containerpattern";
@@ -190,10 +186,6 @@ export default class MediatorStreamDeck extends Mediator<iEventsMinimal & {
 
                     return this._executeActionInputKey(bodyParameters);
 
-                case "COMMAND":
-
-                    return this._executeActionCommand(bodyParameters);
-
                 case "PLUGIN":
 
                     return this._executeActionPlugin(bodyParameters);
@@ -276,116 +268,6 @@ export default class MediatorStreamDeck extends Mediator<iEventsMinimal & {
 
             }
 
-        });
-
-    }
-
-    private _executeActionCommand (bodyParameters: operations["executeCommand"]["requestBody"]["content"]["application/json"]): Promise<void> {
-
-        return new Promise((resolve: (value: string) => void, reject: (value: Error) => void): void => {
-
-            const command: components["schemas"]["ActionCommand"] = bodyParameters.action as components["schemas"]["ActionCommand"];
-
-            let ended: boolean = false;
-            let running: boolean = false;
-            let stderr: string = "";
-            let stdout: string = "";
-
-            const options: Record<string, string | boolean> = {
-                "windowsHide": true
-            };
-
-            if ("undefined" !== typeof command.cwd) {
-                options.cwd = command.cwd;
-            }
-            if ("undefined" !== typeof command.detached) {
-                options.detached = command.detached;
-            }
-            if ("undefined" !== typeof command.shell) {
-                options.shell = command.shell;
-            }
-            else if ("undefined" !== typeof command.insideShell) {
-                options.shell = command.insideShell;
-            }
-
-            const childProcess: ChildProcess = spawn(command.command, options);
-
-            childProcess.once("error", (err: Error): void => {
-
-                if (!ended) {
-
-                    ended = true;
-
-                    if (running) {
-
-                        this.emit("command.fail", bodyParameters, {
-                            "code": "COMMAND",
-                            "message": err.message
-                        });
-
-                    }
-
-                    reject(err);
-
-                }
-
-            }).once("spawn", (): void => {
-
-                running = true;
-
-                this.emit("command.running", bodyParameters);
-
-            }).once("close", (code: number | null): void => {
-
-                if (ended) {
-                    return;
-                }
-
-                ended = true;
-
-                if ("number" === typeof code && code) {
-
-                    this.emit("command.fail", bodyParameters, {
-                        "code": "COMMAND",
-                        "message": stderr
-                    });
-
-                    reject(new Error(stderr));
-
-                }
-                else {
-
-                    this.emit("command.success", bodyParameters, stdout);
-
-                    resolve(stdout);
-
-                }
-
-            });
-
-            if (childProcess.stderr) {
-
-                childProcess.stderr.setEncoding("utf-8");
-
-                childProcess.stderr.on("data", (chunk: string): void => {
-                    stderr += chunk;
-                });
-
-            }
-
-            if (childProcess.stdout) {
-
-                childProcess.stdout.setEncoding("utf-8");
-
-                childProcess.stdout.on("data", (chunk: string): void => {
-                    stdout += chunk;
-                });
-
-            }
-
-        // force return nothing
-        }).then((): Promise<void> => {
-            return Promise.resolve();
         });
 
     }
