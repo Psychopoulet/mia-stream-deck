@@ -164,7 +164,7 @@ export default class TableCommands extends React.Component<iProps, iState> {
         const maxPercentLineSize: number = 100 / this.state.table.length;
         const maxPercentRowSize: number = 100 / countMaxRows;
 
-        return <Table borderless className="m-0 p-0 vh-100">
+        return <Table borderless>
 
             <TableBody>
 

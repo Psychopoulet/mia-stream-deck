@@ -6,6 +6,7 @@
 
     // locals
     import getSDK from "./SDK";
+    import TableCommands from "./components/TableCommands";
     import AddTable from "./components/AddTable";
     import TableCommandsChoice from "./components/TableCommandsChoice";
 
@@ -34,6 +35,7 @@ export default class App extends React.Component<iPropsNode, iState> {
     // private
 
         private readonly _sdk: SDK = getSDK();
+        private readonly _research: URLSearchParams = new URLSearchParams(window.location.search);
 
     // constructor
 
@@ -169,6 +171,11 @@ export default class App extends React.Component<iPropsNode, iState> {
             return <div className="container">
                 <Alert variant="info">Not initialized yet...</Alert>
             </div>;
+
+        }
+        else if (this._research.has("tablename")) {
+
+            return <TableCommands name={ this._research.get("tablename") as string } onError={ this._handleError } />;
 
         }
         else {

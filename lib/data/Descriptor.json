@@ -105,6 +105,43 @@
 				}
 			}
 		},
+		"/mia-stream-deck/public/table.html": {
+			"get": {
+				"description": "",
+				"summary": "Plugin's front for fullscreen table",
+				"operationId": "getTablePage",
+				"parameters": [
+					{
+						"name": "tablename",
+						"in": "query",
+						"required": true,
+						"schema": { "$ref": "#/components/schemas/TableName" }
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "Plugin's front for fullscreen table",
+						"content": {
+							"text/html": {
+								"schema": {
+									"type": "string"
+								}
+							}
+						}
+					},
+					"default": {
+						"description": "An error occurred",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Error"
+								}
+							}
+						}
+					}
+				}
+			}
+		},
 		"/mia-stream-deck/public/bundle.min.js": {
 			"get": {
 				"description": "",

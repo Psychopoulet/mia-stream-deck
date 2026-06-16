@@ -86,6 +86,21 @@ export default class MediatorStreamDeck extends Mediator<iEventsMinimal & {
 
     }
 
+    public getTablePage (urlParameters: operations["getTablePage"]["parameters"]): Promise<operations["getTablePage"]["responses"]["200"]["content"]["text/html"]> {
+
+        return readFile(join(__dirname, "..", "..", "public", "table.html"), "utf-8").then((content: string): string => {
+
+            return content
+
+                .replace(/{{plugin.name}}/g, this.getPluginName())
+                .replace(/{{plugin.version}}/g, this.getPluginVersion())
+                .replace(/{{plugin.description}}/g, this.getPluginDescription())
+                .replace(/{{tablename}}/g, urlParameters.query.tablename);
+
+        });
+
+    }
+
     public getFrontApp (): Promise<operations["getFrontApp"]["responses"]["200"]["content"]["application/javascript"]> {
 
         return readFile(join(__dirname, "..", "..", "public", "dist", "bundle.min.js"), "utf-8").then((content: string): string => {

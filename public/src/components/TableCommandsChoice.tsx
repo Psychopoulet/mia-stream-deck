@@ -11,7 +11,6 @@
 
     // locals
     import getSDK from "../SDK";
-    import TableCommands from "./TableCommands";
 
 // types & interfaces
 
@@ -19,7 +18,7 @@
     import type { iPropsNode } from "react-bootstrap-fontawesome";
 
     // locals
-    import type { components } from "../../../lib/src/Descriptor";
+    import type { components, paths } from "../../../lib/src/Descriptor";
     import type { SDK } from "../SDK";
 
     interface iProps extends iPropsNode {
@@ -30,9 +29,7 @@
         "loading": boolean;
         "running": boolean;
         "tables": Array<components["schemas"]["TableName"]>;
-        "seeTableName": boolean;
         "selectedTableName": string;
-        "newTableName": string;
     }
 
 // component
@@ -46,7 +43,6 @@ export default class TableCommandsChoice extends React.Component<iProps, iState>
     // private
 
         private readonly _sdk: SDK = getSDK();
-        private readonly _research: URLSearchParams = new URLSearchParams(window.location.search);
 
     // constructor
 
@@ -58,9 +54,7 @@ export default class TableCommandsChoice extends React.Component<iProps, iState>
             "loading": true,
             "running": false,
             "tables": [],
-            "seeTableName": false,
-            "selectedTableName": "",
-            "newTableName": ""
+            "selectedTableName": ""
         };
 
     }
@@ -73,43 +67,10 @@ export default class TableCommandsChoice extends React.Component<iProps, iState>
 
         this._sdk.getTables().then((tablenames: Array<components["schemas"]["TableName"]>): void => {
 
-            let seeTableName: boolean = false;
-            let selectedTableName: string = "";
-            let newTableName: string = "";
-
-            // if there is a wanted tablename in the url
-            if (this._research.has("tablename")) {
-
-                const wantedTableName: components["schemas"]["TableName"] = this._research.get("tablename") as components["schemas"]["TableName"];
-
-                // if registered, set it as the wanted table to see
-                if (tablenames.some((value: components["schemas"]["TableName"]): boolean => {
-                    return value === wantedTableName;
-                })) {
-
-                    seeTableName = true;
-                    selectedTableName = wantedTableName;
-                    newTableName = "";
-
-                }
-
-                // if not registered, set it as the newTableName
-                else {
-
-                    seeTableName = false;
-                    selectedTableName = "";
-                    newTableName = wantedTableName;
-
-                }
-
-            }
-
             this.setState({
                 "loading": false,
                 "tables": tablenames,
-                "seeTableName": seeTableName,
-                "selectedTableName": selectedTableName,
-                "newTableName": newTableName
+                "selectedTableName": ""
             });
 
         }).catch((err: Error): void => {
@@ -173,12 +134,14 @@ export default class TableCommandsChoice extends React.Component<iProps, iState>
         e.stopPropagation();
         e.preventDefault();
 
-        this._research.set("tablename", this.state.selectedTableName);
-        window.location.search = "?tablename=" + this.state.selectedTableName;
+        let url: keyof paths = "/mia-stream-deck/public/table.html";
+        url += "?tablename=" + this.state.selectedTableName;
 
-        this.setState({
-            "seeTableName": true
-        });
+        const redirectWindow: WindowProxy | null = window.open(url, "_blank");
+
+        if (redirectWindow) {
+            redirectWindow.focus();
+        }
 
     };
 
@@ -212,9 +175,6 @@ export default class TableCommandsChoice extends React.Component<iProps, iState>
 
         if (this.state.loading) {
             return <Alert variant="warning">Loading...</Alert>;
-        }
-        else if (this.state.seeTableName) {
-            return <TableCommands name={ this.state.selectedTableName } onError={ this.props.onError } />;
         }
         else if (0 >= this.state.tables.length) {
             return <Alert variant="warning">No tables found...</Alert>;
