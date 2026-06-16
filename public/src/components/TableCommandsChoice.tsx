@@ -4,8 +4,9 @@
     import React from "react";
     import {
         Alert,
-        InputTextLabel, ButtonGroup, Button,
-        SelectLabel
+        Card, CardHeader, CardBody, CardFooter,
+        Select,
+        ButtonGroup, Button
     } from "react-bootstrap-fontawesome";
 
     // locals
@@ -121,50 +122,6 @@ export default class TableCommandsChoice extends React.Component<iProps, iState>
 
     // events
 
-    private readonly _handleChangeNewTableName = (e: React.ChangeEvent<HTMLInputElement>, newValue: string): void => {
-
-        e.stopPropagation();
-        e.preventDefault();
-
-        this.setState({
-            "newTableName": newValue
-        });
-
-    };
-
-    private readonly _handleAddNewTableName = (e: React.MouseEvent<HTMLButtonElement>): void => {
-
-        e.stopPropagation();
-        e.preventDefault();
-
-        this.setState({
-            "running": true
-        });
-
-        this._sdk.addTable(this.state.newTableName).then((): Promise<Array<components["schemas"]["TableName"]>> => {
-
-            return this._sdk.getTables();
-
-        }).then((tablenames: Array<components["schemas"]["TableName"]>): void => {
-
-            this.setState({
-                "running": false,
-                "tables": tablenames,
-                "selectedTableName": this.state.newTableName
-            });
-
-        }).catch((err: Error): void => {
-
-            this.setState({
-                "running": false
-            });
-
-            this.props.onError(err);
-
-        });
-
-    };
-
     private readonly _handleChangeTable = (e: React.ChangeEvent<HTMLSelectElement>, newValue: string): void => {
 
         e.stopPropagation();
@@ -224,34 +181,23 @@ export default class TableCommandsChoice extends React.Component<iProps, iState>
     public render (): React.JSX.Element {
 
         if (this.state.loading) {
-
-            return <div className="container">
-                <Alert variant="warning">Loading...</Alert>
-            </div>;
-
+            return <Alert variant="warning">Loading...</Alert>;
         }
         else if (this.state.seeTableName) {
             return <TableCommands name={ this.state.selectedTableName } onError={ this.props.onError } />;
         }
+        else if (0 >= this.state.tables.length) {
+            return <Alert variant="warning">No tables found...</Alert>;
+        }
         else {
 
-            return <div className="container">
+            return <Card>
 
-                <InputTextLabel label="New table name"
-                    value={ this.state.newTableName } onChange={ this._handleChangeNewTableName } minLength={ 1 }
-                    disabled={ this.state.running }
-                />
+                <CardHeader>Choose table</CardHeader>
 
-                <Button icon="plus" variant="success" block
-                    onClick={ this._handleAddNewTableName }
-                    disabled={ this.state.running || 0 >= this.state.newTableName.length }
-                >
-                    Add new table
-                </Button>
+                <CardBody>
 
-                { 0 >= this.state.tables.length ? undefined : <>
-
-                    <SelectLabel label="Choose table"
+                    <Select
                         value={ this.state.selectedTableName } onChange={ this._handleChangeTable }
                         disabled={ this.state.running || 0 >= this.state.tables.length }
                     >
@@ -262,7 +208,11 @@ export default class TableCommandsChoice extends React.Component<iProps, iState>
                             return <option key={ key } value={ value }>{ value }</option>;
                         }) }
 
-                    </SelectLabel>
+                    </Select>
+
+                </CardBody>
+
+                <CardFooter>
 
                     <ButtonGroup block>
 
@@ -282,9 +232,9 @@ export default class TableCommandsChoice extends React.Component<iProps, iState>
 
                     </ButtonGroup>
 
-                </> }
+                </CardFooter>
 
-            </div>;
+            </Card>;
 
         }
 
