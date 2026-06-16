@@ -25,9 +25,11 @@ export default class MediatorStreamDeck extends Mediator<iEventsMinimal & {
     "initialized": [ ContainerPattern ];
     "released": [ ContainerPattern ];
     "error": [ components["schemas"]["PushEventPluginError"]["data"] ];
-    "command.running": [ components["schemas"]["Command"] ];
-    "command.fail": [ components["schemas"]["Command"], components["schemas"]["Error"] ];
-    "command.success": [ components["schemas"]["Command"], string ];
+    "table.added": [ components["schemas"]["PushEventTableAdded"]["data"] ];
+    "table.deleted": [ components["schemas"]["PushEventTableDeleted"]["data"] ];
+    "command.running": [ components["schemas"]["PushEventCommandRunning"]["data"] ];
+    "command.fail": [ components["schemas"]["PushEventCommandFail"]["data"]["command"], components["schemas"]["PushEventCommandFail"]["data"]["error"] ];
+    "command.success": [ components["schemas"]["PushEventCommandSuccess"]["data"]["command"], components["schemas"]["PushEventCommandSuccess"]["data"]["content"] ];
 }> {
 
     // attributes
@@ -141,6 +143,8 @@ export default class MediatorStreamDeck extends Mediator<iEventsMinimal & {
 
             return writeFile(this._file, JSON.stringify(content), "utf-8");
 
+        }).then((): void => {
+            this.emit("table.added", urlParameters.path.tablename);
         });
 
     }
@@ -164,6 +168,8 @@ export default class MediatorStreamDeck extends Mediator<iEventsMinimal & {
 
             }
 
+        }).then((): void => {
+            this.emit("table.deleted", urlParameters.path.tablename);
         });
 
     }

@@ -11,6 +11,7 @@
     // locals
     import type { components, operations, paths } from "./Descriptor";
     type tEvents = components["schemas"]["PushEventPluginInitialized"] | components["schemas"]["PushEventPluginReleased"] | components["schemas"]["PushEventPluginError"]
+        | components["schemas"]["PushEventTableAdded"] | components["schemas"]["PushEventTableDeleted"]
         | components["schemas"]["PushEventCommandRunning"] | components["schemas"]["PushEventCommandSuccess"] | components["schemas"]["PushEventCommandFail"];
 
     type HttpMethodsOf<P extends keyof paths> = {
@@ -27,9 +28,11 @@ export class SDK extends EventEmitter<{
     "initialized": [];
     "released": [];
     "error": [ components["schemas"]["PushEventPluginError"]["data"] ];
-    "command.running": [ components["schemas"]["Command"] ];
-    "command.fail": [ components["schemas"]["Command"], components["schemas"]["Error"] ];
-    "command.success": [ components["schemas"]["Command"], string ];
+    "table.added": [ components["schemas"]["PushEventTableAdded"]["data"] ];
+    "table.deleted": [ components["schemas"]["PushEventTableDeleted"]["data"] ];
+    "command.running": [ components["schemas"]["PushEventCommandRunning"]["data"] ];
+    "command.fail": [ components["schemas"]["PushEventCommandFail"]["data"]["command"], components["schemas"]["PushEventCommandFail"]["data"]["error"] ];
+    "command.success": [ components["schemas"]["PushEventCommandSuccess"]["data"]["command"], components["schemas"]["PushEventCommandSuccess"]["data"]["content"] ];
 }> {
 
     // static
@@ -148,13 +151,21 @@ export class SDK extends EventEmitter<{
                 switch (parsedMessage.command) {
 
                     case "initialized":
-                        this.emit("initialized");
+                        this.emit(parsedMessage.command);
                     break;
                     case "released":
-                        this.emit("released");
+                        this.emit(parsedMessage.command);
                     break;
                     case "error":
-                        this.emit("error", parsedMessage.data);
+                        this.emit(parsedMessage.command, parsedMessage.data);
+                    break;
+
+                    case "table.added":
+                        this.emit(parsedMessage.command, parsedMessage.data);
+                    break;
+
+                    case "table.deleted":
+                        this.emit(parsedMessage.command, parsedMessage.data);
                     break;
 
                     case "command.running":

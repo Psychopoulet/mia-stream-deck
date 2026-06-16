@@ -67,6 +67,10 @@ export default class TableCommandsChoice extends React.Component<iProps, iState>
 
     public componentDidMount (): void {
 
+        this._sdk
+            .on("table.added", this._handleTableAdded)
+            .on("table.deleted", this._handleTableDeleted);
+
         this._sdk.getTables().then((tablenames: Array<components["schemas"]["TableName"]>): void => {
 
             let seeTableName: boolean = false;
@@ -120,7 +124,38 @@ export default class TableCommandsChoice extends React.Component<iProps, iState>
 
     }
 
+    public componentWillUnmount (): void {
+
+        this._sdk
+            .off("table.added", this._handleTableAdded)
+            .off("table.deleted", this._handleTableDeleted);
+
+    }
+
     // events
+
+    private readonly _handleTableAdded = (tableName: components["schemas"]["TableName"]): void => {
+
+        this.setState({
+            "tables": [ ...this.state.tables, tableName ]
+        });
+
+    };
+
+    private readonly _handleTableDeleted = (tableName: components["schemas"]["TableName"]): void => {
+
+        const newTables: Array<components["schemas"]["TableName"]> = this.state.tables.filter((value: components["schemas"]["TableName"]): boolean => {
+            return value !== tableName;
+        });
+
+        this.setState({
+            "tables": newTables,
+            "selectedTableName": this.state.selectedTableName === tableName ? "" : this.state.selectedTableName
+        });
+
+    };
+
+    // interface handlers
 
     private readonly _handleChangeTable = (e: React.ChangeEvent<HTMLSelectElement>, newValue: string): void => {
 
@@ -152,15 +187,10 @@ export default class TableCommandsChoice extends React.Component<iProps, iState>
         e.stopPropagation();
         e.preventDefault();
 
-        this._sdk.deleteTableByName(this.state.selectedTableName).then((): Promise<Array<components["schemas"]["TableName"]>> => {
-
-            return this._sdk.getTables();
-
-        }).then((tablenames: Array<components["schemas"]["TableName"]>): void => {
+        this._sdk.deleteTableByName(this.state.selectedTableName).then((): void => {
 
             this.setState({
                 "running": false,
-                "tables": tablenames,
                 "selectedTableName": ""
             });
 
@@ -202,7 +232,7 @@ export default class TableCommandsChoice extends React.Component<iProps, iState>
                         disabled={ this.state.running || 0 >= this.state.tables.length }
                     >
 
-                        <option value="">-</option>
+                        { "" === this.state.selectedTableName && <option value="">-</option> }
 
                         { this.state.tables.map((value: string, key: number): React.JSX.Element => {
                             return <option key={ key } value={ value }>{ value }</option>;

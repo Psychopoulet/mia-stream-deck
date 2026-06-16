@@ -590,6 +590,30 @@
 				},
 				"required": [ "id", "plugin", "command", "data" ]
 			},
+			"PushEventTableAdded": {
+				"type": "object",
+				"properties": {
+					"plugin": { "$ref": "#/components/schemas/PluginName" },
+					"command": {
+						"type": "string",
+						"enum": [ "table.added" ]
+					},
+					"data": { "$ref": "#/components/schemas/TableName" }
+				},
+				"required": [ "plugin", "command", "data" ]
+			},
+			"PushEventTableDeleted": {
+				"type": "object",
+				"properties": {
+					"plugin": { "$ref": "#/components/schemas/PluginName" },
+					"command": {
+						"type": "string",
+						"enum": [ "table.deleted" ]
+					},
+					"data": { "$ref": "#/components/schemas/TableName" }
+				},
+				"required": [ "plugin", "command", "data" ]
+			},
 			"PushEventCommandRunning": {
 				"type": "object",
 				"properties": {

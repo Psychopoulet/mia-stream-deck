@@ -4,7 +4,8 @@
     import React from "react";
     import {
         Card, CardHeader, CardBody, CardFooter,
-        InputText, Button
+        InputText, Button,
+        generateFocus
     } from "react-bootstrap-fontawesome";
 
     // locals
@@ -13,7 +14,7 @@
 // types & interfaces
 
     // externals
-    import type { iPropsNode } from "react-bootstrap-fontawesome";
+    import type { iPropsNode, iGenerateFocusCallback } from "react-bootstrap-fontawesome";
 
     // locals
     import type { components } from "../../../lib/src/Descriptor";
@@ -39,6 +40,7 @@ export default class AddTable extends React.Component<iProps, iState> {
     // private
 
         private readonly _sdk: SDK = getSDK();
+        private readonly _focus: iGenerateFocusCallback<HTMLInputElement> = generateFocus<HTMLInputElement>();
 
     // constructor
 
@@ -46,10 +48,18 @@ export default class AddTable extends React.Component<iProps, iState> {
 
         super(props);
 
+        this._focus = generateFocus();
+
         this.state = {
             "running": false,
             "newTableName": ""
         };
+
+    }
+
+    public componentDidMount (): void {
+
+        this._focus.setFocus();
 
     }
 
@@ -75,15 +85,24 @@ export default class AddTable extends React.Component<iProps, iState> {
             "running": true
         });
 
-        this._sdk.addTable(this.state.newTableName).catch((err: Error): void => {
+        this._sdk.addTable(this.state.newTableName).then((): void => {
 
-            this.props.onError(err);
+            this.setState({
+                "running": false,
+                "newTableName": ""
+            });
 
-        }).finally(() => {
+            setTimeout((): void => {
+                this._focus.setFocus();
+            }, 200);
+
+        }).catch((err: Error): void => {
 
             this.setState({
                 "running": false
             });
+
+            this.props.onError(err);
 
         });
 
@@ -99,7 +118,7 @@ export default class AddTable extends React.Component<iProps, iState> {
 
             <CardBody>
 
-                <InputText
+                <InputText _ref={ this._focus.ref }
                     value={ this.state.newTableName } onChange={ this._handleChangeNewTableName } minLength={ 1 }
                     disabled={ this.state.running }
                 />
