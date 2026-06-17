@@ -98,7 +98,8 @@ export default class TableCommandsChoice extends React.Component<iProps, iState>
     private readonly _handleTableAdded = (tableName: components["schemas"]["TableName"]): void => {
 
         this.setState({
-            "tables": [ ...this.state.tables, tableName ]
+            "tables": [ ...this.state.tables, tableName ],
+            "selectedTableName": tableName
         });
 
     };

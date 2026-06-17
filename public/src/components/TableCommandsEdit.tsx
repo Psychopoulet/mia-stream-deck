@@ -58,6 +58,24 @@ export default class TableCommandsChoice extends React.Component<iProps, iState>
     }
 
     public componentDidMount (): void {
+        this._loadTable();
+    }
+
+    public componentDidUpdate (prevProps: iProps): void {
+
+        if (prevProps.tablename !== this.props.tablename) {
+            this._loadTable();
+        }
+
+    }
+
+    // private
+
+    private _loadTable (): void {
+
+        this.setState({
+            "loading": false
+        });
 
         this._sdk.getTableByName(this.props.tablename).then((table: components["schemas"]["Table"]): void => {
 
@@ -139,7 +157,7 @@ export default class TableCommandsChoice extends React.Component<iProps, iState>
 
         return <Card className="mt-3">
 
-            <CardHeader>Edit table</CardHeader>
+            <CardHeader>Edit table "{ this.props.tablename }"</CardHeader>
 
             <CardBody>
 
