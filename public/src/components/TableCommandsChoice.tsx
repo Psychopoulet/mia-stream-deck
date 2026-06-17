@@ -5,12 +5,12 @@
     import {
         Alert,
         Card, CardHeader, CardBody,
-        Select,
-        ButtonGroup, Button
+        Select
     } from "react-bootstrap-fontawesome";
 
     // locals
     import getSDK from "../SDK";
+    import TableCommandsEdit from "./TableCommandsEdit";
 
 // types & interfaces
 
@@ -18,7 +18,7 @@
     import type { iPropsNode } from "react-bootstrap-fontawesome";
 
     // locals
-    import type { components, paths } from "../../../lib/src/Descriptor";
+    import type { components } from "../../../lib/src/Descriptor";
     import type { SDK } from "../SDK";
 
     interface iProps extends iPropsNode {
@@ -129,46 +129,6 @@ export default class TableCommandsChoice extends React.Component<iProps, iState>
 
     };
 
-    private readonly _handleSeeTable = (e: React.MouseEvent<HTMLButtonElement>): void => {
-
-        e.stopPropagation();
-        e.preventDefault();
-
-        let url: keyof paths = "/mia-stream-deck/public/table.html";
-        url += "?tablename=" + this.state.selectedTableName;
-
-        const redirectWindow: WindowProxy | null = window.open(url, "_blank");
-
-        if (redirectWindow) {
-            redirectWindow.focus();
-        }
-
-    };
-
-    private readonly _handleDeleteTable = (e: React.MouseEvent<HTMLButtonElement>): void => {
-
-        e.stopPropagation();
-        e.preventDefault();
-
-        this._sdk.deleteTableByName(this.state.selectedTableName).then((): void => {
-
-            this.setState({
-                "running": false,
-                "selectedTableName": ""
-            });
-
-        }).catch((err: Error): void => {
-
-            this.setState({
-                "running": false
-            });
-
-            this.props.onError(err);
-
-        });
-
-    };
-
     // render
 
     public render (): React.JSX.Element {
@@ -206,33 +166,7 @@ export default class TableCommandsChoice extends React.Component<iProps, iState>
 
                 </Card>
 
-                { 0 < this.state.selectedTableName.length && <Card className="mt-3">
-
-                    <CardHeader>Edit table</CardHeader>
-
-                    <CardBody>
-
-                        <ButtonGroup block>
-
-                            <Button icon="eye" variant="success"
-                                onClick={ this._handleSeeTable }
-                                disabled={ this.state.running || 0 >= this.state.selectedTableName.length }
-                            >
-                                See table
-                            </Button>
-
-                            <Button icon="trash" variant="danger"
-                                onClick={ this._handleDeleteTable }
-                                disabled={ this.state.running || 0 >= this.state.selectedTableName.length }
-                            >
-                                Delete table
-                            </Button>
-
-                        </ButtonGroup>
-
-                    </CardBody>
-
-                </Card> }
+                { 0 < this.state.selectedTableName.length && <TableCommandsEdit tablename={ this.state.selectedTableName } onError={ this.props.onError } /> }
 
             </>;
 
