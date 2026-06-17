@@ -6,7 +6,7 @@
 
     // locals
     import getSDK from "./SDK";
-    import TableCommands from "./components/TableCommands";
+    import TableCommandsExecute from "./components/TableCommandsExecute";
     import AddTable from "./components/AddTable";
     import TableCommandsChoice from "./components/TableCommandsChoice";
 
@@ -175,7 +175,7 @@ export default class App extends React.Component<iPropsNode, iState> {
         }
         else if (this._research.has("tablename")) {
 
-            return <TableCommands name={ this._research.get("tablename") as string } onError={ this._handleError } />;
+            return <TableCommandsExecute name={ this._research.get("tablename") as string } onError={ this._handleError } />;
 
         }
         else {
@@ -194,7 +194,7 @@ export default class App extends React.Component<iPropsNode, iState> {
                         <AddTable onError={ this._handleError } />
                     </div>
 
-                    <div className="col-12 col-md-8 col-lg-9">
+                    <div className="col-12 col-md-8 col-lg-9 mt-3 mt-md-0">
                         <TableCommandsChoice onError={ this._handleError } />
                     </div>
 

@@ -4,7 +4,7 @@
     import React from "react";
     import {
         Alert,
-        Card, CardHeader, CardBody, CardFooter,
+        Card, CardHeader, CardBody,
         Select,
         ButtonGroup, Button
     } from "react-bootstrap-fontawesome";
@@ -181,50 +181,60 @@ export default class TableCommandsChoice extends React.Component<iProps, iState>
         }
         else {
 
-            return <Card>
+            return <>
 
-                <CardHeader>Choose table</CardHeader>
+                <Card>
 
-                <CardBody>
+                    <CardHeader>Choose table</CardHeader>
 
-                    <Select
-                        value={ this.state.selectedTableName } onChange={ this._handleChangeTable }
-                        disabled={ this.state.running || 0 >= this.state.tables.length }
-                    >
+                    <CardBody>
 
-                        { "" === this.state.selectedTableName && <option value="">-</option> }
-
-                        { this.state.tables.map((value: string, key: number): React.JSX.Element => {
-                            return <option key={ key } value={ value }>{ value }</option>;
-                        }) }
-
-                    </Select>
-
-                </CardBody>
-
-                <CardFooter>
-
-                    <ButtonGroup block>
-
-                        <Button icon="eye" variant="success"
-                            onClick={ this._handleSeeTable }
-                            disabled={ this.state.running || 0 >= this.state.selectedTableName.length }
+                        <Select
+                            value={ this.state.selectedTableName } onChange={ this._handleChangeTable }
+                            disabled={ this.state.running || 0 >= this.state.tables.length }
                         >
-                            See table
-                        </Button>
 
-                        <Button icon="trash" variant="danger"
-                            onClick={ this._handleDeleteTable }
-                            disabled={ this.state.running || 0 >= this.state.selectedTableName.length }
-                        >
-                            Delete table
-                        </Button>
+                            { "" === this.state.selectedTableName && <option value="">-</option> }
 
-                    </ButtonGroup>
+                            { this.state.tables.map((value: string, key: number): React.JSX.Element => {
+                                return <option key={ key } value={ value }>{ value }</option>;
+                            }) }
 
-                </CardFooter>
+                        </Select>
 
-            </Card>;
+                    </CardBody>
+
+                </Card>
+
+                { 0 < this.state.selectedTableName.length && <Card className="mt-3">
+
+                    <CardHeader>Edit table</CardHeader>
+
+                    <CardBody>
+
+                        <ButtonGroup block>
+
+                            <Button icon="eye" variant="success"
+                                onClick={ this._handleSeeTable }
+                                disabled={ this.state.running || 0 >= this.state.selectedTableName.length }
+                            >
+                                See table
+                            </Button>
+
+                            <Button icon="trash" variant="danger"
+                                onClick={ this._handleDeleteTable }
+                                disabled={ this.state.running || 0 >= this.state.selectedTableName.length }
+                            >
+                                Delete table
+                            </Button>
+
+                        </ButtonGroup>
+
+                    </CardBody>
+
+                </Card> }
+
+            </>;
 
         }
 

@@ -29,11 +29,11 @@
 
 // component
 
-export default class TableCommands extends React.Component<iProps, iState> {
+export default class TableCommandsExecute extends React.Component<iProps, iState> {
 
     // name
 
-        public static displayName: string = "TableCommands";
+        public static displayName: string = "TableCommandsExecute";
 
     // private
 
