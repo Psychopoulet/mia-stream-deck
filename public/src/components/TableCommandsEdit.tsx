@@ -5,6 +5,8 @@
     import {
         Alert,
         Card, CardHeader, CardBody,
+        Table, TableHeader, TableBody,
+        Range,
         ButtonGroup, Button
     } from "react-bootstrap-fontawesome";
 
@@ -28,8 +30,21 @@
     interface iState {
         "loading": boolean;
         "running": boolean;
-        "table": components["schemas"]["Table"] | null;
+        "table": components["schemas"]["Table"];
+        "countLines": number;
+        "countRows": number;
     }
+
+// consts
+
+    const MAX_LINES: number = 10;
+    const MAX_ROWS: number = 10;
+
+    const EMPTY_COMMAND: components["schemas"]["Command"] = {
+        "action": {
+            "type": "EMPTY"
+        }
+    };
 
 // component
 
@@ -52,7 +67,9 @@ export default class TableCommandsChoice extends React.Component<iProps, iState>
         this.state = {
             "loading": true,
             "running": false,
-            "table": null
+            "table": [],
+            "countLines": 0,
+            "countRows": 0
         };
 
     }
@@ -137,6 +154,70 @@ export default class TableCommandsChoice extends React.Component<iProps, iState>
 
     };
 
+    private readonly _handleChangeCountLines = (e: React.MouseEvent<HTMLInputElement>, newValue: number): void => {
+
+        if (this.state.countLines < newValue) {
+
+            this.setState({
+                "table": [
+                    ...this.state.table,
+                    ...(Array(newValue - this.state.countLines) as Array<Array<components["schemas"]["Command"]>>).fill( // new lines
+                        (Array(this.state.countRows) as Array<components["schemas"]["Command"]>).fill(EMPTY_COMMAND) // new rows
+                    )
+                ],
+                "countLines": newValue
+            });
+
+        }
+        else if (this.state.countLines > newValue) {
+
+            this.setState({
+                "table": this.state.table.slice(0, newValue),
+                "countLines": newValue
+            });
+
+        }
+
+    };
+
+    private readonly _handleChangeCountRows = (e: React.MouseEvent<HTMLInputElement>, newValue: number): void => {
+
+        if (0 >= this.state.countLines) {
+            return;
+        }
+
+        if (this.state.countRows < newValue) {
+
+            this.setState({
+                "table": this.state.table.map((line: Array<components["schemas"]["Command"]>): Array<components["schemas"]["Command"]> => {
+                    return [ ...line, ...(Array(newValue - line.length) as Array<components["schemas"]["Command"]>).fill(EMPTY_COMMAND) ];
+                }),
+                "countRows": newValue
+            });
+
+        }
+        else if (this.state.countRows > newValue) {
+
+            this.setState({
+                "table": this.state.table.map((line: Array<components["schemas"]["Command"]>): Array<components["schemas"]["Command"]> => {
+                    return line.slice(0, newValue);
+                }),
+                "countRows": newValue
+            });
+
+        }
+
+    };
+
+    private readonly _handleEditCommand = (e: React.MouseEvent<HTMLButtonElement>, indexLine: number, indexRow: number, command: components["schemas"]["Command"]): void => {
+
+        e.preventDefault();
+        e.stopPropagation();
+
+        console.log({ indexLine, indexRow, command });
+
+    };
+
     // render
 
     private _renderContent (): React.JSX.Element | string {
@@ -144,11 +225,89 @@ export default class TableCommandsChoice extends React.Component<iProps, iState>
         if (this.state.loading) {
             return <Alert variant="warning">Loading...</Alert>;
         }
-        else if (!this.state.table) {
-            return <Alert variant="warning">Table not found...</Alert>;
-        }
         else {
-            return JSON.stringify(this.state.table);
+
+            return <Table borderless small>
+
+                <TableHeader>
+
+                    <tr>
+
+                        <td colSpan={ this.state.countRows + 1 }>
+
+                            <Range
+                                min={ 0 } max={ MAX_LINES } step={ 1 }
+                                disabled={ this.state.loading }
+                                value={ this.state.countLines } onChange={ this._handleChangeCountLines }
+                            >
+
+                                <div className="input-group-text">
+                                    { this.state.countLines }
+                                </div>
+
+                            </Range>
+
+                        </td>
+
+                    </tr>
+
+                </TableHeader>
+
+                <TableBody>
+
+                    { 0 < this.state.countLines && <tr>
+
+                        <td rowSpan={ this.state.countLines + 1 } className="p-3 pt-0 pb-0" style={{ "width": "2.4em" }}>
+
+                            <Range
+                                min={ 0 } max={ MAX_ROWS } step={ 1 }
+                                disabled={ this.state.loading }
+                                orientation="vertical"
+                                className="flex-column align-items-center"
+                                style={{
+                                    "height": (this.state.countLines * 3) + "rem"
+                                }}
+                                value={ this.state.countRows } onChange={ this._handleChangeCountRows }
+                            >
+                                <div className="input-group-text">
+                                    { this.state.countRows }
+                                </div>
+                            </Range>
+
+                        </td>
+
+                    </tr> }
+
+                    { this.state.table.map((line: Array<components["schemas"]["Command"]>, indexLine: number): React.JSX.Element => {
+
+                        return <tr key={ indexLine }>
+
+                            { line.map((row: components["schemas"]["Command"], indexRow: number): React.JSX.Element => {
+
+                                const _handleEditCommand = (e: React.MouseEvent<HTMLButtonElement>): void => {
+                                    return this._handleEditCommand(e, indexLine, indexRow, row);
+                                };
+
+                                return <td key={ indexLine + "-" + indexRow }>
+
+                                    <Button title={ row.action.type } variant="info" outline block
+                                        onClick={ _handleEditCommand }
+                                    >
+                                        { row.action.type }
+                                    </Button>
+
+                                </td>;
+
+                            }) }
+
+                        </tr>;
+
+                    }) }
+
+                </TableBody>
+
+            </Table>;
+
         }
 
     }
@@ -164,15 +323,15 @@ export default class TableCommandsChoice extends React.Component<iProps, iState>
                 <ButtonGroup block>
 
                     <Button icon="eye" variant="success"
+                        disabled={ this.state.loading }
                         onClick={ this._handleSeeTable }
-                        disabled={ this.state.running }
                     >
                         See table
                     </Button>
 
                     <Button icon="trash" variant="danger"
+                        disabled={ this.state.loading }
                         onClick={ this._handleDeleteTable }
-                        disabled={ this.state.running }
                     >
                         Delete table
                     </Button>
