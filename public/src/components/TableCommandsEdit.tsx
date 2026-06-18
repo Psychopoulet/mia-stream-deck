@@ -4,7 +4,7 @@
     import React from "react";
     import {
         Alert,
-        Card, CardHeader, CardBody,
+        Card, CardHeader, CardBody, CardFooter,
         Table, TableHeader, TableBody,
         Range,
         ButtonGroup, Button
@@ -105,7 +105,9 @@ export default class TableCommandsChoice extends React.Component<iProps, iState>
 
             this.setState({
                 "loading": false,
-                "table": table
+                "table": table,
+                "countLines": table.length,
+                "countRows": 0 < table.length ? table[0].length : 0
             });
 
         }).catch((err: Error): void => {
@@ -267,6 +269,33 @@ export default class TableCommandsChoice extends React.Component<iProps, iState>
 
     };
 
+    private readonly _handleSave = (e: React.MouseEvent<HTMLButtonElement>): void => {
+
+        e.stopPropagation();
+        e.preventDefault();
+
+        this.setState({
+            "running": true
+        });
+
+        this._sdk.updateTable(this.props.tablename, this.state.table).then((): void => {
+
+            this.setState({
+                "running": false
+            });
+
+        }).catch((err: Error): void => {
+
+            this.props.onError(err);
+
+            this.setState({
+                "running": false
+            });
+
+        });
+
+    };
+
     // render
 
     private _renderContent (): React.JSX.Element | string {
@@ -411,6 +440,18 @@ export default class TableCommandsChoice extends React.Component<iProps, iState>
                     { this._renderContent() }
 
                 </CardBody>
+
+                <CardFooter>
+
+                    <Button type="submit"
+                        icon="save" variant="success" block
+                        disabled={ this.state.running }
+                        onClick={ this._handleSave }
+                    >
+                        Save table
+                    </Button>
+
+                </CardFooter>
 
             </Card>
 

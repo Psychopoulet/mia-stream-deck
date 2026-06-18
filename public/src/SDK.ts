@@ -308,6 +308,26 @@ export class SDK extends EventEmitter<{
 
     }
 
+    public updateTable (tableName: components["schemas"]["TableName"], table: components["schemas"]["Table"]): Promise<operations["updateTable"]["responses"]["204"]["content"]["application/json"]> {
+
+        const url: keyof paths = "/mia-stream-deck/api/tables/{tablename}";
+        const method: HttpMethodsOf<typeof url> = "post";
+        const body: operations["updateTable"]["requestBody"]["content"]["application/json"] = table;
+
+        return fetch(url.replace("{tablename}", tableName), {
+            "method": method,
+            "headers": {
+                "Content-Type": "application/json"
+            },
+            "body": JSON.stringify(body)
+        }).then((res: Response): Promise<operations["updateTable"]["responses"]["204"]["content"]["application/json"]> => {
+
+            return this._parseResponse(res);
+
+        });
+
+    }
+
     public deleteTableByName (tableName: string): Promise<operations["deleteTableByName"]["responses"]["204"]["content"]["application/json"]> {
 
         const url: keyof paths = "/mia-stream-deck/api/tables/{tablename}";
@@ -330,13 +350,14 @@ export class SDK extends EventEmitter<{
 
         const url: keyof paths = "/mia-stream-deck/api/execute-command";
         const method: HttpMethodsOf<typeof url> = "put";
+        const body: operations["executeCommand"]["requestBody"]["content"]["application/json"] = cmd;
 
         return fetch(url, {
             "method": method,
             "headers": {
                 "Content-Type": "application/json"
             },
-            "body": JSON.stringify(cmd)
+            "body": JSON.stringify(body)
         }).then((res: Response): Promise<operations["executeCommand"]["responses"]["201"]["content"]["application/json"]> => {
 
             return this._parseResponse(res);
