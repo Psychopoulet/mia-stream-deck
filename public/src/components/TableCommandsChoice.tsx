@@ -62,8 +62,8 @@ export default class TableCommandsChoice extends React.Component<iProps, iState>
     public componentDidMount (): void {
 
         this._sdk
-            .on("table.added", this._handleTableAdded)
-            .on("table.deleted", this._handleTableDeleted);
+            .on("table.added", this._onTableAdded)
+            .on("table.deleted", this._onTableDeleted);
 
         this._sdk.getTables().then((tablenames: Array<components["schemas"]["TableName"]>): void => {
 
@@ -88,14 +88,14 @@ export default class TableCommandsChoice extends React.Component<iProps, iState>
     public componentWillUnmount (): void {
 
         this._sdk
-            .off("table.added", this._handleTableAdded)
-            .off("table.deleted", this._handleTableDeleted);
+            .off("table.added", this._onTableAdded)
+            .off("table.deleted", this._onTableDeleted);
 
     }
 
     // events
 
-    private readonly _handleTableAdded = (tableName: components["schemas"]["TableName"]): void => {
+    private readonly _onTableAdded = (tableName: components["schemas"]["TableName"]): void => {
 
         this.setState({
             "tables": [ ...this.state.tables, tableName ],
@@ -104,7 +104,7 @@ export default class TableCommandsChoice extends React.Component<iProps, iState>
 
     };
 
-    private readonly _handleTableDeleted = (tableName: components["schemas"]["TableName"]): void => {
+    private readonly _onTableDeleted = (tableName: components["schemas"]["TableName"]): void => {
 
         const newTables: Array<components["schemas"]["TableName"]> = this.state.tables.filter((value: components["schemas"]["TableName"]): boolean => {
             return value !== tableName;

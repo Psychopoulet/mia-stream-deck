@@ -123,7 +123,7 @@ export default class TableCommandsExecute extends React.Component<iProps, iState
 
     };
 
-    // handlers
+    // interface handlers
 
     private _executeCommand (cmd: components["schemas"]["Command"]): void {
 

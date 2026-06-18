@@ -63,7 +63,7 @@ export default class AddTable extends React.Component<iProps, iState> {
 
     }
 
-    // events
+    // interface handlers
 
     private readonly _handleChangeNewTableName = (e: React.ChangeEvent<HTMLInputElement>, newValue: string): void => {
 
