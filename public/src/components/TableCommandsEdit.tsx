@@ -12,6 +12,7 @@
 
     // locals
     import getSDK from "../SDK";
+    import ModalEditCommand from "./ModalEditCommand";
 
 // types & interfaces
 
@@ -33,6 +34,11 @@
         "table": components["schemas"]["Table"];
         "countLines": number;
         "countRows": number;
+        "commandEdition": {
+            "indexLine": number;
+            "indexRow": number;
+            "command": components["schemas"]["Command"];
+        } | null;
     }
 
 // consts
@@ -69,7 +75,8 @@ export default class TableCommandsChoice extends React.Component<iProps, iState>
             "running": false,
             "table": [],
             "countLines": 0,
-            "countRows": 0
+            "countRows": 0,
+            "commandEdition": null
         };
 
     }
@@ -135,6 +142,10 @@ export default class TableCommandsChoice extends React.Component<iProps, iState>
 
         e.stopPropagation();
         e.preventDefault();
+
+        this.setState({
+            "running": true
+        });
 
         this._sdk.deleteTableByName(this.props.tablename).then((): void => {
 
@@ -214,7 +225,45 @@ export default class TableCommandsChoice extends React.Component<iProps, iState>
         e.preventDefault();
         e.stopPropagation();
 
-        console.log({ indexLine, indexRow, command });
+        this.setState({
+            "commandEdition": {
+                "indexLine": indexLine,
+                "indexRow": indexRow,
+                "command": command
+            }
+        });
+
+    };
+
+    private readonly _handleUpdateCommand = (command: components["schemas"]["Command"]): void => {
+
+        if (!this.state.commandEdition) {
+            return;
+        }
+
+        if ("undefined" === typeof this.state.table[this.state.commandEdition.indexLine]) {
+            return;
+        }
+
+        if ("undefined" === typeof this.state.table[this.state.commandEdition.indexLine][this.state.commandEdition.indexRow]) {
+            return;
+        }
+
+        const newTable: components["schemas"]["Table"] = [ ...this.state.table ];
+        newTable[this.state.commandEdition.indexLine][this.state.commandEdition.indexRow] = command;
+
+        this.setState({
+            "table": newTable,
+            "commandEdition": null
+        });
+
+    };
+
+    private readonly _handleCloseEditCommand = (): void => {
+
+        this.setState({
+            "commandEdition": null
+        });
 
     };
 
@@ -237,7 +286,7 @@ export default class TableCommandsChoice extends React.Component<iProps, iState>
 
                             <Range
                                 min={ 0 } max={ MAX_LINES } step={ 1 }
-                                disabled={ this.state.loading || this.state.running }
+                                disabled={ this.state.running }
                                 value={ this.state.countLines } onChange={ this._handleChangeCountLines }
                             >
 
@@ -261,7 +310,7 @@ export default class TableCommandsChoice extends React.Component<iProps, iState>
 
                             <Range
                                 min={ 0 } max={ MAX_ROWS } step={ 1 }
-                                disabled={ this.state.loading || this.state.running }
+                                disabled={ this.state.running }
                                 orientation="vertical"
                                 className="flex-column align-items-center"
                                 style={{
@@ -301,6 +350,7 @@ export default class TableCommandsChoice extends React.Component<iProps, iState>
                                 return <td key={ indexLine + "-" + indexRow }>
 
                                     <Button title={ row.action.type } variant="info" outline block
+                                        disabled={ this.state.running }
                                         onClick={ _handleEditCommand }
                                     >
                                         { row.action.type }
@@ -324,39 +374,47 @@ export default class TableCommandsChoice extends React.Component<iProps, iState>
 
     public render (): React.JSX.Element {
 
-        return <Card className="mt-3">
+        return <>
 
-            <CardHeader>Edit table "{ this.props.tablename }"</CardHeader>
+            { this.state.commandEdition && <ModalEditCommand command={ this.state.commandEdition.command }
+                onChange={ this._handleUpdateCommand } onClose={ this._handleCloseEditCommand }
+            /> }
 
-            <CardBody>
+            <Card className="mt-3">
 
-                <ButtonGroup block>
+                <CardHeader>Edit table "{ this.props.tablename }"</CardHeader>
 
-                    <Button icon="eye" variant="success"
-                        disabled={ this.state.loading || this.state.running }
-                        onClick={ this._handleSeeTable }
-                    >
-                        See table
-                    </Button>
+                <CardBody>
 
-                    <Button icon="trash" variant="danger"
-                        disabled={ this.state.loading || this.state.running }
-                        onClick={ this._handleDeleteTable }
-                    >
-                        Delete table
-                    </Button>
+                    <ButtonGroup block>
 
-                </ButtonGroup>
+                        <Button icon="eye" variant="success"
+                            disabled={ this.state.running }
+                            onClick={ this._handleSeeTable }
+                        >
+                            See table
+                        </Button>
 
-            </CardBody>
+                        <Button icon="trash" variant="danger"
+                            disabled={ this.state.running }
+                            onClick={ this._handleDeleteTable }
+                        >
+                            Delete table
+                        </Button>
 
-            <CardBody>
+                    </ButtonGroup>
 
-                { this._renderContent() }
+                </CardBody>
 
-            </CardBody>
+                <CardBody>
 
-        </Card>;
+                    { this._renderContent() }
+
+                </CardBody>
+
+            </Card>
+
+        </>;
 
     }
 
