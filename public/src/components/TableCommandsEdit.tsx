@@ -237,7 +237,7 @@ export default class TableCommandsChoice extends React.Component<iProps, iState>
 
                             <Range
                                 min={ 0 } max={ MAX_LINES } step={ 1 }
-                                disabled={ this.state.loading }
+                                disabled={ this.state.loading || this.state.running }
                                 value={ this.state.countLines } onChange={ this._handleChangeCountLines }
                             >
 
@@ -261,15 +261,25 @@ export default class TableCommandsChoice extends React.Component<iProps, iState>
 
                             <Range
                                 min={ 0 } max={ MAX_ROWS } step={ 1 }
-                                disabled={ this.state.loading }
+                                disabled={ this.state.loading || this.state.running }
                                 orientation="vertical"
                                 className="flex-column align-items-center"
                                 style={{
-                                    "height": (this.state.countLines * 3) + "rem"
+                                    "height": (this.state.countLines * 3) + "rem",
+                                    "borderTopLeftRadius": "var(--bs-border-radius)",
+                                    "borderTopRightRadius": "var(--bs-border-radius)",
+                                    "borderBottomLeftRadius": "0",
+                                    "borderBottomRightRadius": "0"
                                 }}
                                 value={ this.state.countRows } onChange={ this._handleChangeCountRows }
                             >
-                                <div className="input-group-text">
+                                <div className="input-group-text ml-0" style={{
+                                    "borderTopLeftRadius": 0,
+                                    "borderTopRightRadius": 0,
+                                    "borderBottomLeftRadius": "var(--bs-border-radius)",
+                                    "borderBottomRightRadius": "var(--bs-border-radius)",
+                                    "marginTop": "calc(var(--bs-border-width) * -1)"
+                                }}>
                                     { this.state.countRows }
                                 </div>
                             </Range>
@@ -323,14 +333,14 @@ export default class TableCommandsChoice extends React.Component<iProps, iState>
                 <ButtonGroup block>
 
                     <Button icon="eye" variant="success"
-                        disabled={ this.state.loading }
+                        disabled={ this.state.loading || this.state.running }
                         onClick={ this._handleSeeTable }
                     >
                         See table
                     </Button>
 
                     <Button icon="trash" variant="danger"
-                        disabled={ this.state.loading }
+                        disabled={ this.state.loading || this.state.running }
                         onClick={ this._handleDeleteTable }
                     >
                         Delete table
