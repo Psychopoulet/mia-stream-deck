@@ -188,7 +188,7 @@ export default class ModalEditCommand extends React.Component<iProps, iState> {
 
     public render (): React.JSX.Element {
 
-        return <Modal appId="{{plugin.name}}-app" title="Edit command" size="lg"
+        return <Modal appId="{{plugin.name}}-app" title="Edit command" size="lg" scrollable
             onSubmit={ this._handleSubmit }
             onClose={ this.props.onClose }
         >
@@ -245,8 +245,6 @@ export default class ModalEditCommand extends React.Component<iProps, iState> {
                         { "INPUT-KEY" === this.state.command.action.type && <EditKey action={ this.state.command.action } onChange={ this._handleChangeActionKey } /> }
                         { "INPUT-STRING" === this.state.command.action.type && <EditString action={ this.state.command.action } onChange={ this._handleChangeActionString } /> }
                         { "PLUGIN" === this.state.command.action.type && <EditPlugin action={ this.state.command.action } onChange={ this._handleChangeActionPlugin } /> }
-
-                        { JSON.stringify(this.state.command) }
 
                     </CardBody>
 

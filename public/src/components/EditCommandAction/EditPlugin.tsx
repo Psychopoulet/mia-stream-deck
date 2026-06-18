@@ -20,13 +20,58 @@
         "onChange": (action: components["schemas"]["ActionPlugin"]) => void;
     }
 
+    interface iState {
+        "urlParameters": {
+            "path": string;
+            "query": string;
+            "headers": string;
+            "cookies": string;
+        };
+    }
+
 // component
 
-export default class EditPlugin extends React.PureComponent<iProps> {
+export default class EditPlugin extends React.Component<iProps, iState> {
 
     // name
 
         public static displayName: string = "EditPlugin";
+
+    // constructor
+
+    public constructor (props: iProps) {
+
+        super(props);
+
+        this.state = {
+            "urlParameters": {
+                "path": "object" === typeof this.props.action.urlParameters?.path ? JSON.stringify(this.props.action.urlParameters.path) : "",
+                "query": "object" === typeof this.props.action.urlParameters?.query ? JSON.stringify(this.props.action.urlParameters.query) : "",
+                "headers": "object" === typeof this.props.action.urlParameters?.headers ? JSON.stringify(this.props.action.urlParameters.headers) : "",
+                "cookies": "object" === typeof this.props.action.urlParameters?.cookies ? JSON.stringify(this.props.action.urlParameters.cookies) : ""
+            }
+        };
+
+    }
+
+    public componentDidUpdate (prevProps: iProps): void {
+
+        if (prevProps.action.urlParameters !== this.props.action.urlParameters) {
+
+            console.log(this.props.action.urlParameters);
+
+            this.setState({
+                "urlParameters": {
+                    "path": "object" === typeof this.props.action.urlParameters?.path ? JSON.stringify(this.props.action.urlParameters.path) : "",
+                    "query": "object" === typeof this.props.action.urlParameters?.query ? JSON.stringify(this.props.action.urlParameters.query) : "",
+                    "headers": "object" === typeof this.props.action.urlParameters?.headers ? JSON.stringify(this.props.action.urlParameters.headers) : "",
+                    "cookies": "object" === typeof this.props.action.urlParameters?.cookies ? JSON.stringify(this.props.action.urlParameters.cookies) : ""
+                }
+            });
+
+        }
+
+    }
 
     // interface handlers
 
@@ -54,15 +99,119 @@ export default class EditPlugin extends React.PureComponent<iProps> {
 
     };
 
-    private readonly _handleChangeUrlParameters = (e: React.ChangeEvent<HTMLTextAreaElement>, newValue: string): void => {
+    private readonly _handleChangeUrlPath = (e: React.ChangeEvent<HTMLTextAreaElement>, newValue: string): void => {
 
-        this.props.onChange({
-            ...this.props.action,
+        e.stopPropagation();
+        e.preventDefault();
+
+        this.setState({
             "urlParameters": {
-                ...(this.props.action.urlParameters ?? {}),
-                "path": JSON.parse(newValue)
+                ...this.state.urlParameters,
+                "path": newValue
             }
         });
+
+        try {
+
+            this.props.onChange({
+                ...this.props.action,
+                "urlParameters": {
+                    ...(this.props.action.urlParameters ?? {}),
+                    "path": JSON.parse(newValue) as Record<string, string>
+                }
+            });
+
+        }
+        catch (err: unknown) { // eslint-disable-line @typescript-eslint/no-unused-vars
+            // nothing to do here
+        }
+
+    };
+
+    private readonly _handleChangeUrlQuery = (e: React.ChangeEvent<HTMLTextAreaElement>, newValue: string): void => {
+
+        e.stopPropagation();
+        e.preventDefault();
+
+        this.setState({
+            "urlParameters": {
+                ...this.state.urlParameters,
+                "query": newValue
+            }
+        });
+
+        try {
+
+            this.props.onChange({
+                ...this.props.action,
+                "urlParameters": {
+                    ...(this.props.action.urlParameters ?? {}),
+                    "query": JSON.parse(newValue) as Record<string, string>
+                }
+            });
+
+        }
+        catch (err: unknown) { // eslint-disable-line @typescript-eslint/no-unused-vars
+            // nothing to do here
+        }
+
+    };
+
+    private readonly _handleChangeUrlHeaders = (e: React.ChangeEvent<HTMLTextAreaElement>, newValue: string): void => {
+
+        e.stopPropagation();
+        e.preventDefault();
+
+        this.setState({
+            "urlParameters": {
+                ...this.state.urlParameters,
+                "headers": newValue
+            }
+        });
+
+        try {
+
+            this.props.onChange({
+                ...this.props.action,
+                "urlParameters": {
+                    ...(this.props.action.urlParameters ?? {}),
+                    "headers": JSON.parse(newValue) as Record<string, string>
+                }
+            });
+
+        }
+        catch (err: unknown) { // eslint-disable-line @typescript-eslint/no-unused-vars
+            // nothing to do here
+        }
+
+    };
+
+    private readonly _handleChangeUrlCookies = (e: React.ChangeEvent<HTMLTextAreaElement>, newValue: string): void => {
+
+        e.stopPropagation();
+        e.preventDefault();
+
+        this.setState({
+            "urlParameters": {
+                ...this.state.urlParameters,
+                "cookies": newValue
+            }
+        });
+
+        try {
+
+            this.props.onChange({
+                ...this.props.action,
+                "urlParameters": {
+                    ...(this.props.action.urlParameters ?? {}),
+                    "cookies": JSON.parse(newValue) as Record<string, string>
+                }
+            });
+
+        }
+        catch (err: unknown) { // eslint-disable-line @typescript-eslint/no-unused-vars
+            // nothing to do here
+        }
 
     };
 
@@ -96,11 +245,26 @@ export default class EditPlugin extends React.PureComponent<iProps> {
 
                     <CardHeader>URL parameters</CardHeader>
 
-                    <CardBody>
+                    <CardBody className="pb-1">
 
                         <TextAreaLabel label="Paths"
-                            value={ "object" === typeof this.props.action?.urlParameters?.path ? JSON.stringify(this.props.action.urlParameters.path) : "" }
-                            onChange={ this._handleChangeUrlParameters }
+                            value={ this.state.urlParameters.path }
+                            onChange={ this._handleChangeUrlPath }
+                        />
+
+                        <TextAreaLabel label="Query"
+                            value={ this.state.urlParameters.query }
+                            onChange={ this._handleChangeUrlQuery }
+                        />
+
+                        <TextAreaLabel label="Headers"
+                            value={ this.state.urlParameters.headers }
+                            onChange={ this._handleChangeUrlHeaders }
+                        />
+
+                        <TextAreaLabel label="Cookies"
+                            value={ this.state.urlParameters.cookies }
+                            onChange={ this._handleChangeUrlCookies }
                         />
 
                     </CardBody>
