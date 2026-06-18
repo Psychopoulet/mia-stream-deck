@@ -5,11 +5,16 @@
     import {
         Modal, ModalBody, ModalFooter,
         Card, CardHeader, CardBody,
-        InputTextLabel, SelectLabel, CheckBoxLabel,
+        InputTextLabel, SelectLabel,
         Icon, Image,
         Button,
         generateFocus
     } from "react-bootstrap-fontawesome";
+
+    // locals
+    import EditKey from "./EditCommandAction/EditKey";
+    import EditString from "./EditCommandAction/EditString";
+    import EditPlugin from "./EditCommandAction/EditPlugin";
 
 // types & interfaces
 
@@ -146,181 +151,40 @@ export default class ModalEditCommand extends React.Component<iProps, iState> {
 
     };
 
-    private readonly _handleChangeActionString = (e: React.ChangeEvent<HTMLInputElement>, newValue: string): void => {
-
-        e.stopPropagation();
-        e.preventDefault();
+    private readonly _handleChangeActionKey = (action: components["schemas"]["ActionInputKey"]): void => {
 
         this.setState({
             "command": {
                 ...this.state.command,
-                "action": {
-                    ...this.state.command.action as components["schemas"]["ActionInputString"],
-                    "string": newValue
-                }
+                "action": action
             }
         });
 
     };
 
-    private readonly _handleChangeActionEnter = (e: React.ChangeEvent<HTMLInputElement>, newValue: boolean): void => {
+    private readonly _handleChangeActionString = (action: components["schemas"]["ActionInputString"]): void => {
 
         this.setState({
             "command": {
                 ...this.state.command,
-                "action": {
-                    ...this.state.command.action as components["schemas"]["ActionInputString"],
-                    "enter": newValue
-                }
+                "action": action
             }
         });
 
     };
 
-    private readonly _handleChangeActionKey = (e: React.ChangeEvent<HTMLInputElement>, newValue: string): void => {
-
-        e.stopPropagation();
-        e.preventDefault();
+    private readonly _handleChangeActionPlugin = (action: components["schemas"]["ActionPlugin"]): void => {
 
         this.setState({
             "command": {
                 ...this.state.command,
-                "action": {
-                    ...this.state.command.action as components["schemas"]["ActionInputKey"],
-                    "key": newValue
-                }
-            }
-        });
-
-    };
-
-    private readonly _handleChangeActionAlt = (e: React.ChangeEvent<HTMLInputElement>, newValue: boolean): void => {
-
-        this.setState({
-            "command": {
-                ...this.state.command,
-                "action": {
-                    ...this.state.command.action as components["schemas"]["ActionInputKey"],
-                    "alt": newValue
-                }
-            }
-        });
-
-    };
-
-    private readonly _handleChangeActionCtrl = (e: React.ChangeEvent<HTMLInputElement>, newValue: boolean): void => {
-
-        this.setState({
-            "command": {
-                ...this.state.command,
-                "action": {
-                    ...this.state.command.action as components["schemas"]["ActionInputKey"],
-                    "ctrl": newValue
-                }
-            }
-        });
-
-    };
-
-    private readonly _handleChangeActionShift = (e: React.ChangeEvent<HTMLInputElement>, newValue: boolean): void => {
-
-        this.setState({
-            "command": {
-                ...this.state.command,
-                "action": {
-                    ...this.state.command.action as components["schemas"]["ActionInputKey"],
-                    "shift": newValue
-                }
-            }
-        });
-
-    };
-
-    private readonly _handleChangeActionCommand = (e: React.ChangeEvent<HTMLInputElement>, newValue: boolean): void => {
-
-        this.setState({
-            "command": {
-                ...this.state.command,
-                "action": {
-                    ...this.state.command.action as components["schemas"]["ActionInputKey"],
-                    "command": newValue
-                }
+                "action": action
             }
         });
 
     };
 
     // render
-
-    private readonly _renderInputKey = (): React.JSX.Element | undefined => {
-
-        if ("INPUT-KEY" !== this.state.command.action.type) {
-            return undefined;
-        }
-
-        return <div className="row">
-
-            <div className="col-12">
-
-                <InputTextLabel label="Key"
-                    value={ this.state.command.action.key }
-                    onChange={ this._handleChangeActionKey }
-                />
-            </div>
-
-            <div className="col-12 col-md-6">
-
-                <CheckBoxLabel label="Alt"
-                    checked={ this.state.command.action.alt }
-                    onToogle={ this._handleChangeActionAlt }
-                />
-
-                <CheckBoxLabel label="Ctrl"
-                    checked={ this.state.command.action.ctrl }
-                    onToogle={ this._handleChangeActionCtrl }
-                />
-
-            </div>
-
-            <div className="col-12 col-md-6">
-
-                <CheckBoxLabel label="Shift"
-                    checked={ this.state.command.action.shift }
-                    onToogle={ this._handleChangeActionShift }
-                />
-
-                <CheckBoxLabel label="Command"
-                    checked={ this.state.command.action.command }
-                    onToogle={ this._handleChangeActionCommand }
-                />
-
-            </div>
-
-        </div>;
-
-    };
-
-    private readonly _renderInputString = (): React.JSX.Element | undefined => {
-
-        if ("INPUT-STRING" !== this.state.command.action.type) {
-            return undefined;
-        }
-
-        return <>
-
-            <InputTextLabel label="String"
-                value={ this.state.command.action.string }
-                onChange={ this._handleChangeActionString }
-            />
-
-            <CheckBoxLabel label="Enter"
-                checked={ this.state.command.action.enter }
-                onToogle={ this._handleChangeActionEnter }
-            />
-
-        </>;
-
-    };
 
     public render (): React.JSX.Element {
 
@@ -378,14 +242,15 @@ export default class ModalEditCommand extends React.Component<iProps, iState> {
 
                         </SelectLabel>
 
-                        { this._renderInputString() }
-                        { this._renderInputKey() }
+                        { "INPUT-KEY" === this.state.command.action.type && <EditKey action={ this.state.command.action } onChange={ this._handleChangeActionKey } /> }
+                        { "INPUT-STRING" === this.state.command.action.type && <EditString action={ this.state.command.action } onChange={ this._handleChangeActionString } /> }
+                        { "PLUGIN" === this.state.command.action.type && <EditPlugin action={ this.state.command.action } onChange={ this._handleChangeActionPlugin } /> }
+
+                        { JSON.stringify(this.state.command) }
 
                     </CardBody>
 
                 </Card>
-
-                { JSON.stringify(this.state.command) }
 
             </ModalBody>
 
