@@ -275,7 +275,7 @@
 			},
 			"put": {
 				"description": "",
-				"summary": "Add new table",
+				"summary": "Add new commands table",
 				"operationId": "addTable",
 				"parameters": [
 					{
@@ -306,9 +306,52 @@
 					}
 				}
 			},
+			"post": {
+				"description": "",
+				"summary": "Update the commands table",
+				"operationId": "updateTable",
+				"parameters": [
+					{
+						"name": "tablename",
+						"in": "path",
+						"required": true,
+						"schema": {
+							"$ref": "#/components/schemas/TableName"
+						}
+					}
+				],
+				"requestBody": {
+					"required": true,
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/Table"
+							}
+						}
+					}
+				},
+				"responses": {
+					"204": {
+						"description": "Table updated",
+						"content": {
+							"application/json": {}
+						}
+					},
+					"default": {
+						"description": "An error occurred",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Error"
+								}
+							}
+						}
+					}
+				}
+			},
 			"delete": {
 				"description": "",
-				"summary": "Delete the command table",
+				"summary": "Delete the commands table",
 				"operationId": "deleteTableByName",
 				"parameters": [
 					{
@@ -402,10 +445,8 @@
 			"Table": {
 				"type": "array",
 				"description": "Commands table description, contains an array for the lines which contains an array for the rows. Each row is a command.",
-				"uniqueItems": true,
 				"items": {
 					"type": "array",
-					"uniqueItems": true,
 					"items": {
 						"$ref": "#/components/schemas/Command"
 					}

@@ -86,7 +86,9 @@ export default class MediatorStreamDeck extends Mediator<iEventsMinimal & {
 
     }
 
-    public getTablePage (urlParameters: operations["getTablePage"]["parameters"]): Promise<operations["getTablePage"]["responses"]["200"]["content"]["text/html"]> {
+    public getTablePage (
+        urlParameters: operations["getTablePage"]["parameters"]
+    ): Promise<operations["getTablePage"]["responses"]["200"]["content"]["text/html"]> {
 
         return readFile(join(__dirname, "..", "..", "public", "table.html"), "utf-8").then((content: string): string => {
 
@@ -131,7 +133,9 @@ export default class MediatorStreamDeck extends Mediator<iEventsMinimal & {
 
     }
 
-    public getTableByName (urlParameters: operations["getTableByName"]["parameters"]): Promise<operations["getTableByName"]["responses"]["200"]["content"]["application/json"]> {
+    public getTableByName (
+        urlParameters: operations["getTableByName"]["parameters"]
+    ): Promise<operations["getTableByName"]["responses"]["200"]["content"]["application/json"]> {
 
         return readFile(this._file, "utf-8").then((content: string): Record<string, components["schemas"]["Table"]> => {
             return JSON.parse(content) as Record<string, components["schemas"]["Table"]>;
@@ -148,7 +152,9 @@ export default class MediatorStreamDeck extends Mediator<iEventsMinimal & {
 
     }
 
-    public addTable (urlParameters: operations["addTable"]["parameters"]): Promise<operations["addTable"]["responses"]["201"]["content"]["application/json"]> {
+    public addTable (
+        urlParameters: operations["addTable"]["parameters"]
+    ): Promise<operations["addTable"]["responses"]["201"]["content"]["application/json"]> {
 
         return readFile(this._file, "utf-8").then((content: string): Record<string, components["schemas"]["Table"]> => {
             return JSON.parse(content) as Record<string, components["schemas"]["Table"]>;
@@ -164,7 +170,30 @@ export default class MediatorStreamDeck extends Mediator<iEventsMinimal & {
 
     }
 
-    public deleteTableByName (urlParameters: operations["deleteTableByName"]["parameters"]): Promise<operations["deleteTableByName"]["responses"]["204"]["content"]["application/json"]> {
+    public updateTable (
+        urlParameters: operations["updateTable"]["parameters"],
+        bodyParameters: operations["updateTable"]["requestBody"]["content"]["application/json"]
+    ): Promise<operations["updateTable"]["responses"]["204"]["content"]["application/json"]> {
+
+        return readFile(this._file, "utf-8").then((content: string): Record<string, components["schemas"]["Table"]> => {
+            return JSON.parse(content) as Record<string, components["schemas"]["Table"]>;
+        }).then((content: Record<string, components["schemas"]["Table"]>): Promise<operations["updateTable"]["responses"]["204"]["content"]["application/json"]> => {
+
+            if ("undefined" === typeof content[urlParameters.path.tablename]) {
+                return Promise.reject(new NotFoundError("Table \"" + urlParameters.path.tablename + "\" not found"));
+            }
+
+            content[urlParameters.path.tablename] = bodyParameters;
+
+            return writeFile(this._file, JSON.stringify(content), "utf-8");
+
+        });
+
+    }
+
+    public deleteTableByName (
+        urlParameters: operations["deleteTableByName"]["parameters"]
+    ): Promise<operations["deleteTableByName"]["responses"]["204"]["content"]["application/json"]> {
 
         return readFile(this._file, "utf-8").then((content: string): Record<string, components["schemas"]["Table"]> => {
             return JSON.parse(content) as Record<string, components["schemas"]["Table"]>;
@@ -189,7 +218,10 @@ export default class MediatorStreamDeck extends Mediator<iEventsMinimal & {
 
     }
 
-    public executeCommand (urlParameters: operations["executeCommand"]["parameters"], bodyParameters: operations["executeCommand"]["requestBody"]["content"]["application/json"]): Promise<operations["executeCommand"]["responses"]["201"]["content"]["application/json"]> {
+    public executeCommand (
+        urlParameters: operations["executeCommand"]["parameters"],
+        bodyParameters: operations["executeCommand"]["requestBody"]["content"]["application/json"]
+    ): Promise<operations["executeCommand"]["responses"]["201"]["content"]["application/json"]> {
 
         return Promise.resolve().then((): Promise<void> => {
 
