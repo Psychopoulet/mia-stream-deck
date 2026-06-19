@@ -11,6 +11,7 @@
     // locals
     import type { components, operations, paths } from "./Descriptor";
     type tEvents = components["schemas"]["PushEventPluginInitialized"] | components["schemas"]["PushEventPluginReleased"] | components["schemas"]["PushEventPluginError"]
+        | components["schemas"]["PushEventTableAdded"] | components["schemas"]["PushEventTableDeleted"]
         | components["schemas"]["PushEventCommandRunning"] | components["schemas"]["PushEventCommandSuccess"] | components["schemas"]["PushEventCommandFail"];
 
     type HttpMethodsOf<P extends keyof paths> = {
@@ -27,9 +28,11 @@ export class SDK extends EventEmitter<{
     "initialized": [];
     "released": [];
     "error": [ components["schemas"]["PushEventPluginError"]["data"] ];
-    "command.running": [ components["schemas"]["Command"] ];
-    "command.fail": [ components["schemas"]["Command"], components["schemas"]["Error"] ];
-    "command.success": [ components["schemas"]["Command"], string ];
+    "table.added": [ components["schemas"]["PushEventTableAdded"]["data"] ];
+    "table.deleted": [ components["schemas"]["PushEventTableDeleted"]["data"] ];
+    "command.running": [ components["schemas"]["PushEventCommandRunning"]["data"] ];
+    "command.fail": [ components["schemas"]["PushEventCommandFail"]["data"]["command"], components["schemas"]["PushEventCommandFail"]["data"]["error"] ];
+    "command.success": [ components["schemas"]["PushEventCommandSuccess"]["data"]["command"], components["schemas"]["PushEventCommandSuccess"]["data"]["content"] ];
 }> {
 
     // static
@@ -148,13 +151,21 @@ export class SDK extends EventEmitter<{
                 switch (parsedMessage.command) {
 
                     case "initialized":
-                        this.emit("initialized");
+                        this.emit(parsedMessage.command);
                     break;
                     case "released":
-                        this.emit("released");
+                        this.emit(parsedMessage.command);
                     break;
                     case "error":
-                        this.emit("error", parsedMessage.data);
+                        this.emit(parsedMessage.command, parsedMessage.data);
+                    break;
+
+                    case "table.added":
+                        this.emit(parsedMessage.command, parsedMessage.data);
+                    break;
+
+                    case "table.deleted":
+                        this.emit(parsedMessage.command, parsedMessage.data);
                     break;
 
                     case "command.running":
@@ -297,6 +308,26 @@ export class SDK extends EventEmitter<{
 
     }
 
+    public updateTable (tableName: components["schemas"]["TableName"], table: components["schemas"]["Table"]): Promise<operations["updateTable"]["responses"]["204"]["content"]["application/json"]> {
+
+        const url: keyof paths = "/mia-stream-deck/api/tables/{tablename}";
+        const method: HttpMethodsOf<typeof url> = "post";
+        const body: operations["updateTable"]["requestBody"]["content"]["application/json"] = table;
+
+        return fetch(url.replace("{tablename}", tableName), {
+            "method": method,
+            "headers": {
+                "Content-Type": "application/json"
+            },
+            "body": JSON.stringify(body)
+        }).then((res: Response): Promise<operations["updateTable"]["responses"]["204"]["content"]["application/json"]> => {
+
+            return this._parseResponse(res);
+
+        });
+
+    }
+
     public deleteTableByName (tableName: string): Promise<operations["deleteTableByName"]["responses"]["204"]["content"]["application/json"]> {
 
         const url: keyof paths = "/mia-stream-deck/api/tables/{tablename}";
@@ -319,13 +350,14 @@ export class SDK extends EventEmitter<{
 
         const url: keyof paths = "/mia-stream-deck/api/execute-command";
         const method: HttpMethodsOf<typeof url> = "put";
+        const body: operations["executeCommand"]["requestBody"]["content"]["application/json"] = cmd;
 
         return fetch(url, {
             "method": method,
             "headers": {
                 "Content-Type": "application/json"
             },
-            "body": JSON.stringify(cmd)
+            "body": JSON.stringify(body)
         }).then((res: Response): Promise<operations["executeCommand"]["responses"]["201"]["content"]["application/json"]> => {
 
             return this._parseResponse(res);

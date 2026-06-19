@@ -29,11 +29,11 @@
 
 // component
 
-export default class TableCommands extends React.Component<iProps, iState> {
+export default class TableCommandsExecute extends React.Component<iProps, iState> {
 
     // name
 
-        public static displayName: string = "TableCommands";
+        public static displayName: string = "TableCommandsExecute";
 
     // private
 
@@ -123,7 +123,7 @@ export default class TableCommands extends React.Component<iProps, iState> {
 
     };
 
-    // handlers
+    // interface handlers
 
     private _executeCommand (cmd: components["schemas"]["Command"]): void {
 
@@ -164,7 +164,7 @@ export default class TableCommands extends React.Component<iProps, iState> {
         const maxPercentLineSize: number = 100 / this.state.table.length;
         const maxPercentRowSize: number = 100 / countMaxRows;
 
-        return <Table borderless className="m-0 p-0 vh-100">
+        return <Table borderless>
 
             <TableBody>
 

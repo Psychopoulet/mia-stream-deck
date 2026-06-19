@@ -21,6 +21,9 @@ export default class ServerStreamDeck extends Server {
             .on("released", this._onPluginReleased)
             .on("error", this._onPluginError)
 
+            .on("table.added", this._onTableAdded)
+            .on("table.deleted", this._onTableDeleted)
+
             .on("command.running", this._onCommandRunning)
             .on("command.success", this._onCommandSuccess)
             .on("command.fail", this._onCommandFail);
@@ -36,6 +39,9 @@ export default class ServerStreamDeck extends Server {
             .off("initialized", this._onPluginInitialized)
             .off("released", this._onPluginReleased)
             .off("error", this._onPluginError)
+
+            .off("table.added", this._onTableAdded)
+            .off("table.deleted", this._onTableDeleted)
 
             .off("command.running", this._onCommandRunning)
             .off("command.success", this._onCommandSuccess)
@@ -62,6 +68,22 @@ export default class ServerStreamDeck extends Server {
     private readonly _onPluginError = (data: components["schemas"]["PushEventPluginError"]["data"]): void => {
 
         this.push("error", data);
+
+    };
+
+    private readonly _onTableAdded = (tableName: components["schemas"]["TableName"]): void => {
+
+        const event: components["schemas"]["PushEventTableAdded"]["data"] = tableName;
+
+        this.push("table.added", event);
+
+    };
+
+    private readonly _onTableDeleted = (tableName: components["schemas"]["TableName"]): void => {
+
+        const event: components["schemas"]["PushEventTableDeleted"]["data"] = tableName;
+
+        this.push("table.deleted", event);
 
     };
 

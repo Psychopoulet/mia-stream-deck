@@ -1,7 +1,6 @@
 // deps
 
     // natives
-    import { spawn } from "node:child_process";
     import { readFile, writeFile } from "node:fs/promises";
     import { join } from "node:path";
 
@@ -10,9 +9,6 @@
     import robotjs from "@hurdlegroup/robotjs";
 
 // types & interfaces
-
-    // natives
-    import type { ChildProcess } from "node:child_process";
 
     // externals
     import type ContainerPattern from "node-containerpattern";
@@ -29,9 +25,11 @@ export default class MediatorStreamDeck extends Mediator<iEventsMinimal & {
     "initialized": [ ContainerPattern ];
     "released": [ ContainerPattern ];
     "error": [ components["schemas"]["PushEventPluginError"]["data"] ];
-    "command.running": [ components["schemas"]["Command"] ];
-    "command.fail": [ components["schemas"]["Command"], components["schemas"]["Error"] ];
-    "command.success": [ components["schemas"]["Command"], string ];
+    "table.added": [ components["schemas"]["PushEventTableAdded"]["data"] ];
+    "table.deleted": [ components["schemas"]["PushEventTableDeleted"]["data"] ];
+    "command.running": [ components["schemas"]["PushEventCommandRunning"]["data"] ];
+    "command.fail": [ components["schemas"]["PushEventCommandFail"]["data"]["command"], components["schemas"]["PushEventCommandFail"]["data"]["error"] ];
+    "command.success": [ components["schemas"]["PushEventCommandSuccess"]["data"]["command"], components["schemas"]["PushEventCommandSuccess"]["data"]["content"] ];
 }> {
 
     // attributes
@@ -88,6 +86,23 @@ export default class MediatorStreamDeck extends Mediator<iEventsMinimal & {
 
     }
 
+    public getTablePage (
+        urlParameters: operations["getTablePage"]["parameters"]
+    ): Promise<operations["getTablePage"]["responses"]["200"]["content"]["text/html"]> {
+
+        return readFile(join(__dirname, "..", "..", "public", "table.html"), "utf-8").then((content: string): string => {
+
+            return content
+
+                .replace(/{{plugin.name}}/g, this.getPluginName())
+                .replace(/{{plugin.version}}/g, this.getPluginVersion())
+                .replace(/{{plugin.description}}/g, this.getPluginDescription())
+                .replace(/{{tablename}}/g, urlParameters.query.tablename);
+
+        });
+
+    }
+
     public getFrontApp (): Promise<operations["getFrontApp"]["responses"]["200"]["content"]["application/javascript"]> {
 
         return readFile(join(__dirname, "..", "..", "public", "dist", "bundle.min.js"), "utf-8").then((content: string): string => {
@@ -118,7 +133,9 @@ export default class MediatorStreamDeck extends Mediator<iEventsMinimal & {
 
     }
 
-    public getTableByName (urlParameters: operations["getTableByName"]["parameters"]): Promise<operations["getTableByName"]["responses"]["200"]["content"]["application/json"]> {
+    public getTableByName (
+        urlParameters: operations["getTableByName"]["parameters"]
+    ): Promise<operations["getTableByName"]["responses"]["200"]["content"]["application/json"]> {
 
         return readFile(this._file, "utf-8").then((content: string): Record<string, components["schemas"]["Table"]> => {
             return JSON.parse(content) as Record<string, components["schemas"]["Table"]>;
@@ -135,7 +152,9 @@ export default class MediatorStreamDeck extends Mediator<iEventsMinimal & {
 
     }
 
-    public addTable (urlParameters: operations["addTable"]["parameters"]): Promise<operations["addTable"]["responses"]["201"]["content"]["application/json"]> {
+    public addTable (
+        urlParameters: operations["addTable"]["parameters"]
+    ): Promise<operations["addTable"]["responses"]["201"]["content"]["application/json"]> {
 
         return readFile(this._file, "utf-8").then((content: string): Record<string, components["schemas"]["Table"]> => {
             return JSON.parse(content) as Record<string, components["schemas"]["Table"]>;
@@ -145,11 +164,36 @@ export default class MediatorStreamDeck extends Mediator<iEventsMinimal & {
 
             return writeFile(this._file, JSON.stringify(content), "utf-8");
 
+        }).then((): void => {
+            this.emit("table.added", urlParameters.path.tablename);
         });
 
     }
 
-    public deleteTableByName (urlParameters: operations["deleteTableByName"]["parameters"]): Promise<operations["deleteTableByName"]["responses"]["204"]["content"]["application/json"]> {
+    public updateTable (
+        urlParameters: operations["updateTable"]["parameters"],
+        bodyParameters: operations["updateTable"]["requestBody"]["content"]["application/json"]
+    ): Promise<operations["updateTable"]["responses"]["204"]["content"]["application/json"]> {
+
+        return readFile(this._file, "utf-8").then((content: string): Record<string, components["schemas"]["Table"]> => {
+            return JSON.parse(content) as Record<string, components["schemas"]["Table"]>;
+        }).then((content: Record<string, components["schemas"]["Table"]>): Promise<operations["updateTable"]["responses"]["204"]["content"]["application/json"]> => {
+
+            if ("undefined" === typeof content[urlParameters.path.tablename]) {
+                return Promise.reject(new NotFoundError("Table \"" + urlParameters.path.tablename + "\" not found"));
+            }
+
+            content[urlParameters.path.tablename] = bodyParameters;
+
+            return writeFile(this._file, JSON.stringify(content), "utf-8");
+
+        });
+
+    }
+
+    public deleteTableByName (
+        urlParameters: operations["deleteTableByName"]["parameters"]
+    ): Promise<operations["deleteTableByName"]["responses"]["204"]["content"]["application/json"]> {
 
         return readFile(this._file, "utf-8").then((content: string): Record<string, components["schemas"]["Table"]> => {
             return JSON.parse(content) as Record<string, components["schemas"]["Table"]>;
@@ -168,11 +212,16 @@ export default class MediatorStreamDeck extends Mediator<iEventsMinimal & {
 
             }
 
+        }).then((): void => {
+            this.emit("table.deleted", urlParameters.path.tablename);
         });
 
     }
 
-    public executeCommand (urlParameters: operations["executeCommand"]["parameters"], bodyParameters: operations["executeCommand"]["requestBody"]["content"]["application/json"]): Promise<operations["executeCommand"]["responses"]["201"]["content"]["application/json"]> {
+    public executeCommand (
+        urlParameters: operations["executeCommand"]["parameters"],
+        bodyParameters: operations["executeCommand"]["requestBody"]["content"]["application/json"]
+    ): Promise<operations["executeCommand"]["responses"]["201"]["content"]["application/json"]> {
 
         return Promise.resolve().then((): Promise<void> => {
 
@@ -189,10 +238,6 @@ export default class MediatorStreamDeck extends Mediator<iEventsMinimal & {
                 case "INPUT-KEY":
 
                     return this._executeActionInputKey(bodyParameters);
-
-                case "COMMAND":
-
-                    return this._executeActionCommand(bodyParameters);
 
                 case "PLUGIN":
 
@@ -276,116 +321,6 @@ export default class MediatorStreamDeck extends Mediator<iEventsMinimal & {
 
             }
 
-        });
-
-    }
-
-    private _executeActionCommand (bodyParameters: operations["executeCommand"]["requestBody"]["content"]["application/json"]): Promise<void> {
-
-        return new Promise((resolve: (value: string) => void, reject: (value: Error) => void): void => {
-
-            const command: components["schemas"]["ActionCommand"] = bodyParameters.action as components["schemas"]["ActionCommand"];
-
-            let ended: boolean = false;
-            let running: boolean = false;
-            let stderr: string = "";
-            let stdout: string = "";
-
-            const options: Record<string, string | boolean> = {
-                "windowsHide": true
-            };
-
-            if ("undefined" !== typeof command.cwd) {
-                options.cwd = command.cwd;
-            }
-            if ("undefined" !== typeof command.detached) {
-                options.detached = command.detached;
-            }
-            if ("undefined" !== typeof command.shell) {
-                options.shell = command.shell;
-            }
-            else if ("undefined" !== typeof command.insideShell) {
-                options.shell = command.insideShell;
-            }
-
-            const childProcess: ChildProcess = spawn(command.command, options);
-
-            childProcess.once("error", (err: Error): void => {
-
-                if (!ended) {
-
-                    ended = true;
-
-                    if (running) {
-
-                        this.emit("command.fail", bodyParameters, {
-                            "code": "COMMAND",
-                            "message": err.message
-                        });
-
-                    }
-
-                    reject(err);
-
-                }
-
-            }).once("spawn", (): void => {
-
-                running = true;
-
-                this.emit("command.running", bodyParameters);
-
-            }).once("close", (code: number | null): void => {
-
-                if (ended) {
-                    return;
-                }
-
-                ended = true;
-
-                if ("number" === typeof code && code) {
-
-                    this.emit("command.fail", bodyParameters, {
-                        "code": "COMMAND",
-                        "message": stderr
-                    });
-
-                    reject(new Error(stderr));
-
-                }
-                else {
-
-                    this.emit("command.success", bodyParameters, stdout);
-
-                    resolve(stdout);
-
-                }
-
-            });
-
-            if (childProcess.stderr) {
-
-                childProcess.stderr.setEncoding("utf-8");
-
-                childProcess.stderr.on("data", (chunk: string): void => {
-                    stderr += chunk;
-                });
-
-            }
-
-            if (childProcess.stdout) {
-
-                childProcess.stdout.setEncoding("utf-8");
-
-                childProcess.stdout.on("data", (chunk: string): void => {
-                    stdout += chunk;
-                });
-
-            }
-
-        // force return nothing
-        }).then((): Promise<void> => {
-            return Promise.resolve();
         });
 
     }

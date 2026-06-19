@@ -2,7 +2,7 @@
 	"openapi": "3.0.2",
 	"info": {
 		"title": "mia-stream-deck",
-		"version": "1.1.1",
+		"version": "1.2.0",
 		"description": "Stream deck plugin for MIA."
 	},
 	"paths": {
@@ -84,6 +84,43 @@
 				"responses": {
 					"200": {
 						"description": "Plugin's front",
+						"content": {
+							"text/html": {
+								"schema": {
+									"type": "string"
+								}
+							}
+						}
+					},
+					"default": {
+						"description": "An error occurred",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Error"
+								}
+							}
+						}
+					}
+				}
+			}
+		},
+		"/mia-stream-deck/public/table.html": {
+			"get": {
+				"description": "",
+				"summary": "Plugin's front for fullscreen table",
+				"operationId": "getTablePage",
+				"parameters": [
+					{
+						"name": "tablename",
+						"in": "query",
+						"required": true,
+						"schema": { "$ref": "#/components/schemas/TableName" }
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "Plugin's front for fullscreen table",
 						"content": {
 							"text/html": {
 								"schema": {
@@ -238,7 +275,7 @@
 			},
 			"put": {
 				"description": "",
-				"summary": "Add new table",
+				"summary": "Add new commands table",
 				"operationId": "addTable",
 				"parameters": [
 					{
@@ -269,9 +306,52 @@
 					}
 				}
 			},
+			"post": {
+				"description": "",
+				"summary": "Update the commands table",
+				"operationId": "updateTable",
+				"parameters": [
+					{
+						"name": "tablename",
+						"in": "path",
+						"required": true,
+						"schema": {
+							"$ref": "#/components/schemas/TableName"
+						}
+					}
+				],
+				"requestBody": {
+					"required": true,
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/Table"
+							}
+						}
+					}
+				},
+				"responses": {
+					"204": {
+						"description": "Table updated",
+						"content": {
+							"application/json": {}
+						}
+					},
+					"default": {
+						"description": "An error occurred",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Error"
+								}
+							}
+						}
+					}
+				}
+			},
 			"delete": {
 				"description": "",
-				"summary": "Delete the command table",
+				"summary": "Delete the commands table",
 				"operationId": "deleteTableByName",
 				"parameters": [
 					{
@@ -365,10 +445,8 @@
 			"Table": {
 				"type": "array",
 				"description": "Commands table description, contains an array for the lines which contains an array for the rows. Each row is a command.",
-				"uniqueItems": true,
 				"items": {
 					"type": "array",
-					"uniqueItems": true,
 					"items": {
 						"$ref": "#/components/schemas/Command"
 					}
@@ -395,7 +473,6 @@
 							{ "$ref": "#/components/schemas/ActionEmpty" },
 							{ "$ref": "#/components/schemas/ActionInputString" },
 							{ "$ref": "#/components/schemas/ActionInputKey" },
-							{ "$ref": "#/components/schemas/ActionCommand" },
 							{ "$ref": "#/components/schemas/ActionPlugin" }
 						]
 					}
@@ -484,37 +561,6 @@
 					}
 				},
 				"required": [ "type", "key" ]
-			},
-			"ActionCommand": {
-				"type": "object",
-				"description": "Execute a command line (like in a terminal) (see https://nodejs.org/api/child_process.html)",
-				"properties": {
-					"type": {
-						"type": "string",
-						"enum": [ "COMMAND" ]
-					},
-					"command": {
-						"type": "string",
-						"minLength": 1
-					},
-					"cwd": {
-						"description": "Current working directory of the child process. Default: process.cwd().",
-						"type": "string"
-					},
-					"detached": {
-						"description": "Prepare child process to run independently of its parent process. Specific behavior depends on the platform (see options.detached).",
-						"type": "boolean"
-					},
-					"shell": {
-						"description": "Shell to execute the command with. See Shell requirements and Default Windows shell. Default: \"/bin/sh\" on Unix, process.env.ComSpec on Windows.",
-						"type": "string"
-					},
-					"insideShell": {
-						"description": "If true, runs command inside of a shell.",
-						"type": "boolean"
-					}
-				},
-				"required": [ "type", "command" ]
 			},
 			"ActionPlugin": {
 				"type": "object",
@@ -621,6 +667,30 @@
 					}
 				},
 				"required": [ "id", "plugin", "command", "data" ]
+			},
+			"PushEventTableAdded": {
+				"type": "object",
+				"properties": {
+					"plugin": { "$ref": "#/components/schemas/PluginName" },
+					"command": {
+						"type": "string",
+						"enum": [ "table.added" ]
+					},
+					"data": { "$ref": "#/components/schemas/TableName" }
+				},
+				"required": [ "plugin", "command", "data" ]
+			},
+			"PushEventTableDeleted": {
+				"type": "object",
+				"properties": {
+					"plugin": { "$ref": "#/components/schemas/PluginName" },
+					"command": {
+						"type": "string",
+						"enum": [ "table.deleted" ]
+					},
+					"data": { "$ref": "#/components/schemas/TableName" }
+				},
+				"required": [ "plugin", "command", "data" ]
 			},
 			"PushEventCommandRunning": {
 				"type": "object",

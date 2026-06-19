@@ -6,6 +6,8 @@
 
     // locals
     import getSDK from "./SDK";
+    import TableCommandsExecute from "./components/TableCommandsExecute";
+    import AddTable from "./components/AddTable";
     import TableCommandsChoice from "./components/TableCommandsChoice";
 
 // types & interfaces
@@ -33,6 +35,7 @@ export default class App extends React.Component<iPropsNode, iState> {
     // private
 
         private readonly _sdk: SDK = getSDK();
+        private readonly _research: URLSearchParams = new URLSearchParams(window.location.search);
 
     // constructor
 
@@ -170,6 +173,11 @@ export default class App extends React.Component<iPropsNode, iState> {
             </div>;
 
         }
+        else if (this._research.has("tablename")) {
+
+            return <TableCommandsExecute name={ this._research.get("tablename") as string } onError={ this._handleError } />;
+
+        }
         else {
 
             return <div className="container-fluid">
@@ -180,7 +188,17 @@ export default class App extends React.Component<iPropsNode, iState> {
                     </ModalBody>
                 </Modal> }
 
-                <TableCommandsChoice onError={ this._handleError } />
+                <div className="row">
+
+                    <div className="col-12 col-md-4 col-lg-3">
+                        <AddTable onError={ this._handleError } />
+                    </div>
+
+                    <div className="col-12 col-md-8 col-lg-9 mt-3 mt-md-0">
+                        <TableCommandsChoice onError={ this._handleError } />
+                    </div>
+
+                </div>
 
             </div>;
 
