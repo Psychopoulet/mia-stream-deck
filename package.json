@@ -1,7 +1,7 @@
 {
 
   "name": "mia-stream-deck",
-  "version": "1.2.1",
+  "version": "1.3.0",
   "description": "Stream deck plugin for MIA.",
 
   "type": "commonjs",
@@ -58,12 +58,12 @@
   },
 
   "dependencies": {
-    "node-pluginsmanager-plugin": "7.4.0",
+    "node-pluginsmanager-plugin": "7.4.2",
     "@hurdlegroup/robotjs": "0.12.3"
   },
   "devDependencies": {
     "@types/express": "5.0.6",
-    "@types/node": "25.9.3",
+    "@types/node": "26.1.1",
     "@types/react": "19.2.17",
     "@types/react-dom": "19.2.3",
     "@types/socket.io": "3.0.2",
@@ -74,7 +74,7 @@
     "husky": "9.1.7",
     "mocha": "11.7.6",
     "node-containerpattern": "1.12.0",
-    "node-pluginsmanager": "3.6.1",
+    "node-pluginsmanager": "3.7.0",
     "nyc": "18.0.0",
     "openapi-typescript": "7.13.0",
     "react": "19.2.7",
@@ -85,8 +85,8 @@
     "ts-loader": "9.6.2",
     "typescript": "5.9.3",
     "used-deps-analyzer": "0.4.0",
-    "webpack": "5.108.3",
-    "webpack-cli": "7.1.0"
+    "webpack": "5.108.4",
+    "webpack-cli": "7.2.1"
   },
 
   "author": "Sébastien VIDAL",
