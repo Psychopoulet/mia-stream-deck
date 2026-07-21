@@ -1,0 +1,155 @@
+{
+	"openapi": "3.0.2",
+	"info": {
+		"title": "mia-stream-deck - events",
+		"version": "1.3.0",
+		"description": "Stream deck plugin for MIA. Events description.",
+		"license": {
+			"name": "ISC",
+			"url": "https://en.wikipedia.org/wiki/ISC_license"
+		}
+	},
+	"components": {
+		"schemas": {
+            "PluginName": {
+                "$ref": "./Descriptor.json#/components/schemas/PluginName"
+            },
+			"TableName": {
+				"$ref": "./Descriptor.json#/components/schemas/TableName"
+			},
+			"Command": {
+				"$ref": "./Descriptor.json#/components/schemas/Command"
+			},
+            "Error": {
+                "$ref": "./Descriptor.json#/components/schemas/Error"
+            },
+			"PushEventPluginInitialized": {
+				"type": "object",
+				"properties": {
+					"id": {
+						"type": "string"
+					},
+					"plugin": {
+						"$ref": "#/components/schemas/PluginName"
+					},
+					"command": {
+						"type": "string",
+						"enum": [ "initialized" ]
+					}
+				},
+				"required": [ "id", "plugin", "command" ]
+			},
+			"PushEventPluginReleased": {
+				"type": "object",
+				"properties": {
+					"id": {
+						"type": "string"
+					},
+					"plugin": {
+						"$ref": "#/components/schemas/PluginName"
+					},
+					"command": {
+						"type": "string",
+						"enum": [ "released" ]
+					}
+				},
+				"required": [ "id", "plugin", "command" ]
+			},
+			"PushEventPluginError": {
+				"type": "object",
+				"properties": {
+					"id": {
+						"type": "string"
+					},
+					"plugin": {
+						"$ref": "#/components/schemas/PluginName"
+					},
+					"command": {
+						"type": "string",
+						"enum": [ "error" ]
+					},
+					"data": {
+						"$ref": "#/components/schemas/Error"
+					}
+				},
+				"required": [ "id", "plugin", "command", "data" ]
+			},
+			"PushEventTableAdded": {
+				"type": "object",
+				"properties": {
+					"plugin": { "$ref": "#/components/schemas/PluginName" },
+					"command": {
+						"type": "string",
+						"enum": [ "table.added" ]
+					},
+					"data": { "$ref": "#/components/schemas/TableName" }
+				},
+				"required": [ "plugin", "command", "data" ]
+			},
+			"PushEventTableDeleted": {
+				"type": "object",
+				"properties": {
+					"plugin": { "$ref": "#/components/schemas/PluginName" },
+					"command": {
+						"type": "string",
+						"enum": [ "table.deleted" ]
+					},
+					"data": { "$ref": "#/components/schemas/TableName" }
+				},
+				"required": [ "plugin", "command", "data" ]
+			},
+			"PushEventCommandRunning": {
+				"type": "object",
+				"properties": {
+					"plugin": { "$ref": "#/components/schemas/PluginName" },
+					"command": {
+						"type": "string",
+						"enum": [ "command.running" ]
+					},
+					"data": { "$ref": "#/components/schemas/Command" }
+				},
+				"required": [ "plugin", "command", "data" ]
+			},
+			"PushEventCommandSuccess": {
+				"type": "object",
+				"properties": {
+					"plugin": { "$ref": "#/components/schemas/PluginName" },
+					"command": {
+						"type": "string",
+						"enum": [ "command.success" ]
+					},
+					"data": {
+						"type": "object",
+						"properties": {
+							"command": { "$ref": "#/components/schemas/Command" },
+							"content": {
+								"type": "string"
+							}
+						},
+						"required": [ "command", "content" ]
+					}
+				},
+				"required": [ "plugin", "command", "data" ]
+			},
+			"PushEventCommandFail": {
+				"type": "object",
+				"properties": {
+					"plugin": { "$ref": "#/components/schemas/PluginName" },
+					"command": {
+						"type": "string",
+						"enum": [ "command.fail" ]
+					},
+					"data": {
+						"type": "object",
+						"properties": {
+							"command": { "$ref": "#/components/schemas/Command" },
+							"error": { "$ref": "#/components/schemas/Error" }
+						},
+						"required": [ "command", "error" ]
+					}
+				},
+				"required": [ "plugin", "command", "data" ]
+			}
+		}
+	}
+}

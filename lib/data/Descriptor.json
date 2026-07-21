@@ -618,131 +618,28 @@
 				"required": [ "type", "plugin", "operationId" ]
 			},
 			"PushEventPluginInitialized": {
-				"type": "object",
-				"properties": {
-					"id": {
-						"type": "string"
-					},
-					"plugin": {
-						"$ref": "#/components/schemas/PluginName"
-					},
-					"command": {
-						"type": "string",
-						"enum": [ "initialized" ]
-					}
-				},
-				"required": [ "id", "plugin", "command" ]
+				"$ref": "./DescriptorEvents.json#/components/schemas/PushEventPluginInitialized"
 			},
 			"PushEventPluginReleased": {
-				"type": "object",
-				"properties": {
-					"id": {
-						"type": "string"
-					},
-					"plugin": {
-						"$ref": "#/components/schemas/PluginName"
-					},
-					"command": {
-						"type": "string",
-						"enum": [ "released" ]
-					}
-				},
-				"required": [ "id", "plugin", "command" ]
+				"$ref": "./DescriptorEvents.json#/components/schemas/PushEventPluginReleased"
 			},
 			"PushEventPluginError": {
-				"type": "object",
-				"properties": {
-					"id": {
-						"type": "string"
-					},
-					"plugin": {
-						"$ref": "#/components/schemas/PluginName"
-					},
-					"command": {
-						"type": "string",
-						"enum": [ "error" ]
-					},
-					"data": {
-						"$ref": "#/components/schemas/Error"
-					}
-				},
-				"required": [ "id", "plugin", "command", "data" ]
+				"$ref": "./DescriptorEvents.json#/components/schemas/PushEventPluginError"
 			},
 			"PushEventTableAdded": {
-				"type": "object",
-				"properties": {
-					"plugin": { "$ref": "#/components/schemas/PluginName" },
-					"command": {
-						"type": "string",
-						"enum": [ "table.added" ]
-					},
-					"data": { "$ref": "#/components/schemas/TableName" }
-				},
-				"required": [ "plugin", "command", "data" ]
+				"$ref": "./DescriptorEvents.json#/components/schemas/PushEventTableAdded"
 			},
 			"PushEventTableDeleted": {
-				"type": "object",
-				"properties": {
-					"plugin": { "$ref": "#/components/schemas/PluginName" },
-					"command": {
-						"type": "string",
-						"enum": [ "table.deleted" ]
-					},
-					"data": { "$ref": "#/components/schemas/TableName" }
-				},
-				"required": [ "plugin", "command", "data" ]
+				"$ref": "./DescriptorEvents.json#/components/schemas/PushEventTableDeleted"
 			},
 			"PushEventCommandRunning": {
-				"type": "object",
-				"properties": {
-					"plugin": { "$ref": "#/components/schemas/PluginName" },
-					"command": {
-						"type": "string",
-						"enum": [ "command.running" ]
-					},
-					"data": { "$ref": "#/components/schemas/Command" }
-				},
-				"required": [ "plugin", "command", "data" ]
+				"$ref": "./DescriptorEvents.json#/components/schemas/PushEventCommandRunning"
 			},
 			"PushEventCommandSuccess": {
-				"type": "object",
-				"properties": {
-					"plugin": { "$ref": "#/components/schemas/PluginName" },
-					"command": {
-						"type": "string",
-						"enum": [ "command.success" ]
-					},
-					"data": {
-						"type": "object",
-						"properties": {
-							"command": { "$ref": "#/components/schemas/Command" },
-							"content": {
-								"type": "string"
-							}
-						},
-						"required": [ "command", "content" ]
-					}
-				},
-				"required": [ "plugin", "command", "data" ]
+				"$ref": "./DescriptorEvents.json#/components/schemas/PushEventCommandSuccess"
 			},
 			"PushEventCommandFail": {
-				"type": "object",
-				"properties": {
-					"plugin": { "$ref": "#/components/schemas/PluginName" },
-					"command": {
-						"type": "string",
-						"enum": [ "command.fail" ]
-					},
-					"data": {
-						"type": "object",
-						"properties": {
-							"command": { "$ref": "#/components/schemas/Command" },
-							"error": { "$ref": "#/components/schemas/Error" }
-						},
-						"required": [ "command", "error" ]
-					}
-				},
-				"required": [ "plugin", "command", "data" ]
+				"$ref": "./DescriptorEvents.json#/components/schemas/PushEventCommandFail"
 			}
 		}
 	},
