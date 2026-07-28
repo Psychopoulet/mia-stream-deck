@@ -11,6 +11,9 @@
 				"description": "",
 				"summary": "Plugin's descriptor",
 				"operationId": "getPluginDescriptor",
+				"security": [
+					{ "bearerAuth": [] }
+				],
 				"responses": {
 					"200": {
 						"description": "Plugin's descriptor",
@@ -40,6 +43,9 @@
 				"description": "",
 				"summary": "Plugin's status",
 				"operationId": "getPluginStatus",
+				"security": [
+					{ "bearerAuth": [] }
+				],
 				"responses": {
 					"200": {
 						"description": "Plugin's status",
@@ -206,6 +212,9 @@
 				"description": "",
 				"summary": "Get the tables' names",
 				"operationId": "getTables",
+				"security": [
+					{ "bearerAuth": [] }
+				],
 				"responses": {
 					"200": {
 						"description": "Tables registered",
@@ -240,6 +249,9 @@
 				"description": "",
 				"summary": "Get the command table",
 				"operationId": "getTableByName",
+				"security": [
+					{ "bearerAuth": [] }
+				],
 				"parameters": [
 					{
 						"name": "tablename",
@@ -277,6 +289,9 @@
 				"description": "",
 				"summary": "Add new commands table",
 				"operationId": "addTable",
+				"security": [
+					{ "bearerAuth": [] }
+				],
 				"parameters": [
 					{
 						"name": "tablename",
@@ -310,6 +325,9 @@
 				"description": "",
 				"summary": "Update the commands table",
 				"operationId": "updateTable",
+				"security": [
+					{ "bearerAuth": [] }
+				],
 				"parameters": [
 					{
 						"name": "tablename",
@@ -353,6 +371,9 @@
 				"description": "",
 				"summary": "Delete the commands table",
 				"operationId": "deleteTableByName",
+				"security": [
+					{ "bearerAuth": [] }
+				],
 				"parameters": [
 					{
 						"name": "tablename",
@@ -388,6 +409,9 @@
 				"description": "",
 				"summary": "Execute the command",
 				"operationId": "executeCommand",
+				"security": [
+					{ "bearerAuth": [] }
+				],
 				"requestBody": {
 					"required": true,
 					"content": {
@@ -420,6 +444,13 @@
 		}
 	},
 	"components": {
+		"securitySchemes": {
+			"bearerAuth": {
+				"type": "http",
+				"scheme": "bearer",
+				"bearerFormat": "JWT"
+			}
+		},
 		"schemas": {
 			"PluginName": {
 				"type": "string",
