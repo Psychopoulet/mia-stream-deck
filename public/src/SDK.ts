@@ -37,12 +37,17 @@ export class SDK extends EventEmitter<{
 
     // static
 
+        private static readonly _tokenKey: string = "MIAApp-token-auth";
+
+    // static
+
         public static readonly BASE_URL: string = window.location.protocol + "//" + window.location.host;
 
     // protected
 
         protected _socket: WebSocket | null;
         protected _reconnectTimeout: Timeout | null;
+        protected _token: string | null;
 
     public constructor () {
 
@@ -50,6 +55,8 @@ export class SDK extends EventEmitter<{
 
         this._socket = null;
         this._reconnectTimeout = null;
+
+        this._token = localStorage.getItem(SDK._tokenKey);
 
     }
 
@@ -214,6 +221,10 @@ export class SDK extends EventEmitter<{
 
     // api
 
+    public isLoggedIn (): boolean {
+        return Boolean(this._token);
+    }
+
     public getPluginDescriptor (): Promise<operations["getPluginDescriptor"]["responses"]["200"]["content"]["application/json"]> {
 
         const url: keyof paths = "/mia-stream-deck/api/descriptor";
@@ -222,7 +233,8 @@ export class SDK extends EventEmitter<{
         return fetch(url, {
             "method": method,
             "headers": {
-                "Content-Type": "application/json"
+                "Content-Type": "application/json",
+                "Authorization": "Bearer " + this._token
             }
         }).then((res: Response): Promise<operations["getPluginDescriptor"]["responses"]["200"]["content"]["application/json"]> => {
 
@@ -240,7 +252,8 @@ export class SDK extends EventEmitter<{
         return fetch(url, {
             "method": method,
             "headers": {
-                "Content-Type": "application/json"
+                "Content-Type": "application/json",
+                "Authorization": "Bearer " + this._token
             }
         }).then((res: Response): Promise<operations["getPluginStatus"]["responses"]["200"]["content"]["application/json"]> => {
 
@@ -262,7 +275,8 @@ export class SDK extends EventEmitter<{
         return fetch(url, {
             "method": method,
             "headers": {
-                "Content-Type": "application/json"
+                "Content-Type": "application/json",
+                "Authorization": "Bearer " + this._token
             }
         }).then((res: Response): Promise<operations["getTables"]["responses"]["200"]["content"]["application/json"]> => {
 
@@ -280,7 +294,8 @@ export class SDK extends EventEmitter<{
         return fetch(url.replace("{tablename}", tableName), {
             "method": method,
             "headers": {
-                "Content-Type": "application/json"
+                "Content-Type": "application/json",
+                "Authorization": "Bearer " + this._token
             }
         }).then((res: Response): Promise<operations["addTable"]["responses"]["201"]["content"]["application/json"]> => {
 
@@ -298,7 +313,8 @@ export class SDK extends EventEmitter<{
         return fetch(url.replace("{tablename}", tableName), {
             "method": method,
             "headers": {
-                "Content-Type": "application/json"
+                "Content-Type": "application/json",
+                "Authorization": "Bearer " + this._token
             }
         }).then((res: Response): Promise<operations["getTableByName"]["responses"]["200"]["content"]["application/json"]> => {
 
@@ -317,7 +333,8 @@ export class SDK extends EventEmitter<{
         return fetch(url.replace("{tablename}", tableName), {
             "method": method,
             "headers": {
-                "Content-Type": "application/json"
+                "Content-Type": "application/json",
+                "Authorization": "Bearer " + this._token
             },
             "body": JSON.stringify(body)
         }).then((res: Response): Promise<operations["updateTable"]["responses"]["204"]["content"]["application/json"]> => {
@@ -336,7 +353,8 @@ export class SDK extends EventEmitter<{
         return fetch(url.replace("{tablename}", tableName), {
             "method": method,
             "headers": {
-                "Content-Type": "application/json"
+                "Content-Type": "application/json",
+                "Authorization": "Bearer " + this._token
             }
         }).then((res: Response): Promise<operations["deleteTableByName"]["responses"]["204"]["content"]["application/json"]> => {
 
@@ -355,7 +373,8 @@ export class SDK extends EventEmitter<{
         return fetch(url, {
             "method": method,
             "headers": {
-                "Content-Type": "application/json"
+                "Content-Type": "application/json",
+                "Authorization": "Bearer " + this._token
             },
             "body": JSON.stringify(body)
         }).then((res: Response): Promise<operations["executeCommand"]["responses"]["201"]["content"]["application/json"]> => {
