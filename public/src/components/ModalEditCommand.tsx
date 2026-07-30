@@ -191,8 +191,6 @@ export default class ModalEditCommand extends React.Component<iProps, iState> {
 
                             { ([
                                 "EMPTY",
-                                "INPUT-STRING",
-                                "INPUT-KEY",
                                 "PLUGIN"
                             ] as ActionType[]).map((actionType: ActionType): React.JSX.Element => {
                                 return <option key={ actionType } value={ actionType }>{ actionType }</option>;

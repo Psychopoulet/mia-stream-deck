@@ -27,6 +27,7 @@
             "headers": string;
             "cookies": string;
         };
+        "bodyParameters": string;
     }
 
 // component
@@ -49,7 +50,8 @@ export default class EditPlugin extends React.Component<iProps, iState> {
                 "query": "object" === typeof this.props.action.urlParameters?.query ? JSON.stringify(this.props.action.urlParameters.query) : "",
                 "headers": "object" === typeof this.props.action.urlParameters?.headers ? JSON.stringify(this.props.action.urlParameters.headers) : "",
                 "cookies": "object" === typeof this.props.action.urlParameters?.cookies ? JSON.stringify(this.props.action.urlParameters.cookies) : ""
-            }
+            },
+            "bodyParameters": "string" === typeof this.props.action.bodyParameters ? this.props.action.bodyParameters : ""
         };
 
     }
@@ -215,6 +217,29 @@ export default class EditPlugin extends React.Component<iProps, iState> {
 
     };
 
+    private readonly _handleChangeBodyParameters = (e: React.ChangeEvent<HTMLTextAreaElement>, newValue: string): void => {
+
+        e.stopPropagation();
+        e.preventDefault();
+
+        this.setState({
+            "bodyParameters": newValue
+        });
+
+        try {
+
+            this.props.onChange({
+                ...this.props.action,
+                "bodyParameters": this.props.action.bodyParameters ?? {}
+            });
+
+        }
+        catch (err: unknown) { // eslint-disable-line @typescript-eslint/no-unused-vars
+            // nothing to do here
+        }
+
+    };
+
     // render
 
     public render (): React.JSX.Element {
@@ -265,6 +290,15 @@ export default class EditPlugin extends React.Component<iProps, iState> {
                         <TextAreaLabel label="Cookies"
                             value={ this.state.urlParameters.cookies }
                             onChange={ this._handleChangeUrlCookies }
+                        />
+
+                    </CardBody>
+
+                    <CardBody className="pb-1">
+
+                        <TextAreaLabel label="Body"
+                            value={ this.state.bodyParameters }
+                            onChange={ this._handleChangeBodyParameters }
                         />
 
                     </CardBody>
