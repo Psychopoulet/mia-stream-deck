@@ -12,9 +12,7 @@
     } from "react-bootstrap-fontawesome";
 
     // locals
-    import EditKey from "./EditCommandAction/EditKey";
-    import EditString from "./EditCommandAction/EditString";
-    import EditPlugin from "./EditCommandAction/EditPlugin";
+    import EditPlugin from "./EditPlugin";
 
 // types & interfaces
 
@@ -24,7 +22,7 @@
     // locals
     import type { components } from "../../../lib/src/Descriptor";
 
-    type ActionType = components["schemas"]["ActionEmpty"]["type"] | components["schemas"]["ActionInputString"]["type"] | components["schemas"]["ActionInputKey"]["type"] | components["schemas"]["ActionPlugin"]["type"];
+    type ActionType = components["schemas"]["ActionEmpty"]["type"] | components["schemas"]["ActionPlugin"]["type"];
 
     interface iProps extends iPropsNode {
         "command": components["schemas"]["Command"];
@@ -111,24 +109,6 @@ export default class ModalEditCommand extends React.Component<iProps, iState> {
 
         switch (newValue as ActionType) {
 
-            case "INPUT-STRING":
-
-                this.setState({
-                    "command": { ...this.state.command,
-                    "action": { "type": "INPUT-STRING", "string": "" } }
-                });
-
-            break;
-
-            case "INPUT-KEY":
-
-                this.setState({
-                    "command": { ...this.state.command,
-                    "action": { "type": "INPUT-KEY", "key": "" } }
-                });
-
-            break;
-
             case "PLUGIN":
 
                 this.setState({
@@ -148,28 +128,6 @@ export default class ModalEditCommand extends React.Component<iProps, iState> {
             break;
 
         }
-
-    };
-
-    private readonly _handleChangeActionKey = (action: components["schemas"]["ActionInputKey"]): void => {
-
-        this.setState({
-            "command": {
-                ...this.state.command,
-                "action": action
-            }
-        });
-
-    };
-
-    private readonly _handleChangeActionString = (action: components["schemas"]["ActionInputString"]): void => {
-
-        this.setState({
-            "command": {
-                ...this.state.command,
-                "action": action
-            }
-        });
 
     };
 
@@ -242,8 +200,6 @@ export default class ModalEditCommand extends React.Component<iProps, iState> {
 
                         </SelectLabel>
 
-                        { "INPUT-KEY" === this.state.command.action.type && <EditKey action={ this.state.command.action } onChange={ this._handleChangeActionKey } /> }
-                        { "INPUT-STRING" === this.state.command.action.type && <EditString action={ this.state.command.action } onChange={ this._handleChangeActionString } /> }
                         { "PLUGIN" === this.state.command.action.type && <EditPlugin action={ this.state.command.action } onChange={ this._handleChangeActionPlugin } /> }
 
                     </CardBody>

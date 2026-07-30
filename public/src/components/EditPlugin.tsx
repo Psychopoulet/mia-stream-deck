@@ -13,7 +13,7 @@
     import type { iPropsNode } from "react-bootstrap-fontawesome";
 
     // locals
-    import type { components } from "../../../../lib/src/Descriptor";
+    import type { components } from "../../../lib/src/Descriptor";
 
     interface iProps extends iPropsNode {
         "action": components["schemas"]["ActionPlugin"];
