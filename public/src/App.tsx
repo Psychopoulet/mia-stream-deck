@@ -59,10 +59,9 @@ export default class App extends React.Component<iPropsNode, iState> {
             return;
         }
 
-        this._sdk
-            .on("connected", this._onConnected)
-            .on("disconnected", this._onDisconnected)
-            .on("error", this._onError);
+        this._sdk.addEventListener("connected", this._onConnected);
+        this._sdk.addEventListener("disconnected", this._onDisconnected);
+        this._sdk.addEventListener("error", this._onError);
 
         this._sdk.connect();
 
@@ -70,10 +69,9 @@ export default class App extends React.Component<iPropsNode, iState> {
 
     public componentWillUnmount (): void {
 
-        this._sdk
-            .off("connected", this._onConnected)
-            .off("disconnected", this._onDisconnected)
-            .off("error", this._onError);
+        this._sdk.removeEventListener("connected", this._onConnected);
+        this._sdk.removeEventListener("disconnected", this._onDisconnected);
+        this._sdk.removeEventListener("error", this._onError);
 
         this._sdk.disconnect();
 
@@ -114,10 +112,10 @@ export default class App extends React.Component<iPropsNode, iState> {
 
     };
 
-    private readonly _onError = (err: components["schemas"]["PushEventPluginError"]["data"]): void => {
+    private readonly _onError = (event: CustomEvent<components["schemas"]["PushEventPluginError"]["data"]>): void => {
 
         this.setState({
-            "error": err
+            "error": event.detail
         });
 
     };

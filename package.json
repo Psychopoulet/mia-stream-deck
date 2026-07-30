@@ -58,8 +58,7 @@
   },
 
   "dependencies": {
-    "node-pluginsmanager-plugin": "7.4.3",
-    "@hurdlegroup/robotjs": "0.12.3"
+    "node-pluginsmanager-plugin": "7.4.3"
   },
   "devDependencies": {
     "@types/express": "5.0.6",
