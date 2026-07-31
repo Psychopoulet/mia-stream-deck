@@ -46,12 +46,12 @@ export default class EditPlugin extends React.Component<iProps, iState> {
 
         this.state = {
             "urlParameters": {
-                "path": "object" === typeof this.props.action.urlParameters?.path ? JSON.stringify(this.props.action.urlParameters.path) : "",
-                "query": "object" === typeof this.props.action.urlParameters?.query ? JSON.stringify(this.props.action.urlParameters.query) : "",
-                "headers": "object" === typeof this.props.action.urlParameters?.headers ? JSON.stringify(this.props.action.urlParameters.headers) : "",
-                "cookies": "object" === typeof this.props.action.urlParameters?.cookies ? JSON.stringify(this.props.action.urlParameters.cookies) : ""
+                "path": EditPlugin._ensureParameters(this.props.action.urlParameters?.path),
+                "query": EditPlugin._ensureParameters(this.props.action.urlParameters?.query),
+                "headers": EditPlugin._ensureParameters(this.props.action.urlParameters?.headers),
+                "cookies": EditPlugin._ensureParameters(this.props.action.urlParameters?.cookies)
             },
-            "bodyParameters": "string" === typeof this.props.action.bodyParameters ? this.props.action.bodyParameters : ""
+            "bodyParameters": EditPlugin._ensureParameters(this.props.action.bodyParameters)
         };
 
     }
@@ -64,15 +64,30 @@ export default class EditPlugin extends React.Component<iProps, iState> {
 
         this.setState({
             "urlParameters": prevProps.action.urlParameters !== this.props.action.urlParameters ? {
-                "path": "object" === typeof this.props.action.urlParameters?.path ? JSON.stringify(this.props.action.urlParameters.path) : "",
-                "query": "object" === typeof this.props.action.urlParameters?.query ? JSON.stringify(this.props.action.urlParameters.query) : "",
-                "headers": "object" === typeof this.props.action.urlParameters?.headers ? JSON.stringify(this.props.action.urlParameters.headers) : "",
-                "cookies": "object" === typeof this.props.action.urlParameters?.cookies ? JSON.stringify(this.props.action.urlParameters.cookies) : ""
+                "path": EditPlugin._ensureParameters(this.props.action.urlParameters?.path),
+                "query": EditPlugin._ensureParameters(this.props.action.urlParameters?.query),
+                "headers": EditPlugin._ensureParameters(this.props.action.urlParameters?.headers),
+                "cookies": EditPlugin._ensureParameters(this.props.action.urlParameters?.cookies)
             } : this.state.urlParameters,
             "bodyParameters": prevProps.action.bodyParameters !== this.props.action.bodyParameters ? JSON.stringify(this.props.action.bodyParameters) : this.state.bodyParameters
         });
 
     }
+
+    // private
+
+        private static readonly _ensureParameters = (urlParameters: unknown): string => {
+
+            if ("undefined" === typeof urlParameters) {
+                return "";
+            }
+            else if ("string" === typeof urlParameters) {
+                return urlParameters;
+            }
+
+            return JSON.stringify(urlParameters);
+
+        };
 
     // interface handlers
 
@@ -225,16 +240,32 @@ export default class EditPlugin extends React.Component<iProps, iState> {
             "bodyParameters": newValue
         });
 
+        if ("" === newValue.trim()) {
+
+            this.props.onChange({
+                ...this.props.action,
+                "bodyParameters": undefined
+            });
+
+            return;
+
+        }
+
         try {
 
             this.props.onChange({
                 ...this.props.action,
-                "bodyParameters": this.props.action.bodyParameters ?? {}
+                "bodyParameters": JSON.parse(newValue) as Record<string, string>
             });
 
         }
         catch (err: unknown) { // eslint-disable-line @typescript-eslint/no-unused-vars
-            // nothing to do here
+
+            this.props.onChange({
+                ...this.props.action,
+                "bodyParameters": newValue
+            });
+
         }
 
     };
