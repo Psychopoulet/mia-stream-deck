@@ -58,20 +58,19 @@ export default class EditPlugin extends React.Component<iProps, iState> {
 
     public componentDidUpdate (prevProps: iProps): void {
 
-        if (prevProps.action.urlParameters !== this.props.action.urlParameters) {
-
-            console.log(this.props.action.urlParameters);
-
-            this.setState({
-                "urlParameters": {
-                    "path": "object" === typeof this.props.action.urlParameters?.path ? JSON.stringify(this.props.action.urlParameters.path) : "",
-                    "query": "object" === typeof this.props.action.urlParameters?.query ? JSON.stringify(this.props.action.urlParameters.query) : "",
-                    "headers": "object" === typeof this.props.action.urlParameters?.headers ? JSON.stringify(this.props.action.urlParameters.headers) : "",
-                    "cookies": "object" === typeof this.props.action.urlParameters?.cookies ? JSON.stringify(this.props.action.urlParameters.cookies) : ""
-                }
-            });
-
+        if (prevProps.action.urlParameters === this.props.action.urlParameters && prevProps.action.bodyParameters === this.props.action.bodyParameters) {
+            return;
         }
+
+        this.setState({
+            "urlParameters": prevProps.action.urlParameters !== this.props.action.urlParameters ? {
+                "path": "object" === typeof this.props.action.urlParameters?.path ? JSON.stringify(this.props.action.urlParameters.path) : "",
+                "query": "object" === typeof this.props.action.urlParameters?.query ? JSON.stringify(this.props.action.urlParameters.query) : "",
+                "headers": "object" === typeof this.props.action.urlParameters?.headers ? JSON.stringify(this.props.action.urlParameters.headers) : "",
+                "cookies": "object" === typeof this.props.action.urlParameters?.cookies ? JSON.stringify(this.props.action.urlParameters.cookies) : ""
+            } : this.state.urlParameters,
+            "bodyParameters": prevProps.action.bodyParameters !== this.props.action.bodyParameters ? JSON.stringify(this.props.action.bodyParameters) : this.state.bodyParameters
+        });
 
     }
 
