@@ -3,8 +3,8 @@
     // externals
     import React from "react";
     import {
-        Card, CardHeader, CardBody,
-        InputTextLabel, TextAreaLabel
+        InputTextLabel,
+        Button
     } from "react-bootstrap-fontawesome";
 
 // types & interfaces
@@ -14,20 +14,18 @@
 
     // locals
     import type { components } from "../../../lib/src/Descriptor";
+    import EditPluginParameters from "./EditPluginParameters";
+
+    type tAction = components["schemas"]["ActionPlugin"];
 
     interface iProps extends iPropsNode {
         "action": components["schemas"]["ActionPlugin"];
-        "onChange": (action: components["schemas"]["ActionPlugin"]) => void;
+        "onSave": (action: components["schemas"]["ActionPlugin"]) => void;
+        "onError": (err: Error) => void;
     }
 
-    interface iState {
-        "urlParameters": {
-            "path": string;
-            "query": string;
-            "headers": string;
-            "cookies": string;
-        };
-        "bodyParameters": string;
+    interface iState extends tAction {
+        "editParameters": boolean;
     }
 
 // component
@@ -45,49 +43,11 @@ export default class EditPlugin extends React.Component<iProps, iState> {
         super(props);
 
         this.state = {
-            "urlParameters": {
-                "path": EditPlugin._ensureParameters(this.props.action.urlParameters?.path),
-                "query": EditPlugin._ensureParameters(this.props.action.urlParameters?.query),
-                "headers": EditPlugin._ensureParameters(this.props.action.urlParameters?.headers),
-                "cookies": EditPlugin._ensureParameters(this.props.action.urlParameters?.cookies)
-            },
-            "bodyParameters": EditPlugin._ensureParameters(this.props.action.bodyParameters)
+            ...this.props.action,
+            "editParameters": false
         };
 
     }
-
-    public componentDidUpdate (prevProps: iProps): void {
-
-        if (prevProps.action.urlParameters === this.props.action.urlParameters && prevProps.action.bodyParameters === this.props.action.bodyParameters) {
-            return;
-        }
-
-        this.setState({
-            "urlParameters": prevProps.action.urlParameters !== this.props.action.urlParameters ? {
-                "path": EditPlugin._ensureParameters(this.props.action.urlParameters?.path),
-                "query": EditPlugin._ensureParameters(this.props.action.urlParameters?.query),
-                "headers": EditPlugin._ensureParameters(this.props.action.urlParameters?.headers),
-                "cookies": EditPlugin._ensureParameters(this.props.action.urlParameters?.cookies)
-            } : this.state.urlParameters,
-            "bodyParameters": prevProps.action.bodyParameters !== this.props.action.bodyParameters ? JSON.stringify(this.props.action.bodyParameters) : this.state.bodyParameters
-        });
-
-    }
-
-    // private
-
-        private static readonly _ensureParameters = (urlParameters: unknown): string => {
-
-            if ("undefined" === typeof urlParameters) {
-                return "";
-            }
-            else if ("string" === typeof urlParameters) {
-                return urlParameters;
-            }
-
-            return JSON.stringify(urlParameters);
-
-        };
 
     // interface handlers
 
@@ -96,8 +56,7 @@ export default class EditPlugin extends React.Component<iProps, iState> {
         e.stopPropagation();
         e.preventDefault();
 
-        this.props.onChange({
-            ...this.props.action,
+        this.setState({
             "plugin": newValue
         });
 
@@ -108,165 +67,27 @@ export default class EditPlugin extends React.Component<iProps, iState> {
         e.stopPropagation();
         e.preventDefault();
 
-        this.props.onChange({
-            ...this.props.action,
+        this.setState({
             "operationId": newValue
         });
 
     };
 
-    private readonly _handleChangeUrlPath = (e: React.ChangeEvent<HTMLTextAreaElement>, newValue: string): void => {
-
-        e.stopPropagation();
-        e.preventDefault();
+    private readonly _handleChangeParameters = (urlParameters: components["schemas"]["ActionPlugin"]["urlParameters"], bodyParameters: components["schemas"]["ActionPlugin"]["bodyParameters"]): void => {
 
         this.setState({
-            "urlParameters": {
-                ...this.state.urlParameters,
-                "path": newValue
-            }
+            "urlParameters": urlParameters,
+            "bodyParameters": bodyParameters,
+            "editParameters": false
         });
-
-        try {
-
-            this.props.onChange({
-                ...this.props.action,
-                "urlParameters": {
-                    ...(this.props.action.urlParameters ?? {}),
-                    "path": JSON.parse(newValue) as Record<string, string>
-                }
-            });
-
-        }
-        catch (err: unknown) { // eslint-disable-line @typescript-eslint/no-unused-vars
-            // nothing to do here
-        }
 
     };
 
-    private readonly _handleChangeUrlQuery = (e: React.ChangeEvent<HTMLTextAreaElement>, newValue: string): void => {
-
-        e.stopPropagation();
-        e.preventDefault();
+    private readonly _handleEditParameters = (): void => {
 
         this.setState({
-            "urlParameters": {
-                ...this.state.urlParameters,
-                "query": newValue
-            }
+            "editParameters": true
         });
-
-        try {
-
-            this.props.onChange({
-                ...this.props.action,
-                "urlParameters": {
-                    ...(this.props.action.urlParameters ?? {}),
-                    "query": JSON.parse(newValue) as Record<string, string>
-                }
-            });
-
-        }
-        catch (err: unknown) { // eslint-disable-line @typescript-eslint/no-unused-vars
-            // nothing to do here
-        }
-
-    };
-
-    private readonly _handleChangeUrlHeaders = (e: React.ChangeEvent<HTMLTextAreaElement>, newValue: string): void => {
-
-        e.stopPropagation();
-        e.preventDefault();
-
-        this.setState({
-            "urlParameters": {
-                ...this.state.urlParameters,
-                "headers": newValue
-            }
-        });
-
-        try {
-
-            this.props.onChange({
-                ...this.props.action,
-                "urlParameters": {
-                    ...(this.props.action.urlParameters ?? {}),
-                    "headers": JSON.parse(newValue) as Record<string, string>
-                }
-            });
-
-        }
-        catch (err: unknown) { // eslint-disable-line @typescript-eslint/no-unused-vars
-            // nothing to do here
-        }
-
-    };
-
-    private readonly _handleChangeUrlCookies = (e: React.ChangeEvent<HTMLTextAreaElement>, newValue: string): void => {
-
-        e.stopPropagation();
-        e.preventDefault();
-
-        this.setState({
-            "urlParameters": {
-                ...this.state.urlParameters,
-                "cookies": newValue
-            }
-        });
-
-        try {
-
-            this.props.onChange({
-                ...this.props.action,
-                "urlParameters": {
-                    ...(this.props.action.urlParameters ?? {}),
-                    "cookies": JSON.parse(newValue) as Record<string, string>
-                }
-            });
-
-        }
-        catch (err: unknown) { // eslint-disable-line @typescript-eslint/no-unused-vars
-            // nothing to do here
-        }
-
-    };
-
-    private readonly _handleChangeBodyParameters = (e: React.ChangeEvent<HTMLTextAreaElement>, newValue: string): void => {
-
-        e.stopPropagation();
-        e.preventDefault();
-
-        this.setState({
-            "bodyParameters": newValue
-        });
-
-        if ("" === newValue.trim()) {
-
-            this.props.onChange({
-                ...this.props.action,
-                "bodyParameters": undefined
-            });
-
-            return;
-
-        }
-
-        try {
-
-            this.props.onChange({
-                ...this.props.action,
-                "bodyParameters": JSON.parse(newValue) as Record<string, string>
-            });
-
-        }
-        catch (err: unknown) { // eslint-disable-line @typescript-eslint/no-unused-vars
-
-            this.props.onChange({
-                ...this.props.action,
-                "bodyParameters": newValue
-            });
-
-        }
 
     };
 
@@ -279,7 +100,7 @@ export default class EditPlugin extends React.Component<iProps, iState> {
             <div className="col-12 col-md-6">
 
                 <InputTextLabel label="Plugin name"
-                    value={ this.props.action.plugin }
+                    value={ this.state.plugin }
                     onChange={ this._handleChangePluginName }
                 />
 
@@ -288,7 +109,7 @@ export default class EditPlugin extends React.Component<iProps, iState> {
             <div className="col-12 col-md-6">
 
                 <InputTextLabel label="Operation ID"
-                    value={ this.props.action.operationId }
+                    value={ this.state.operationId }
                     onChange={ this._handleChangeOperationId }
                 />
 
@@ -296,44 +117,16 @@ export default class EditPlugin extends React.Component<iProps, iState> {
 
             <div className="col-12">
 
-                <Card>
-
-                    <CardHeader>URL parameters</CardHeader>
-
-                    <CardBody className="pb-1">
-
-                        <TextAreaLabel label="Paths"
-                            value={ this.state.urlParameters.path }
-                            onChange={ this._handleChangeUrlPath }
-                        />
-
-                        <TextAreaLabel label="Query"
-                            value={ this.state.urlParameters.query }
-                            onChange={ this._handleChangeUrlQuery }
-                        />
-
-                        <TextAreaLabel label="Headers"
-                            value={ this.state.urlParameters.headers }
-                            onChange={ this._handleChangeUrlHeaders }
-                        />
-
-                        <TextAreaLabel label="Cookies"
-                            value={ this.state.urlParameters.cookies }
-                            onChange={ this._handleChangeUrlCookies }
-                        />
-
-                    </CardBody>
-
-                    <CardBody className="pb-1">
-
-                        <TextAreaLabel label="Body"
-                            value={ this.state.bodyParameters }
-                            onChange={ this._handleChangeBodyParameters }
-                        />
-
-                    </CardBody>
-
-                </Card>
+                { this.state.editParameters
+                    ? <EditPluginParameters action={ this.state }
+                        onSave={ this._handleChangeParameters } onError={ this.props.onError }
+                    />
+                    : <Button icon="edit" variant="primary" block outline
+                        onClick={ this._handleEditParameters }
+                    >
+                        Edit parameters
+                    </Button>
+                }
 
             </div>
 

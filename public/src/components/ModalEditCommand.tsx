@@ -28,6 +28,7 @@
         "command": components["schemas"]["Command"];
         "onChange": (command: components["schemas"]["Command"]) => void;
         "onClose": () => void;
+        "onError": (err: Error) => void;
     }
 
     interface iState {
@@ -144,6 +145,25 @@ export default class ModalEditCommand extends React.Component<iProps, iState> {
 
     // render
 
+    private readonly _renderActionType = (disabled: boolean): React.JSX.Element => {
+
+        return <SelectLabel label="Type"
+            disabled={ disabled }
+            value={ this.state.command.action.type }
+            onChange={ this._handleChangeActionType }
+        >
+
+            { ([
+                "EMPTY",
+                "PLUGIN"
+            ] as ActionType[]).map((actionType: ActionType): React.JSX.Element => {
+                return <option key={ actionType } value={ actionType }>{ actionType }</option>;
+            }) }
+
+        </SelectLabel>;
+
+    };
+
     public render (): React.JSX.Element {
 
         return <Modal appId="{{plugin.name}}-app" title="Edit command" size="lg" scrollable
@@ -178,31 +198,27 @@ export default class ModalEditCommand extends React.Component<iProps, iState> {
                     </div> }
                 </InputTextLabel>
 
-                <Card>
+                { "EMPTY" === this.state.command.action.type
+                    ? this._renderActionType(false)
+                    : <Card>
 
-                    <CardHeader>Action</CardHeader>
+                        <CardHeader>Action</CardHeader>
 
-                    <CardBody>
+                        <CardBody>
 
-                        <SelectLabel label="Action"
-                            value={ this.state.command.action.type }
-                            onChange={ this._handleChangeActionType }
-                        >
+                            { this._renderActionType(true) }
 
-                            { ([
-                                "EMPTY",
-                                "PLUGIN"
-                            ] as ActionType[]).map((actionType: ActionType): React.JSX.Element => {
-                                return <option key={ actionType } value={ actionType }>{ actionType }</option>;
-                            }) }
+                            <EditPlugin
+                                action={ this.state.command.action }
+                                onSave={ this._handleChangeActionPlugin }
+                                onError={ this.props.onError }
+                            />
 
-                        </SelectLabel>
+                        </CardBody>
 
-                        { "PLUGIN" === this.state.command.action.type && <EditPlugin action={ this.state.command.action } onChange={ this._handleChangeActionPlugin } /> }
+                    </Card>
 
-                    </CardBody>
-
-                </Card>
+                }
 
             </ModalBody>
 

@@ -406,7 +406,7 @@ export default class TableCommandsChoice extends React.Component<iProps, iState>
         return <>
 
             { this.state.commandEdition && <ModalEditCommand command={ this.state.commandEdition.command }
-                onChange={ this._handleUpdateCommand } onClose={ this._handleCloseEditCommand }
+                onChange={ this._handleUpdateCommand } onClose={ this._handleCloseEditCommand } onError={ this.props.onError }
             /> }
 
             <Card className="mt-3">
