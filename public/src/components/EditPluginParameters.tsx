@@ -10,6 +10,7 @@
 
     // locals
     import parseParameters from "../tools/parseParameters";
+    import formateParameters from "../tools/formateParameters";
 
 // types & interfaces
 
@@ -150,15 +151,15 @@ export default class EditPluginParameters extends React.Component<iProps, iState
 
         try {
 
-            this.props.onSave({
-                    ...(this.props.action.urlParameters ?? {}),
-                    "path": JSON.parse(this.state.urlParameters.path) as Record<string, string>,
-                    "query": JSON.parse(this.state.urlParameters.query) as Record<string, string>,
-                    "headers": JSON.parse(this.state.urlParameters.headers) as Record<string, string>,
-                    "cookies": JSON.parse(this.state.urlParameters.cookies) as Record<string, string>
-                },
-                body
-            );
+            const urlParameters: components["schemas"]["ActionPlugin"]["urlParameters"] = {
+                ...(this.props.action.urlParameters ?? {}),
+                "path": formateParameters(this.state.urlParameters.path),
+                "query": formateParameters(this.state.urlParameters.query),
+                "headers": formateParameters(this.state.urlParameters.headers),
+                "cookies": formateParameters(this.state.urlParameters.cookies)
+            };
+
+            this.props.onSave(urlParameters, body);
 
         }
         catch (err: unknown) {
