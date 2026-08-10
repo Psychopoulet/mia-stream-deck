@@ -131,7 +131,10 @@ export default class EditPluginParameters extends React.Component<iProps, iState
 
     };
 
-    private readonly _handleSave = (): void => {
+    private readonly _handleSave = (e: React.FormEvent<HTMLFormElement> | React.MouseEvent<HTMLButtonElement>): void => {
+
+        e.stopPropagation();
+        e.preventDefault();
 
         let body: Record<string, string> | string | undefined = "";
 
@@ -168,7 +171,10 @@ export default class EditPluginParameters extends React.Component<iProps, iState
 
     };
 
-    private readonly _handleClose = (): void => {
+    private readonly _handleClose = (e: React.MouseEvent<HTMLButtonElement>): void => {
+
+        e.stopPropagation();
+        e.preventDefault();
 
         this.props.onSave(this.props.action.urlParameters, this.props.action.bodyParameters);
 
