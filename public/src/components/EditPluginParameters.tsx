@@ -151,7 +151,39 @@ export default class EditPluginParameters extends React.Component<iProps, iState
         e.stopPropagation();
         e.preventDefault();
 
-        let body: Record<string, string> | string | undefined = "";
+        const urlParameters: components["schemas"]["ActionPlugin"]["urlParameters"] = {
+            ...(this.props.action.urlParameters ?? {})
+        };
+
+        try {
+
+            ([
+                "path",
+                "query",
+                "headers",
+                "cookies"
+            ] as Array<keyof typeof this.state.urlParameters>).forEach((key): void => {
+
+                try {
+
+                    if (this.state.urlParameters[key]) {
+                        urlParameters[key] = formateParameters(this.state.urlParameters[key]);
+                    }
+
+                }
+                catch (err: unknown) { // eslint-disable-line @typescript-eslint/no-unused-vars
+                    throw new Error("Failed to save url '" + key + "' parameters");
+                }
+
+            });
+
+        }
+        catch (err: unknown) {
+            this.props.onError(err as Error);
+            return;
+        }
+
+        let body: unknown = "";
 
         if ("" === this.state.bodyParameters.trim()) {
             body = undefined;
@@ -167,22 +199,7 @@ export default class EditPluginParameters extends React.Component<iProps, iState
 
         }
 
-        try {
-
-            const urlParameters: components["schemas"]["ActionPlugin"]["urlParameters"] = {
-                ...(this.props.action.urlParameters ?? {}),
-                "path": formateParameters(this.state.urlParameters.path),
-                "query": formateParameters(this.state.urlParameters.query),
-                "headers": formateParameters(this.state.urlParameters.headers),
-                "cookies": formateParameters(this.state.urlParameters.cookies)
-            };
-
-            this.props.onSave(urlParameters, body);
-
-        }
-        catch (err: unknown) {
-            this.props.onError(err as Error);
-        }
+        this.props.onSave(urlParameters, body);
 
     };
 
