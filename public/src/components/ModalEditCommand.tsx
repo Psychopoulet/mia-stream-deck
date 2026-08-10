@@ -12,9 +12,7 @@
     } from "react-bootstrap-fontawesome";
 
     // locals
-    import EditKey from "./EditCommandAction/EditKey";
-    import EditString from "./EditCommandAction/EditString";
-    import EditPlugin from "./EditCommandAction/EditPlugin";
+    import EditPlugin from "./EditPlugin";
 
 // types & interfaces
 
@@ -24,12 +22,13 @@
     // locals
     import type { components } from "../../../lib/src/Descriptor";
 
-    type ActionType = components["schemas"]["ActionEmpty"]["type"] | components["schemas"]["ActionInputString"]["type"] | components["schemas"]["ActionInputKey"]["type"] | components["schemas"]["ActionPlugin"]["type"];
+    type ActionType = components["schemas"]["ActionEmpty"]["type"] | components["schemas"]["ActionPlugin"]["type"];
 
     interface iProps extends iPropsNode {
         "command": components["schemas"]["Command"];
         "onChange": (command: components["schemas"]["Command"]) => void;
         "onClose": () => void;
+        "onError": (err: Error) => void;
     }
 
     interface iState {
@@ -46,13 +45,15 @@ export default class ModalEditCommand extends React.Component<iProps, iState> {
 
     // private
 
-        private readonly _focus: iGenerateFocusCallback<HTMLInputElement> = generateFocus<HTMLInputElement>();
+        private readonly _focus: iGenerateFocusCallback<HTMLInputElement>;
 
     // constructor
 
     public constructor (props: iProps) {
 
         super(props);
+
+        this._focus = generateFocus<HTMLInputElement>();
 
         this.state = {
             "command": this.props.command
@@ -111,24 +112,6 @@ export default class ModalEditCommand extends React.Component<iProps, iState> {
 
         switch (newValue as ActionType) {
 
-            case "INPUT-STRING":
-
-                this.setState({
-                    "command": { ...this.state.command,
-                    "action": { "type": "INPUT-STRING", "string": "" } }
-                });
-
-            break;
-
-            case "INPUT-KEY":
-
-                this.setState({
-                    "command": { ...this.state.command,
-                    "action": { "type": "INPUT-KEY", "key": "" } }
-                });
-
-            break;
-
             case "PLUGIN":
 
                 this.setState({
@@ -151,28 +134,6 @@ export default class ModalEditCommand extends React.Component<iProps, iState> {
 
     };
 
-    private readonly _handleChangeActionKey = (action: components["schemas"]["ActionInputKey"]): void => {
-
-        this.setState({
-            "command": {
-                ...this.state.command,
-                "action": action
-            }
-        });
-
-    };
-
-    private readonly _handleChangeActionString = (action: components["schemas"]["ActionInputString"]): void => {
-
-        this.setState({
-            "command": {
-                ...this.state.command,
-                "action": action
-            }
-        });
-
-    };
-
     private readonly _handleChangeActionPlugin = (action: components["schemas"]["ActionPlugin"]): void => {
 
         this.setState({
@@ -186,6 +147,25 @@ export default class ModalEditCommand extends React.Component<iProps, iState> {
 
     // render
 
+    private readonly _renderActionType = (disabled: boolean): React.JSX.Element => {
+
+        return <SelectLabel label="Type"
+            disabled={ disabled }
+            value={ this.state.command.action.type }
+            onChange={ this._handleChangeActionType }
+        >
+
+            { ([
+                "EMPTY",
+                "PLUGIN"
+            ] as ActionType[]).map((actionType: ActionType): React.JSX.Element => {
+                return <option key={ actionType } value={ actionType }>{ actionType }</option>;
+            }) }
+
+        </SelectLabel>;
+
+    };
+
     public render (): React.JSX.Element {
 
         return <Modal appId="{{plugin.name}}-app" title="Edit command" size="lg" scrollable
@@ -195,7 +175,7 @@ export default class ModalEditCommand extends React.Component<iProps, iState> {
 
             <ModalBody>
 
-                <InputTextLabel label="Label"
+                <InputTextLabel label="Label" _ref={ this._focus.ref }
                     value={ this.state.command.label }
                     onChange={ this._handleChangeLabel }
                 />
@@ -220,35 +200,27 @@ export default class ModalEditCommand extends React.Component<iProps, iState> {
                     </div> }
                 </InputTextLabel>
 
-                <Card>
+                { "EMPTY" === this.state.command.action.type
+                    ? this._renderActionType(false)
+                    : <Card>
 
-                    <CardHeader>Action</CardHeader>
+                        <CardHeader>Action</CardHeader>
 
-                    <CardBody>
+                        <CardBody>
 
-                        <SelectLabel label="Action"
-                            value={ this.state.command.action.type }
-                            onChange={ this._handleChangeActionType }
-                        >
+                            { this._renderActionType(true) }
 
-                            { ([
-                                "EMPTY",
-                                "INPUT-STRING",
-                                "INPUT-KEY",
-                                "PLUGIN"
-                            ] as ActionType[]).map((actionType: ActionType): React.JSX.Element => {
-                                return <option key={ actionType } value={ actionType }>{ actionType }</option>;
-                            }) }
+                            <EditPlugin
+                                action={ this.state.command.action }
+                                onSave={ this._handleChangeActionPlugin }
+                                onError={ this.props.onError }
+                            />
 
-                        </SelectLabel>
+                        </CardBody>
 
-                        { "INPUT-KEY" === this.state.command.action.type && <EditKey action={ this.state.command.action } onChange={ this._handleChangeActionKey } /> }
-                        { "INPUT-STRING" === this.state.command.action.type && <EditString action={ this.state.command.action } onChange={ this._handleChangeActionString } /> }
-                        { "PLUGIN" === this.state.command.action.type && <EditPlugin action={ this.state.command.action } onChange={ this._handleChangeActionPlugin } /> }
+                    </Card>
 
-                    </CardBody>
-
-                </Card>
+                }
 
             </ModalBody>
 

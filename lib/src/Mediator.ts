@@ -6,7 +6,6 @@
 
     // externals
     import { Mediator, NotFoundError } from "node-pluginsmanager-plugin";
-    import robotjs from "@hurdlegroup/robotjs";
 
 // types & interfaces
 
@@ -231,14 +230,6 @@ export default class MediatorStreamDeck extends Mediator<iEventsMinimal & {
 
                     return Promise.resolve();
 
-                case "INPUT-STRING":
-
-                    return this._executeActionInputString(bodyParameters);
-
-                case "INPUT-KEY":
-
-                    return this._executeActionInputKey(bodyParameters);
-
                 case "PLUGIN":
 
                     return this._executeActionPlugin(bodyParameters);
@@ -254,72 +245,6 @@ export default class MediatorStreamDeck extends Mediator<iEventsMinimal & {
             this._log("error", err.message);
 
             return Promise.reject(err);
-
-        });
-
-    }
-
-    private _executeActionInputString (bodyParameters: operations["executeCommand"]["requestBody"]["content"]["application/json"]): Promise<void> {
-
-        return new Promise((resolve: () => void, reject: (err: Error) => void): void => {
-
-            try {
-
-                const command: components["schemas"]["ActionInputString"] = bodyParameters.action as components["schemas"]["ActionInputString"];
-
-                robotjs.typeString(command.string);
-
-                if ("boolean" === typeof command.enter && command.enter) {
-                    robotjs.keyTap("enter");
-                }
-
-                return resolve();
-
-            }
-            catch (e: unknown) {
-
-                return reject(e instanceof Error ? e : new Error(String(e)));
-
-            }
-
-        });
-
-    }
-
-    private _executeActionInputKey (bodyParameters: operations["executeCommand"]["requestBody"]["content"]["application/json"]): Promise<void> {
-
-        return new Promise((resolve: () => void, reject: (err: Error) => void): void => {
-
-            try {
-
-                const command: components["schemas"]["ActionInputKey"] = bodyParameters.action as components["schemas"]["ActionInputKey"];
-
-                const modifiers: string[] = [];
-
-                if ("boolean" === typeof command.alt && command.alt) {
-                    modifiers.push("alt");
-                }
-                if ("boolean" === typeof command.ctrl && command.ctrl) {
-                    modifiers.push("control");
-                }
-                if ("boolean" === typeof command.shift && command.shift) {
-                    modifiers.push("shift");
-                }
-                if ("boolean" === typeof command.command && command.command) {
-                    modifiers.push("command");
-                }
-
-                // https://www.piathome.com/homepage/docs/robotjs-key-syntax.html
-                robotjs.keyTap(command.key, modifiers);
-
-                return resolve();
-
-            }
-            catch (e: unknown) {
-
-                return reject(e instanceof Error ? e : new Error(String(e)));
-
-            }
 
         });
 

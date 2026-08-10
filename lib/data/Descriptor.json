@@ -2,85 +2,10 @@
 	"openapi": "3.0.2",
 	"info": {
 		"title": "mia-stream-deck",
-		"version": "2.0.0",
+		"version": "2.1.0",
 		"description": "Stream deck plugin for MIA."
 	},
 	"paths": {
-		"/mia-stream-deck/api/descriptor": {
-			"get": {
-				"description": "",
-				"summary": "Plugin's descriptor",
-				"operationId": "getPluginDescriptor",
-				"security": [
-					{ "bearerAuth": [] }
-				],
-				"responses": {
-					"200": {
-						"description": "Plugin's descriptor",
-						"content": {
-							"application/json": {
-								"schema": {
-									"type": "object"
-								}
-							}
-						}
-					},
-					"default": {
-						"description": "An error occurred",
-						"content": {
-							"application/json": {
-								"schema": {
-									"$ref": "#/components/schemas/Error"
-								}
-							}
-						}
-					}
-				}
-			}
-		},
-		"/mia-stream-deck/api/status": {
-			"get": {
-				"description": "",
-				"summary": "Plugin's status",
-				"operationId": "getPluginStatus",
-				"security": [
-					{ "bearerAuth": [] }
-				],
-				"responses": {
-					"200": {
-						"description": "Plugin's status",
-						"content": {
-							"application/json": {
-								"schema": {
-									"type": "string",
-									"enum": [ "ENABLED", "INITIALIZED", "RELEASED" ]
-								}
-							}
-						}
-					},
-					"404": {
-						"description": "The plugin is not enabled (=RELEASED)",
-						"content": {
-							"application/json": {
-								"schema": {
-									"$ref": "#/components/schemas/Error"
-								}
-							}
-						}
-					},
-					"default": {
-						"description": "An error occurred",
-						"content": {
-							"application/json": {
-								"schema": {
-									"$ref": "#/components/schemas/Error"
-								}
-							}
-						}
-					}
-				}
-			}
-		},
 
 		"/mia-stream-deck/public/index.html": {
 			"get": {
@@ -190,6 +115,82 @@
 								"schema": {
 									"type": "object",
 									"additionalProperties": true
+								}
+							}
+						}
+					},
+					"default": {
+						"description": "An error occurred",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Error"
+								}
+							}
+						}
+					}
+				}
+			}
+		},
+
+		"/mia-stream-deck/api/descriptor": {
+			"get": {
+				"description": "",
+				"summary": "Plugin's descriptor",
+				"operationId": "getPluginDescriptor",
+				"security": [
+					{ "bearerAuth": [] }
+				],
+				"responses": {
+					"200": {
+						"description": "Plugin's descriptor",
+						"content": {
+							"application/json": {
+								"schema": {
+									"type": "object"
+								}
+							}
+						}
+					},
+					"default": {
+						"description": "An error occurred",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Error"
+								}
+							}
+						}
+					}
+				}
+			}
+		},
+		"/mia-stream-deck/api/status": {
+			"get": {
+				"description": "",
+				"summary": "Plugin's status",
+				"operationId": "getPluginStatus",
+				"security": [
+					{ "bearerAuth": [] }
+				],
+				"responses": {
+					"200": {
+						"description": "Plugin's status",
+						"content": {
+							"application/json": {
+								"schema": {
+									"type": "string",
+									"enum": [ "ENABLED", "INITIALIZED", "RELEASED" ]
+								}
+							}
+						}
+					},
+					"404": {
+						"description": "The plugin is not enabled (=RELEASED)",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Error"
 								}
 							}
 						}
@@ -502,8 +503,6 @@
 					"action": {
 						"oneOf": [
 							{ "$ref": "#/components/schemas/ActionEmpty" },
-							{ "$ref": "#/components/schemas/ActionInputString" },
-							{ "$ref": "#/components/schemas/ActionInputKey" },
 							{ "$ref": "#/components/schemas/ActionPlugin" }
 						]
 					}
@@ -520,78 +519,6 @@
 					}
 				},
 				"required": [ "type" ]
-			},
-			"ActionInputString": {
-				"type": "object",
-				"description": "Input string (keyboard simulator)",
-				"properties": {
-					"type": {
-						"type": "string",
-						"enum": [ "INPUT-STRING" ]
-					},
-					"string": {
-						"type": "string",
-						"minLength": 1
-					},
-					"enter": {
-						"description": "Add a 'enter' input at the end of the string (default : false)",
-						"type": "boolean"
-					}
-				},
-				"required": [ "type", "string" ]
-			},
-			"ActionInputKey": {
-				"type": "object",
-				"description": "Input specific key (keyboard simulator)",
-				"properties": {
-					"type": {
-						"type": "string",
-						"enum": [ "INPUT-KEY" ]
-					},
-					"key": {
-						"anyOf": [
-							{
-								"type": "string",
-								"description": "global key, like a single letter",
-								"minLength": 1,
-								"maxLength": 1
-							},
-							{
-								"type": "string",
-								"description": "specific key, like \"backspace\"",
-								"enum": [
-									"f1", "f2", "f3", "f4", "f5", "f6", "f7", "f8", "f9", "f10", "f11", "f12",
-									"f13", "f14", "f15", "f16", "f17", "f18", "f19", "f20", "f21", "f22", "f23", "f24",
-									"insert", "home", "pageup", "delete", "end", "pagedown", "scroll_lock",
-									"command", "menu", "alt", "right_alt", "control", "left_control", "right_control", "shift", "right_shift",
-									"space", "backspace", "enter", "escape", "tab", "up", "down", "left", "right", "printscreen", "capslock",
-									"numpad_lock", "numpad_0", "numpad_1", "numpad_2", "numpad_3", "numpad_4", "numpad_5", "numpad_6",
-									"numpad_7", "numpad_8", "numpad_9", "numpad_+", "numpad_-", "numpad_*", "numpad_/", "numpad_.",
-									"audio_mute", "audio_vol_up", "audio_vol_down", "audio_play", "audio_stop", "audio_pause", "audio_prev",
-									"audio_next", "audio_rewind", "audio_forward", "audio_repeat", "audio_random",
-									"lights_mon_up", "lights_mon_down", "lights_kbd_toggle", "lights_kbd_up", "lights_kbd_down"
-								]
-							}
-						]
-					},
-					"alt": {
-						"description": "Key + alt (default : false)",
-						"type": "boolean"
-					},
-					"ctrl": {
-						"description": "Key + ctrl (default : false)",
-						"type": "boolean"
-					},
-					"shift": {
-						"description": "Key + shift (default : false)",
-						"type": "boolean"
-					},
-					"command": {
-						"description": "Key + command (default : false) (mac only)",
-						"type": "boolean"
-					}
-				},
-				"required": [ "type", "key" ]
 			},
 			"ActionPlugin": {
 				"type": "object",
