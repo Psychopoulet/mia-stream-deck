@@ -5,7 +5,8 @@
     import {
         Modal, ModalBody, ModalFooter,
         TextAreaLabel,
-        Button
+        Button,
+        generateFocus
     } from "react-bootstrap-fontawesome";
 
     // locals
@@ -15,7 +16,7 @@
 // types & interfaces
 
     // externals
-    import type { iPropsNode } from "react-bootstrap-fontawesome";
+    import type { iPropsNode, iGenerateFocusCallback } from "react-bootstrap-fontawesome";
 
     // locals
     import type { components } from "../../../lib/src/Descriptor";
@@ -44,11 +45,19 @@ export default class EditPluginParameters extends React.Component<iProps, iState
 
         public static displayName: string = "EditPluginParameters";
 
+    // private
+
+        private readonly _focus: iGenerateFocusCallback<HTMLTextAreaElement>;
+
+    //
+
     // constructor
 
     public constructor (props: iProps) {
 
         super(props);
+
+        this._focus = generateFocus<HTMLTextAreaElement>();
 
         this.state = {
             "urlParameters": {
@@ -59,6 +68,12 @@ export default class EditPluginParameters extends React.Component<iProps, iState
             },
             "bodyParameters": parseParameters(this.props.action.bodyParameters)
         };
+
+    }
+
+    public componentDidMount (): void {
+
+        this._focus.setFocus();
 
     }
 
@@ -185,30 +200,55 @@ export default class EditPluginParameters extends React.Component<iProps, iState
     public render (): React.JSX.Element {
 
         return <Modal appId={ "{{plugin.name}}-app" } title="Modify parameters"
+            size="lg"
             onSubmit={ this._handleSave } onClose={ this._handleClose }
         >
 
             <ModalBody>
 
-                <TextAreaLabel label="Paths"
-                    value={ this.state.urlParameters.path }
-                    onChange={ this._handleChangeUrlPath }
-                />
+                <div className="row">
 
-                <TextAreaLabel label="Query"
-                    value={ this.state.urlParameters.query }
-                    onChange={ this._handleChangeUrlQuery }
-                />
+                    <div className="col-12 col-md-6">
 
-                <TextAreaLabel label="Headers"
-                    value={ this.state.urlParameters.headers }
-                    onChange={ this._handleChangeUrlHeaders }
-                />
+                        <TextAreaLabel label="Paths" _ref={ this._focus.ref }
+                            value={ this.state.urlParameters.path }
+                            onChange={ this._handleChangeUrlPath }
+                        />
 
-                <TextAreaLabel label="Cookies"
-                    value={ this.state.urlParameters.cookies }
-                    onChange={ this._handleChangeUrlCookies }
-                />
+                    </div>
+
+                    <div className="col-12 col-md-6">
+
+                        <TextAreaLabel label="Query"
+                            value={ this.state.urlParameters.query }
+                            onChange={ this._handleChangeUrlQuery }
+                        />
+
+                    </div>
+
+                </div>
+
+                <div className="row">
+
+                    <div className="col-12 col-md-6">
+
+                        <TextAreaLabel label="Headers"
+                            value={ this.state.urlParameters.headers }
+                            onChange={ this._handleChangeUrlHeaders }
+                        />
+
+                    </div>
+
+                    <div className="col-12 col-md-6">
+
+                        <TextAreaLabel label="Cookies"
+                            value={ this.state.urlParameters.cookies }
+                            onChange={ this._handleChangeUrlCookies }
+                        />
+
+                    </div>
+
+                </div>
 
                 <TextAreaLabel label="Body"
                     value={ this.state.bodyParameters }

@@ -45,13 +45,15 @@ export default class ModalEditCommand extends React.Component<iProps, iState> {
 
     // private
 
-        private readonly _focus: iGenerateFocusCallback<HTMLInputElement> = generateFocus<HTMLInputElement>();
+        private readonly _focus: iGenerateFocusCallback<HTMLInputElement>;
 
     // constructor
 
     public constructor (props: iProps) {
 
         super(props);
+
+        this._focus = generateFocus<HTMLInputElement>();
 
         this.state = {
             "command": this.props.command
@@ -173,7 +175,7 @@ export default class ModalEditCommand extends React.Component<iProps, iState> {
 
             <ModalBody>
 
-                <InputTextLabel label="Label"
+                <InputTextLabel label="Label" _ref={ this._focus.ref }
                     value={ this.state.command.label }
                     onChange={ this._handleChangeLabel }
                 />

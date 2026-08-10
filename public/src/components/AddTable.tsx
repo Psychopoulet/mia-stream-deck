@@ -40,7 +40,7 @@ export default class AddTable extends React.Component<iProps, iState> {
     // private
 
         private readonly _sdk: SDK = getSDK();
-        private readonly _focus: iGenerateFocusCallback<HTMLInputElement> = generateFocus<HTMLInputElement>();
+        private readonly _focus: iGenerateFocusCallback<HTMLInputElement>;
 
     // constructor
 

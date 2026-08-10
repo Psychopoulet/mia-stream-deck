@@ -4,13 +4,14 @@
     import React from "react";
     import {
         InputTextLabel,
-        Button
+        Button,
+        generateFocus
     } from "react-bootstrap-fontawesome";
 
 // types & interfaces
 
     // externals
-    import type { iPropsNode } from "react-bootstrap-fontawesome";
+    import type { iPropsNode, iGenerateFocusCallback } from "react-bootstrap-fontawesome";
 
     // locals
     import type { components } from "../../../lib/src/Descriptor";
@@ -36,16 +37,28 @@ export default class EditPlugin extends React.Component<iProps, iState> {
 
         public static displayName: string = "EditPlugin";
 
+    // private
+
+        private readonly _focus: iGenerateFocusCallback<HTMLInputElement>;
+
     // constructor
 
     public constructor (props: iProps) {
 
         super(props);
 
+        this._focus = generateFocus<HTMLInputElement>();
+
         this.state = {
             ...this.props.action,
             "editParameters": false
         };
+
+    }
+
+    public componentDidMount (): void {
+
+        this._focus.setFocus();
 
     }
 
@@ -99,7 +112,7 @@ export default class EditPlugin extends React.Component<iProps, iState> {
 
             <div className="col-12 col-md-6">
 
-                <InputTextLabel label="Plugin name"
+                <InputTextLabel label="Plugin name" _ref={ this._focus.ref }
                     value={ this.state.plugin }
                     onChange={ this._handleChangePluginName }
                 />
