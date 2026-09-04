@@ -69,11 +69,19 @@ export default class MediatorStreamDeck extends Mediator<iEventsMinimal & {
 
     }
 
+    // private
+
+    private _readPublic (relativePath: string): Promise<string> {
+
+        return readFile(join(__dirname, "..", "..", "public", relativePath), "utf-8");
+
+    }
+
     // front files
 
     public getFrontIndex (): Promise<operations["getFrontIndex"]["responses"]["200"]["content"]["text/html"]> {
 
-        return readFile(join(__dirname, "..", "..", "public", "index.html"), "utf-8").then((content: string): string => {
+        return this._readPublic("index.html").then((content: string): string => {
 
             return content
 
@@ -89,7 +97,7 @@ export default class MediatorStreamDeck extends Mediator<iEventsMinimal & {
         urlParameters: operations["getTablePage"]["parameters"]
     ): Promise<operations["getTablePage"]["responses"]["200"]["content"]["text/html"]> {
 
-        return readFile(join(__dirname, "..", "..", "public", "table.html"), "utf-8").then((content: string): string => {
+        return this._readPublic("table.html").then((content: string): string => {
 
             return content
 
@@ -104,7 +112,7 @@ export default class MediatorStreamDeck extends Mediator<iEventsMinimal & {
 
     public getFrontApp (): Promise<operations["getFrontApp"]["responses"]["200"]["content"]["application/javascript"]> {
 
-        return readFile(join(__dirname, "..", "..", "public", "dist", "bundle.min.js"), "utf-8").then((content: string): string => {
+        return this._readPublic(join("dist", "bundle.min.js")).then((content: string): string => {
 
             return content
 
@@ -117,7 +125,7 @@ export default class MediatorStreamDeck extends Mediator<iEventsMinimal & {
     }
 
     public getFrontAppMap (): Promise<string> { // tricks return to avoid costful parsing
-        return readFile(join(__dirname, "..", "..", "public", "dist", "bundle.min.js.map"), "utf-8");
+        return this._readPublic(join("dist", "bundle.min.js.map"));
     }
 
     // api
